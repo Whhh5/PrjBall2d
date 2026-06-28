@@ -4,6 +4,3 @@
 [submodule "Assets/Framework"]
 	path = Assets/Framework
 	url = git@github.com:Whhh5/UnityFramework.git
-[submodule "Misc/Excel"]
-	path = Misc/Excel
-	url = git@github.com:Whhh5/UnityExcel.git
