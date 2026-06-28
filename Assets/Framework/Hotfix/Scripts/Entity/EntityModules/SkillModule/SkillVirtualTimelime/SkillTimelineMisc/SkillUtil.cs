@@ -1,9 +1,0 @@
-﻿
-
-
-
-public static class SkillUtil
-{
-
-}
-
