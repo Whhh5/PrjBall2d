@@ -1,0 +1,33 @@
+xiaoguai2.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+shuipian_1
+	bounds: 456, 181, 227, 254
+	offsets: 2, 2, 231, 258
+shuipian_2
+	bounds: 492, 590, 363, 136
+	offsets: 3, 2, 368, 140
+shuipian_3
+	bounds: 492, 437, 151, 255
+	offsets: 2, 2, 155, 259
+	rotate: 90
+shuipian_4
+	bounds: 749, 408, 178, 180
+	offsets: 2, 2, 182, 184
+xiaoguai2
+	bounds: 2, 134, 452, 400
+xiaoguai2_1
+	bounds: 2, 2, 371, 130
+xiaoguai2_dizuo
+	bounds: 2, 536, 488, 484
+	offsets: 2, 2, 492, 488
+xiaoguai2_yanzhu_1
+	bounds: 982, 985, 21, 35
+	offsets: 2, 2, 25, 39
+xiaoguai2_yanzhu_2
+	bounds: 375, 97, 20, 35
+	offsets: 2, 2, 24, 39
+xiaoguai2_yinying
+	bounds: 492, 728, 488, 292
+	offsets: 2, 2, 492, 296

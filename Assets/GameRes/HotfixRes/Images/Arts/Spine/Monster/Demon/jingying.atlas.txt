@@ -1,0 +1,38 @@
+jingying.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+1
+	bounds: 2, 2, 206, 149
+	offsets: 1, 1, 208, 151
+2
+	bounds: 445, 276, 193, 307
+	offsets: 1, 1, 195, 309
+	rotate: 90
+3
+	bounds: 445, 471, 364, 212
+	offsets: 1, 1, 366, 214
+4
+	bounds: 496, 824, 403, 174
+5
+	bounds: 811, 472, 211, 205
+	offsets: 1, 1, 213, 207
+	rotate: 90
+6
+	bounds: 445, 138, 306, 136
+	offsets: 1, 2, 308, 140
+ditai
+	bounds: 950, 1025, 963, 969
+	offsets: 1, 1, 965, 971
+jingying_1
+	bounds: 2, 1000, 946, 994
+jingying_2
+	bounds: 230, 181, 213, 519
+jingying_3
+	bounds: 2, 153, 226, 547
+	offsets: 3, 0, 229, 547
+xiaoguai2_yinying
+	bounds: 2, 702, 492, 296
+yinying
+	bounds: 496, 685, 385, 137
+	offsets: 1, 1, 387, 139

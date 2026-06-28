@@ -1,0 +1,38 @@
+xiaoguai4.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+1
+	bounds: 486, 889, 206, 149
+	offsets: 1, 1, 208, 151
+	rotate: 90
+2
+	bounds: 486, 1097, 193, 307
+	offsets: 1, 1, 195, 309
+3
+	bounds: 967, 1753, 364, 212
+	offsets: 1, 1, 366, 214
+4
+	bounds: 486, 1406, 403, 174
+5
+	bounds: 1333, 1760, 211, 205
+	offsets: 1, 1, 213, 207
+6
+	bounds: 967, 1615, 306, 136
+	offsets: 1, 2, 308, 140
+ditai
+	bounds: 2, 996, 482, 969
+	offsets: 1, 1, 484, 971
+xiaoguai2_yinying
+	bounds: 2, 2, 492, 296
+	rotate: 90
+xiaoguai4_1
+	bounds: 2, 496, 482, 498
+	offsets: 1, 1, 484, 500
+xiaoguai4_2
+	bounds: 486, 1582, 479, 383
+	offsets: 1, 1, 481, 386
+yinying
+	bounds: 300, 109, 385, 137
+	offsets: 1, 1, 387, 139
+	rotate: 90

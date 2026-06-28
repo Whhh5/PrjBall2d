@@ -1,0 +1,56 @@
+boss.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+1
+	bounds: 1338, 401, 206, 149
+	offsets: 1, 1, 208, 151
+2
+	bounds: 1740, 1235, 193, 307
+	offsets: 1, 1, 195, 309
+3
+	bounds: 1740, 1544, 364, 212
+	offsets: 1, 1, 366, 214
+	rotate: 90
+4
+	bounds: 1424, 759, 403, 174
+	rotate: 90
+5
+	bounds: 1424, 552, 211, 205
+	offsets: 1, 1, 213, 207
+6
+	bounds: 1740, 1910, 306, 136
+	offsets: 1, 2, 308, 140
+diying1
+	bounds: 1424, 1164, 882, 314
+	offsets: 1, 1, 884, 316
+	rotate: 90
+shenti
+	bounds: 2, 559, 1420, 1487
+	offsets: 1, 1, 1423, 1489
+shou_1
+	bounds: 1600, 904, 240, 258
+	offsets: 1, 1, 242, 260
+shou_2
+	bounds: 1600, 771, 123, 131
+	offsets: 1, 1, 125, 133
+wuqi
+	bounds: 2, 64, 493, 1334
+	offsets: 1, 1, 495, 1336
+	rotate: 90
+
+boss_2.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+ditai
+	bounds: 2, 2, 1449, 1454
+	offsets: 1, 1, 1451, 1456
+
+boss_3.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+diying2
+	bounds: 2, 393, 1453, 1062
+	offsets: 1, 1, 1455, 1064
