@@ -1,0 +1,208 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public interface IGameEnityCallback
+{
+
+}
+public interface IGameDamageCallback : IGameEnityCallback
+{
+    public void DamageCallback(int sourceEntityId, int targetEntityId, int damageValue, EnDamageType damageType, EnDamageValueType valueType, Vector2 worldPos);
+}
+public interface IGameRestoreHealthCallback : IGameEnityCallback
+{
+    public void RestoreHealthCallback(int sourceEntityId, int targetEntityId, float restoreHealthValue, Vector2 worldPos);
+}
+
+public class GameAttackMgr : Singleton<GameAttackMgr>
+{
+
+    public Dictionary<EnDamageType, Dictionary<int, HashSet<IGameEnityCallback>>> _DamageSourceCallback = new();
+    public Dictionary<EnDamageType, Dictionary<int, HashSet<IGameEnityCallback>>> _DamageTargetCallback = new();
+    public Dictionary<int, HashSet<IGameEnityCallback>> _RestoreHealthSourceCallback = new();
+    public Dictionary<int, HashSet<IGameEnityCallback>> _RestoreHealthTargetCallback = new();
+
+    #region 广播消息
+    public void RegisterDamageSourceCallback(int entityId, EnDamageType damageType, IGameDamageCallback callback)
+    {
+        RegisterDamageCallback(ref _DamageSourceCallback, entityId, damageType, callback);
+    }
+    public void UnregisterDamageSourceCallback(int entityId, EnDamageType damageType, IGameDamageCallback callback)
+    {
+        UnregisterDamageCallback(ref _DamageSourceCallback, entityId, damageType, callback);
+    }
+    public void RegisterDamageTargetCallback(int entityId, EnDamageType damageType, IGameDamageCallback callback)
+    {
+        RegisterDamageCallback(ref _DamageTargetCallback, entityId, damageType, callback);
+    }
+    public void UnregisterDamageTargetCallback(int entityId, EnDamageType damageType, IGameDamageCallback callback)
+    {
+        UnregisterDamageCallback(ref _DamageTargetCallback, entityId, damageType, callback);
+    }
+    public static void RegisterDamageCallback(ref Dictionary<EnDamageType, Dictionary<int, HashSet<IGameEnityCallback>>> datas, int entityId, EnDamageType damageType, IGameEnityCallback callback)
+    {
+        if (!datas.TryGetValue(damageType, out var entityList))
+        {
+            entityList = new();
+            datas.Add(damageType, entityList);
+        }
+        RegisterEntityCallback(ref entityList, entityId, callback);
+    }
+    public static void UnregisterDamageCallback(ref Dictionary<EnDamageType, Dictionary<int, HashSet<IGameEnityCallback>>> datas, int entityId, EnDamageType damageType, IGameEnityCallback callback)
+    {
+        if (!datas.TryGetValue(damageType, out var entityList))
+            return;
+        UnregisterEntityCallback(ref entityList, entityId, callback);
+        if (entityList.Count == 0)
+        {
+            datas.Remove(damageType);
+        }
+    }
+    public static void RegisterEntityCallback(ref Dictionary<int, HashSet<IGameEnityCallback>> datas, int entityId, IGameEnityCallback callback)
+    {
+        if (!datas.TryGetValue(entityId, out var list))
+        {
+            list = new();
+            datas.Add(entityId, list);
+        }
+        list.Add(callback);
+    }
+    public static void UnregisterEntityCallback(ref Dictionary<int, HashSet<IGameEnityCallback>> datas, int entityId, IGameEnityCallback callback)
+    {
+        if (!datas.TryGetValue(entityId, out var list))
+            return;
+        if (!list.Remove(callback))
+            return;
+        if (list.Count > 0)
+            return;
+        datas.Remove(entityId);
+    }
+
+    public void RegisterRestoreHealthSourceCallback(int entityId, IGameRestoreHealthCallback callback)
+    {
+        RegisterEntityCallback(ref _RestoreHealthSourceCallback, entityId, callback);
+    }
+    public void UnregisterRestoreHealthSourceCallback(int entityId, IGameRestoreHealthCallback callback)
+    {
+        UnregisterEntityCallback(ref _RestoreHealthSourceCallback, entityId, callback);
+    }
+    public void RegisterRestoreHealthTargetCallback(int entityId, IGameRestoreHealthCallback callback)
+    {
+        RegisterEntityCallback(ref _RestoreHealthTargetCallback, entityId, callback);
+    }
+    public void UnregisterRestoreHealthTargetCallback(int entityId, IGameRestoreHealthCallback callback)
+    {
+        UnregisterEntityCallback(ref _RestoreHealthTargetCallback, entityId, callback);
+    }
+    #endregion
+
+    public int Attack(
+        in int sourceEntityId,
+        in int targetEntityId,
+        in int value,
+        in Vector2 worldPos,
+        in EnDamageType damageType)
+    {
+        if (!GameMonsterUtility.EntityIsValid(in targetEntityId))
+            return 0;
+        var targetProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(targetEntityId, EnSceneEntityComType.Attribute);
+        // 计算伤害数值
+        var finalDamage = value;
+        switch (damageType)
+        {
+            case EnDamageType.Physic:
+                {
+                    var armorValue = targetProCom.GetValue(EnEntityAttributeId.PhysicsArmor);
+                    var criticalValue = targetProCom.GetValue(EnEntityAttributeId.Critical);
+                    var testCriticalValue = Random.Range(0, 100);
+                    if (testCriticalValue < criticalValue) // 暴击
+                    {
+                        var criticalDamageValue = targetProCom.GetValue(EnEntityAttributeId.CriticalDamage);
+                        finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue);
+                    }
+                    var reduceValue = Mathf.Clamp01(armorValue / 100f);
+                    finalDamage = Mathf.CeilToInt(finalDamage * (1 - reduceValue));
+                }
+                break;
+            case EnDamageType.Magic:
+                {
+                    var armorValue = targetProCom.GetValue(EnEntityAttributeId.MagicArmor);
+                    var magicCritical = targetProCom.GetValue(EnEntityAttributeId.MagicCritical);
+                    if (magicCritical > 0)
+                    {
+                        var criticalValue = targetProCom.GetValue(EnEntityAttributeId.Critical);
+                        var testCriticalValue = Random.Range(0, 100);
+                        if (testCriticalValue < criticalValue) // 暴击
+                        {
+                            var criticalDamageValue = targetProCom.GetValue(EnEntityAttributeId.CriticalDamage);
+                            finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue);
+                        }
+                    }
+                    var reduceValue = Mathf.Clamp01(armorValue / 100f);
+                    finalDamage = Mathf.CeilToInt(finalDamage * (1 - reduceValue));
+                }
+                break;
+            case EnDamageType.True:
+                break;
+            default:
+                break;
+        }
+        var valueType = EnDamageValueType.Normal;
+
+        // 减少血量
+        targetProCom.RemoveResultValue(EnEntityAttributeId.Hp, finalDamage);
+        var maxHp = targetProCom.GetValue(EnEntityAttributeId.LimitHp);
+        var curHp = targetProCom.GetValue(EnEntityAttributeId.Hp);
+        var slider = curHp / maxHp;
+        var monsterEntityData = EntityMgr.Instance.GetEntityData<IGameEntityHpChange>(targetEntityId);
+        monsterEntityData.SetHpSliderValue(Mathf.Clamp01(slider));
+
+        // 数值表现
+        GameDamageMgr.Instance.EntityReduceHealth(in finalDamage, in worldPos, in damageType, in valueType);
+
+
+        // 广播订阅
+        if (_DamageSourceCallback.TryGetValue(damageType, out var entityList))
+            if (entityList.TryGetValue(sourceEntityId, out var list))
+                foreach (IGameDamageCallback callback in list)
+                    callback.DamageCallback(sourceEntityId, targetEntityId, finalDamage, damageType, valueType, worldPos);
+        if (_DamageTargetCallback.TryGetValue(damageType, out var entityList2))
+            if (entityList2.TryGetValue(targetEntityId, out var list))
+                foreach (IGameDamageCallback callback in list)
+                    callback.DamageCallback(sourceEntityId, targetEntityId, finalDamage, damageType, valueType, worldPos);
+
+        // 死亡
+        if (slider <= 0)
+        {
+            GameMonsterMgr.Instance.MonsterDie(targetEntityId);
+        }
+        return finalDamage;
+    }
+    public void RestoreHealth(
+        in int sourceEntityId,
+        in int targetEntityId,
+        in float value,
+        in Vector2 worldPos)
+    {
+        // 设置数值
+        var targetProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(targetEntityId, EnSceneEntityComType.Attribute);
+        var curValue = targetProCom.GetValue(EnEntityAttributeId.Hp);
+        var maxValue = targetProCom.GetValue(EnEntityAttributeId.LimitHp);
+        var addValue = Mathf.Min(value, maxValue - curValue);
+        targetProCom.AddResultValue(EnEntityAttributeId.Hp, addValue);
+        // 更新显示
+        var sliderValue = (curValue + addValue) / maxValue;
+        var monsterEntityData = EntityMgr.Instance.GetEntityData<IGameEntityHpChange>(targetEntityId);
+        monsterEntityData.SetHpSliderValue(Mathf.Clamp01(sliderValue));
+        // 数值飘字
+
+        // 广播消息
+        if (_RestoreHealthSourceCallback.TryGetValue(sourceEntityId, out var callbacks))
+            foreach (IGameRestoreHealthCallback callback in callbacks)
+                callback.RestoreHealthCallback(sourceEntityId, targetEntityId, addValue, worldPos);
+        if (_RestoreHealthTargetCallback.TryGetValue(sourceEntityId, out var callbacks2))
+            foreach (IGameRestoreHealthCallback callback in callbacks2)
+                callback.RestoreHealthCallback(sourceEntityId, targetEntityId, addValue, worldPos);
+
+    }
+}

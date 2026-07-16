@@ -4841,6 +4841,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6963783032389894374}
+  - component: {fileID: 1987469408524104429}
   m_Layer: 0
   m_Name: Eff_passive_xiongjia
   m_TagString: Untagged
@@ -4864,6 +4865,19 @@ Transform:
   - {fileID: 651824302042179144}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1987469408524104429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4199577046418380708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065cf2ea205654dceab5b1d47cc5e1b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _MainParticleSystem: {fileID: 6653489676973876327}
 --- !u!1 &7689520539400449473
 GameObject:
   m_ObjectHideFlags: 0
@@ -9726,7 +9740,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 4
   m_MeshDistribution: 0
@@ -14622,7 +14636,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 4
   m_MeshDistribution: 0

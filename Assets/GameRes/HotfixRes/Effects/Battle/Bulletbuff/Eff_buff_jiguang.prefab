@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6805849291060958646}
-  - component: {fileID: 3452778181172222533}
   m_Layer: 0
-  m_Name: jiguan
+  m_Name: root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,27 +34,6 @@ Transform:
   - {fileID: 1211578916297094727}
   m_Father: {fileID: 7889404448985317172}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &3452778181172222533
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3851376474645761234}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: fedd353e86689354fb267b8b887fe4a7, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5150330086385684436
 GameObject:
   m_ObjectHideFlags: 0
@@ -65,7 +43,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7889404448985317172}
-  - component: {fileID: 2100079971605606390}
+  - component: {fileID: 3947880709822752238}
   m_Layer: 0
   m_Name: Eff_buff_jiguang
   m_TagString: Untagged
@@ -89,7 +67,7 @@ Transform:
   - {fileID: 6805849291060958646}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2100079971605606390
+--- !u!114 &3947880709822752238
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -98,10 +76,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5150330086385684436}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c63777dd6f84ff9b634019effad79b5, type: 3}
+  m_Script: {fileID: 11500000, guid: 8372b717e589b4ff58e36524c352fc6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LineRenderList:
+  _Lines:
   - {fileID: 3815167337634995642}
   - {fileID: 8955700853695007951}
   - {fileID: 5941554481331787206}
@@ -115,7 +93,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4711422051408299374}
   - component: {fileID: 3815167337634995642}
-  - component: {fileID: 969041820823095187}
   m_Layer: 0
   m_Name: light
   m_TagString: Untagged
@@ -178,7 +155,7 @@ LineRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
@@ -242,19 +219,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &969041820823095187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7309934808526516631}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9dad6c48fe5283499f3fc9507967eb5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Width: 0
 --- !u!1 &8775289220153503183
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,7 +229,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1211578916297094727}
   - component: {fileID: 5941554481331787206}
-  - component: {fileID: 2453920586553296461}
   m_Layer: 0
   m_Name: uvlightline
   m_TagString: Untagged
@@ -328,7 +291,7 @@ LineRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
@@ -392,19 +355,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &2453920586553296461
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8775289220153503183}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9dad6c48fe5283499f3fc9507967eb5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Width: 0
 --- !u!1 &8929547201222756564
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,7 +365,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9065305723000388531}
   - component: {fileID: 8955700853695007951}
-  - component: {fileID: 3250373468568866305}
   m_Layer: 0
   m_Name: line
   m_TagString: Untagged
@@ -478,7 +427,7 @@ LineRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
@@ -542,16 +491,3 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &3250373468568866305
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8929547201222756564}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a9dad6c48fe5283499f3fc9507967eb5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Width: 0

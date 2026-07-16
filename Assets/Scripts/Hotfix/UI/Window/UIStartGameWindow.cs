@@ -11,6 +11,8 @@ public class UIStartGameWindowData : UIWindowData<UIStartGameWindow>
 public class UIStartGameWindow : UIWindow<UIStartGameWindowData>
 {
     [SerializeField] private Button _EnterBtn = null;
+    [SerializeField] private Button _RestartBtn = null;
+    [SerializeField] private Button _ExitBtn = null;
 
     protected override void Awake()
     {
@@ -20,16 +22,47 @@ public class UIStartGameWindow : UIWindow<UIStartGameWindowData>
     {
         base.OnUnload();
         UIMgr.Instance.RemoveBtnListener(_EnterBtn, EnterGame);
+        UIMgr.Instance.RemoveBtnListener(_RestartBtn, RestartGame);
+        UIMgr.Instance.RemoveBtnListener(_ExitBtn, ExitGame);
     }
     public override void LoadCompeletion()
     {
         base.LoadCompeletion();
         UIMgr.Instance.AddBtnListener(_EnterBtn, EnterGame);
+        UIMgr.Instance.AddBtnListener(_RestartBtn, RestartGame);
+        UIMgr.Instance.AddBtnListener(_ExitBtn, ExitGame);
+
+        UpdateButtonStatus();
     }
 
     private void EnterGame()
     {
+        var mapId = 1;
+        GameMapMgr.Instance.EnterMap(mapId);
 
+        UpdateButtonStatus();
+    }
+    private void RestartGame()
+    {
+        GameMapMgr.Instance.ReenterMap();
+
+
+        UpdateButtonStatus();
+    }
+    private void ExitGame()
+    {
+        GameMapMgr.Instance.ExitMap();
+
+        UpdateButtonStatus();
+    }
+
+    private void UpdateButtonStatus()
+    {
+        var mapId = GameMapMgr.Instance.GetCurMapId();
+        _EnterBtn.interactable = mapId <= 0;
+        _RestartBtn.interactable
+            = _ExitBtn.interactable
+            = mapId > 0;
     }
     //private void EnterGame()
     //{

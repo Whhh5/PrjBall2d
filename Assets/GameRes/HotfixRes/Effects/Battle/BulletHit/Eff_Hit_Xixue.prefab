@@ -1,5 +1,40 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &153947113714647668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3756911513414663779}
+  m_Layer: 0
+  m_Name: root
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3756911513414663779
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153947113714647668}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 3188968636985125399}
+  - {fileID: 3188968636164503051}
+  - {fileID: 3188968635786792335}
+  - {fileID: 4848387608789700284}
+  m_Father: {fileID: 3598962671925431167}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3188968635786792328
 GameObject:
   m_ObjectHideFlags: 0
@@ -31,7 +66,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3598962671925431167}
+  m_Father: {fileID: 3756911513414663779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &3188968635786792333
 ParticleSystem:
@@ -1376,8 +1411,8 @@ ParticleSystem:
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
-        key1: {r: 0.07581829, g: 0.6313726, b: 0.07450981, a: 1}
-        key2: {r: 0.0273572, g: 0.29411766, b: 0, a: 0.29310608}
+        key1: {r: 0.6313726, g: 0.10203771, b: 0.07450981, a: 1}
+        key2: {r: 0.29411766, g: 0.0057017384, b: 0, a: 0.29310608}
         key3: {r: 0.29411766, g: 0.05247885, b: 0, a: 0}
         key4: {r: 0.2924528, g: 0, b: 0, a: 0}
         key5: {r: 0.2924528, g: 0, b: 0, a: 0}
@@ -4863,7 +4898,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 1
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -4928,7 +4963,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3598962671925431167}
+  m_Father: {fileID: 3756911513414663779}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &3188968636164503049
 ParticleSystem:
@@ -6272,17 +6307,17 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 0.15307474, g: 0.4245283, b: 0.1501869, a: 1}
-        key1: {r: 0.13935053, g: 0.509434, b: 0.1321645, a: 0.58431375}
-        key2: {r: 0.38431373, g: 0.14509805, b: 0.5568628, a: 0.43137255}
+        key0: {r: 0.42352942, g: 0.19897069, b: 0.14901963, a: 1}
+        key1: {r: 0.50980395, g: 0.17084087, b: 0.13333334, a: 0.58431375}
+        key2: {r: 0.50980395, g: 0.17084087, b: 0.13333334, a: 0.43137255}
         key3: {r: 0, g: 0.060816165, b: 0.29411766, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
         key5: {r: 0, g: 0, b: 0, a: 0}
         key6: {r: 0, g: 0, b: 0, a: 0}
         key7: {r: 0, g: 0, b: 0, a: 0}
         ctime0: 20046
-        ctime1: 51272
-        ctime2: 65535
+        ctime1: 52428
+        ctime2: 52428
         ctime3: 65535
         ctime4: 0
         ctime5: 0
@@ -9760,7 +9795,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -9825,7 +9860,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3598962671925431167}
+  m_Father: {fileID: 3756911513414663779}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &3188968636985125397
 ParticleSystem:
@@ -10017,7 +10052,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.23092066, g: 0.4811321, b: 0.20652369, a: 0.69411767}
+      maxColor: {r: 0.48235294, g: 0.23384078, b: 0.20784314, a: 0.69411767}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -14666,7 +14701,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 1
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -14711,6 +14746,7 @@ GameObject:
   - component: {fileID: 3598962671925431167}
   - component: {fileID: 3598962671925431166}
   - component: {fileID: 3598962671925431161}
+  - component: {fileID: -708999505073735014}
   m_Layer: 0
   m_Name: Eff_Hit_Xixue
   m_TagString: Untagged
@@ -14731,10 +14767,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3188968636985125399}
-  - {fileID: 3188968636164503051}
-  - {fileID: 3188968635786792335}
-  - {fileID: 4848387608789700284}
+  - {fileID: 3756911513414663779}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &3598962671925431166
@@ -19500,7 +19533,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -19534,6 +19567,19 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &-708999505073735014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3598962671925431160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 065cf2ea205654dceab5b1d47cc5e1b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _MainParticleSystem: {fileID: 3598962671925431166}
 --- !u!1 &4282085540329138942
 GameObject:
   m_ObjectHideFlags: 0
@@ -19560,12 +19606,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4282085540329138942}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.2999998, z: 1.2999998}
+  m_LocalScale: {x: 1.3, y: 1.2999997, z: 1.2999997}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3598962671925431167}
+  m_Father: {fileID: 3756911513414663779}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!198 &8133044821974205843
 ParticleSystem:
@@ -20846,8 +20892,8 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       maxGradient:
         serializedVersion: 2
-        key0: {r: 0.48235294, g: 1, b: 0, a: 0}
-        key1: {r: 0, g: 1, b: 0, a: 1}
+        key0: {r: 1, g: 0, b: 0.24206924, a: 0}
+        key1: {r: 1, g: 0.03875834, b: 0, a: 1}
         key2: {r: 0, g: 0, b: 0, a: 0.6784314}
         key3: {r: 0, g: 0, b: 0, a: 0}
         key4: {r: 0, g: 0, b: 0, a: 0}
@@ -20871,7 +20917,7 @@ ParticleSystem:
         atime6: 0
         atime7: 0
         m_Mode: 0
-        m_ColorSpace: -1
+        m_ColorSpace: 0
         m_NumColorKeys: 2
         m_NumAlphaKeys: 4
       minGradient:
@@ -24268,7 +24314,7 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 633482147
-  m_SortingLayer: 7
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 1
   m_MeshDistribution: 0
