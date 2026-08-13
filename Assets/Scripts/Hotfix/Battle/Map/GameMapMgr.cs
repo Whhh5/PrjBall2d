@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading;
-using Codice.CM.Client.Differences.Graphic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -11,11 +10,11 @@ public enum EnGameMapLifecycleOrder
     GameBattleGridMgr,
     GamePlayerMgr,
     GameBattleBallPartsMgr,
-    GameBattleWaveMgr,
-    GameBattleInputMgr,
+    GameSkillPassivityMgr,
 
     GameMonsterMgr,
     GameBattleBallMgr,
+    GameBattleMgr,
 }
 public interface IGameMapLifecycle
 {
@@ -32,6 +31,7 @@ public class GameMapMgr : Singleton<GameMapMgr>
     private int _FireHitEntityId = -1;
     private int _MapBossEntityId = -1;
     private CancellationTokenSource _BossDebutToken = null;
+    private float _MapDepth;
     public override void Destroy()
     {
         if (_CurMapId > 0)
@@ -39,7 +39,8 @@ public class GameMapMgr : Singleton<GameMapMgr>
             ExitMap();
         }
         base.Destroy();
-        _CurMapId
+        _MapDepth
+            = _CurMapId
             = _BgEntityId
             = _FireHitEntityId
             = _MapBossEntityId
@@ -80,9 +81,12 @@ public class GameMapMgr : Singleton<GameMapMgr>
         var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
         if (mapCfg == null)
             return false;
+        _MapDepth = mapCfg.nDepth;
+
         GamePhysicsUtility.InitParams(mapId);
         _CurMapId = mapId;
         CreateMap(mapId);
+        CreateMapBackground(mapId);
         CreateMapBoss(mapId);
 
         CameraMgr.Instance.SetCameraPos(new Vector3(mapCfg.arrCameraPos[0], mapCfg.arrCameraPos[1], mapCfg.arrCameraPos[2]));
@@ -90,27 +94,40 @@ public class GameMapMgr : Singleton<GameMapMgr>
         foreach (var item in _MapLifecycles)
             item.EnterMap(mapId);
 
-        EventMgr.Instance.Register<GameBattleNextWaveEventData>(EnABBEvent.EVENT_BATTLE_NEXT_WAVE, 0, 0, OnEvent_NextWave);
         EventMgr.Instance.Register(EnABBEvent.EVENT_BATTLE_WAVE_FINISH, 0, 0, OnEvent_WaveFinish);
+        EventMgr.Instance.Register<GameBattleNextWaveEventData>(EnABBEvent.EVENT_BATTLE_NEXT_WAVE, 0, 0, OnEvent_NextWave);
         EventMgr.Instance.Register<GameSkillBossDebutEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Debut, OnEvent_BossDebut);
 
+        AudioMgr.Instance.Play(mapCfg.nBgmAudioId);
         return true;
     }
 
     public void ReenterMap()
     {
         _BossDebutToken?.Cancel();
+        var reenterEventData = ClassPoolMgr.Instance.Pull<GameBattleMapReenterEventData>();
+        reenterEventData.mapId = _CurMapId;
+        EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_MAP_REENTER, 0, 0, reenterEventData);
+        ClassPoolMgr.Instance.Push(reenterEventData);
+
+
         _BossDebutToken = null;
-        foreach (var item in _MapLifecycles)
-            item.ReenterMap(_CurMapId);
+
+        DestroyMapBoss();
+        CreateMapBoss(_CurMapId);
+
+        for (int i = 0; i < _MapLifecycles.Count; i++)
+        {
+            _MapLifecycles[^(i + 1)].ReenterMap(_CurMapId);
+        }
     }
     public void ExitMap()
     {
         if (_CurMapId <= 0)
             return;
         _BossDebutToken?.Cancel();
-        EventMgr.Instance.Unregister<GameBattleNextWaveEventData>(EnABBEvent.EVENT_BATTLE_NEXT_WAVE, 0, 0, OnEvent_NextWave);
         EventMgr.Instance.Unregister(EnABBEvent.EVENT_BATTLE_WAVE_FINISH, 0, 0, OnEvent_WaveFinish);
+        EventMgr.Instance.Unregister<GameBattleNextWaveEventData>(EnABBEvent.EVENT_BATTLE_NEXT_WAVE, 0, 0, OnEvent_NextWave);
         EventMgr.Instance.Unregister<GameSkillBossDebutEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Debut, OnEvent_BossDebut);
 
         for (var i = 0; i < _MapLifecycles.Count; i++)
@@ -122,8 +139,13 @@ public class GameMapMgr : Singleton<GameMapMgr>
         _BgEntityId = -1;
         _FireHitEntityId = -1;
         _BossDebutToken = null;
+        _MapDepth = -1;
     }
-    private void CreateMap(int mapId)
+    public int GetMapBossEntityId()
+    {
+        return _MapBossEntityId;
+    }
+    private void CreateMapBackground(int mapId)
     {
         // 创建背景
         var mapSize = GameMapUtility.GetMapSize(mapId);
@@ -131,8 +153,9 @@ public class GameMapMgr : Singleton<GameMapMgr>
         _BgEntityId = EntityMgr.Instance.CreateEntityData<BattleMapBg_1Data>();
         GameEntityUtility.SetEntityPos(_BgEntityId, mapLbPos + mapSize * 0.5f);
         EntityMgr.Instance.LoadEntity(_BgEntityId);
-
-
+    }
+    private void CreateMap(int mapId)
+    {
         _FireHitEntityId = EntityMgr.Instance.CreateEntityData<GameEffectFireLineEntityData>();
         EntityMgr.Instance.LoadEntity(_FireHitEntityId);
 
@@ -179,23 +202,6 @@ public class GameMapMgr : Singleton<GameMapMgr>
 
         _MapBossEntityId = -1;
     }
-    public int GetMapBossEntityId()
-    {
-        return _MapBossEntityId;
-    }
-
-    private void OnEvent_NextWave(in int _, in int __, in GameBattleNextWaveEventData data)
-    {
-        if (_MapBossEntityId > 0)
-        {
-            var entityData = EntityMgr.Instance.GetEntityData<SceneMonsterEntityData>(in _MapBossEntityId);
-            var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(entityData.GetMonsterCfgId());
-            var arrCmd = new int[] { monsterCfg.nCmdHitLeft, monsterCfg.nCmdHitRight, monsterCfg.nCmdHitUp };
-            var cmdIndex = Random.Range(0, arrCmd.Length);
-            SceneEntityMgr.Instance.AddCmd(in _MapBossEntityId, arrCmd[cmdIndex]);
-        }
-
-    }
     private void OnEvent_WaveFinish(in int _, in int __)
     {
         DelayMonsterZeroCreateBoss();
@@ -213,19 +219,30 @@ public class GameMapMgr : Singleton<GameMapMgr>
             SceneEntityMgr.Instance.AddCmd(_MapBossEntityId, monsterCfg.nFlyDown);
         }
     }
+    private void OnEvent_NextWave(in int _, in int __, in GameBattleNextWaveEventData data)
+    {
+        if (_MapBossEntityId > 0)
+        {
+            var entityData = EntityMgr.Instance.GetEntityData<SceneMonsterEntityData>(in _MapBossEntityId);
+            var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(entityData.GetMonsterCfgId());
+            var arrCmd = new int[] { monsterCfg.nCmdHitLeft, monsterCfg.nCmdHitRight, monsterCfg.nCmdHitUp };
+            var cmdIndex = Random.Range(0, arrCmd.Length);
+            SceneEntityMgr.Instance.AddCmd(in _MapBossEntityId, arrCmd[cmdIndex]);
+        }
+
+    }
+
     private void OnEvent_BossDebut(in int _, in int __, in GameSkillBossDebutEventData data)
     {
         DestroyMapBoss();
+
         var mapCfg = GameSchedule.Instance.GetMapCfg0(_CurMapId);
-        var userData = ClassPoolMgr.Instance.Pull<CommonSerializeToIntArrayUserData>();
-        userData.arrParams = mapCfg.nBossMonsterInfo;
-        userData.startIndex = 0;
-        userData.count = mapCfg.nBossMonsterInfo.Length;
-        var waveData = ClassPoolMgr.Instance.Pull<GameBattleWaveMonsterInfo>(userData);
-        ClassPoolMgr.Instance.Push(userData);
-        var maxRowCol = GameMapUtility.GetMapGridRowCol(_CurMapId);
-        GameMonsterMgr.Instance.CreateMonsterEntity(waveData.monsterId, maxRowCol.x - waveData.backRow, waveData.col, waveData.attValuesId);
-        ClassPoolMgr.Instance.Push(waveData);
+        AudioMgr.Instance.Play(mapCfg.nBossBgmAudioId);
     }
 
+    public float GetLayerDepth(EnGameEntityOrderLayer layer, float offset = 0)
+    {
+        var depth = _MapDepth + (int)layer + offset;
+        return depth;
+    }
 }

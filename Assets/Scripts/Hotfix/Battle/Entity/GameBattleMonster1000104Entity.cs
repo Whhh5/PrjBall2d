@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameBattleMonster1000104EntityData : GameBattleMonsterEntityData
+public class GameBattleMonster1000104EntityData : GameBattleMonsterNormalEntityData<GameBattleMonster1000104Entity>
 {
     public override EnLoadTarget LoadTarget => EnLoadTarget.Pre_GameBattleMonster1000104Entity;
 
@@ -14,7 +14,7 @@ public class GameBattleMonster1000104EntityData : GameBattleMonsterEntityData
     }
 
 }
-public class GameBattleMonster1000104Entity : GameBattleMonsterEntity<GameBattleMonster1000104EntityData>
+public class GameBattleMonster1000104Entity : GameBattleMonsterNormalEntity
 {
 
 }

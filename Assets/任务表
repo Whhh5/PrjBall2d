@@ -1,0 +1,21 @@
+
+1. 整理 map id 相关代码，将 gamemaputility 中的部分代码 移动到 gamemapmgr 中
+// 2. 被动技能选择逻辑，
+3. bug : 弹珠反弹有时候会是横向的
+// 4. playable 不支持 ogg 格式的音效（会导致崩溃），统一改成 map3
+	原因：web 音频不支持在 editor 下 播放，以改成 web 禁用音频
+5. 程序集热更新，安卓程序集编译创建失败，缺少 ndk 文件、
+	Building Library/Bee/artifacts/Android/libunity/arm64-v8a/UnityClassRegistration.o failed with output:
+/bin/sh: /Applications/Unity/Hub/Editor/2022.3.62f1c1/PlaybackEngines/AndroidPlayer/NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++: No such file or directory
+
+UnityEditor.BuildPipeline:BuildPlayer (UnityEditor.BuildPlayerOptions)
+HybridCLR.Editor.Commands.StripAOTDllCommand:GenerateStripedAOTDlls (UnityEditor.BuildTarget) (at ./Packages/com.code-philosophy.hybridclr@73654e76d2/Editor/Commands/StripAOTDllCommand.cs:144)
+HybridCLR.Editor.Commands.PrebuildCommand:GenerateAll () (at ./Packages/com.code-philosophy.hybridclr@73654e76d2/Editor/Commands/PrebuildCommand.cs:32)
+	Building Library/Bee/artifacts/Android/libunity/arm64-v8a/UnityICallRegistration.o failed with output:
+/bin/sh: /Applications/Unity/Hub/Editor/2022.3.62f1c1/PlaybackEngines/AndroidPlayer/NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++: No such file or directory
+
+UnityEditor.BuildPipeline:BuildPlayer (UnityEditor.BuildPlayerOptions)
+HybridCLR.Editor.Commands.StripAOTDllCommand:GenerateStripedAOTDlls (UnityEditor.BuildTarget) (at ./Packages/com.code-philosophy.hybridclr@73654e76d2/Editor/Commands/StripAOTDllCommand.cs:144)
+HybridCLR.Editor.Commands.PrebuildCommand:GenerateAll () (at ./Packages/com.code-philosophy.hybridclr@73654e76d2/Editor/Commands/PrebuildCommand.cs:32)
+
+6. 

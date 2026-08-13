@@ -29,17 +29,6 @@ public static class GameMapUtility
         var pos = new Vector2(mapCfg.fMapLbPos[0], mapCfg.fMapLbPos[1]);
         return pos;
     }
-    public static float GetCurMapDepth()
-    {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var depth = GetMapDepth(mapId);
-        return depth;
-    }
-    public static float GetMapDepth(in int mapId)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        return mapCfg.nDepth;
-    }
     public static Vector2 GetMapPlayerStartPosition(in int mapId)
     {
         var lbPos = GetMapStartPosition(mapId);
@@ -74,6 +63,20 @@ public static class GameMapUtility
         var maxRowCol = GetMapGridRowCol(mapId);
         if (row < 0 || row >= maxRowCol.x)
             return false;
+        if (col < 0 || col >= maxRowCol.y)
+            return false;
+        return true;
+    }
+    public static bool RowIsValid(int mapId, int row)
+    {
+        var maxRowCol = GetMapGridRowCol(mapId);
+        if (row < 0 || row >= maxRowCol.x)
+            return false;
+        return true;
+    }
+    public static bool ColIsValid(int mapId, int col)
+    {
+        var maxRowCol = GetMapGridRowCol(mapId);
         if (col < 0 || col >= maxRowCol.y)
             return false;
         return true;
@@ -130,6 +133,16 @@ public static class GameMapUtility
         var index = Mathf.Clamp(row, 0, maxRowCol.x - 1) * maxRowCol.y + Mathf.Clamp(col, 0, maxRowCol.y - 1);
         return index;
     }
+    public static bool WorldPosToGridRowCol(in int mapId, in Vector2 worldPos, out int row, out int col)
+    {
+        var startPos = GetGridLbPosition(mapId);
+        var size = GetMapGridSize(mapId);
+        var localPos = worldPos - startPos;
+        row = Mathf.FloorToInt(localPos.y / size.y);
+        col = Mathf.FloorToInt(localPos.x / size.x);
+        var maxRowCol = GetMapGridRowCol(mapId);
+        return row >= 0 && row < maxRowCol.x && col >= 0 && col <= maxRowCol.y;
+    }
     public static GameBattleGridIndex CreateGridIndex(int mapId, int index)
     {
         var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
@@ -166,12 +179,6 @@ public static class GameMapUtility
                 return false;
         }
         return true;
-    }
-
-    public static int CreateMonsterEntity(int monsterId, GameBattleGridIndex gridIndex)
-    {
-        var monsterEntityId = MonsterUtility.CreateMonster(monsterId);
-        return monsterEntityId;
     }
 
     public static void CheckMoveBoundsTopY(ref float worldPosY)

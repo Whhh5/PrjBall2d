@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-public enum EnBallId
-{
-    FenLie = 1002,
-}
 public class GameBattleBallMoveData : IClassPoolDestroy
 {
     public Vector2 moveDir;
@@ -27,67 +23,15 @@ public class GameBallFireData : IClassPoolDestroy
             = -1;
     }
 }
-public class GameBattleSkillBallDestroyEventData : IClassPoolDestroy
-{
-    public int unvalidEntityId;
-    public Vector2 pos;
-    public Vector2 moveDir;
-    public void OnPoolDestroy()
-    {
-        unvalidEntityId = -1;
-        pos
-            = moveDir
-            = Vector2.zero;
-    }
-}
-public class GameBattleSkillBallRuntimeData : IClassPoolDestroy
-{
-    private int _Star;
-    private readonly List<int> _EntityIds = new();
-
-    public void OnPoolDestroy()
-    {
-        _EntityIds.Clear();
-        _Star = 0;
-    }
-    public int GetStar()
-    {
-        return _Star;
-    }
-
-    public void SetStar(in int star)
-    {
-        _Star = star;
-    }
-
-    public int GetEntityCount()
-    {
-        return _EntityIds.Count;
-    }
-    public int GetEntity(int index)
-    {
-        return _EntityIds[index];
-    }
-    public void AddEntityId(in int entityId)
-    {
-        _EntityIds.Add(entityId);
-    }
-    public void RemoveEntityId(in int entityId)
-    {
-        _EntityIds.Remove(entityId);
-    }
-}
-
 public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
 {
-    public override EnManagerFuncType FuncType => base.FuncType | EnManagerFuncType.Update;
-
     private readonly Dictionary<int, GameBattleBallMoveData> _BallMoveDatas = new();
     private readonly Dictionary<int, GameBattleSkillBallData> _BallDatas = new();
     private readonly Dictionary<int, GameBattleSkillBallRuntimeData> _BallRuntimeData = new();
-    private float _LastFireTime = 0;
 
     private readonly List<GameBallFireData> _DelayFireBalls = new();
+
+    private readonly Dictionary<int, HashSet<int>> _BallId2FussionId = new();
 
     public override void Destroy()
     {
@@ -101,6 +45,33 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         GameMapMgr.Instance.RegisterLifecycle(this);
     }
 
+    public override void OnDisable()
+    {
+        base.OnDisable();
+        _BallId2FussionId.Clear();
+    }
+    public override async UniTask OnEnableAsync()
+    {
+        await base.OnEnableAsync();
+
+        var fussionCfgCount = GameSchedule.Instance.GetSkillBallFussionCfgCount();
+        for (int i = 0; i < fussionCfgCount; i++)
+        {
+            var cfg = GameSchedule.Instance.GetSkillBallFussionCfg(i);
+
+            for (int j = 0; j < cfg.arrSourceBallIds.Length; j++)
+            {
+                var ballId = cfg.arrSourceBallIds[j];
+                if (!_BallId2FussionId.TryGetValue(ballId, out var list))
+                {
+                    list = new();
+                    _BallId2FussionId.Add(ballId, list);
+                }
+                list.Add(cfg.nFussionId);
+            }
+        }
+    }
+
     public EnGameMapLifecycleOrder GetMapLifecycleOrder()
     {
         return EnGameMapLifecycleOrder.GameBattleBallMgr;
@@ -111,19 +82,6 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     }
     private void InitBallConfig(int mapId)
     {
-        if (true)
-        {
-            var testBallId = 1012;
-            SetBallStar(testBallId, 3);
-            AddDelayFireBall(testBallId, float.MinValue);
-            AddDelayFireBall(testBallId, float.MinValue);
-            AddDelayFireBall(testBallId, float.MinValue);
-            AddDelayFireBall(testBallId, float.MinValue);
-            AddDelayFireBall(testBallId, float.MinValue);
-            AddDelayFireBall(testBallId, float.MinValue);
-            AddDelayFireBall(testBallId, float.MinValue);
-            return;
-        }
         var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
         for (int i = 0; i < mapCfg.arrDefaultBalls.Length; i++)
         {
@@ -132,7 +90,6 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
 
             AddDelayFireBall(ballId, float.MinValue);
         }
-
     }
 
     public void ExitMap(int mapId)
@@ -180,7 +137,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
             var eventUserData = ClassPoolMgr.Instance.Pull<GameSkillBallAddEventData>();
             eventUserData.ballId = ballId;
             eventUserData.star = star;
-            ABBEventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_ADD, ballId, 0, eventUserData);
+            EventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_ADD, cfg.nBallType, ballId, eventUserData);
             ClassPoolMgr.Instance.Push(eventUserData);
         }
         else
@@ -195,7 +152,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
             eventUserData.ballId = ballId;
             eventUserData.star = toStar;
             eventUserData.addStar = star;
-            ABBEventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_UPSTAR, ballId, 0, eventUserData);
+            EventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_UPSTAR, cfg.nBallType, ballId, eventUserData);
             ClassPoolMgr.Instance.Push(eventUserData);
         }
 
@@ -204,6 +161,8 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     {
         if (!_BallRuntimeData.TryGetValue(ballId, out var rtData))
             return;
+        var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
+        var ballData = GetBallData(in ballId);
         var entityCount = rtData.GetEntityCount();
         for (int i = 0; i < entityCount; i++)
         {
@@ -211,12 +170,15 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
             var moveData = _BallMoveDatas[entityId];
             ClassPoolMgr.Instance.Push(moveData);
             _BallMoveDatas.Remove(entityId);
+
+            ballData.DestroyBallEntity(entityId);
         }
 
         RemoveDelayFireBall(ballId);
         var eventUserData = ClassPoolMgr.Instance.Pull<GameSkillBallRemoveEventData>();
         eventUserData.ballId = ballId;
-        ABBEventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_REMOVE, ballId, 0, eventUserData);
+        eventUserData.star = rtData.GetStar();
+        EventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_REMOVE, ballCfg.nBallType, ballId, eventUserData);
         ClassPoolMgr.Instance.Push(eventUserData);
         _BallRuntimeData.Remove(ballId);
         ClassPoolMgr.Instance.Push(rtData);
@@ -233,42 +195,12 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         var star = GetBallStar((int)ballId);
         return star;
     }
-    public int GetBallStar(int ballId)
+    public int GetBallStar(in int ballId)
     {
         if (!_BallRuntimeData.TryGetValue(ballId, out var rtData))
             return 0;
         var star = rtData.GetStar();
         return star;
-    }
-
-    public override bool IsUpdate()
-    {
-        return base.IsUpdate() && GameMapMgr.Instance.IsValid();
-    }
-    public override void Update()
-    {
-        base.Update();
-
-
-        if (GameBattleInputMgr.Instance.IsValid())
-        {
-            var playerEntityId = GamePlayerMgr.Instance.GetPlayerEntityId();
-            var curTime = GameUtility.GetGameTime();
-            var interval = GamePlayerMgr.Instance.GetBallFireInterval(playerEntityId);
-            if (interval + _LastFireTime < curTime)
-            {
-                if (TryGetNextFireBallId(out var ballId))
-                {
-                    _LastFireTime = curTime;
-                    var firePoint = GameBattleInputMgr.Instance.GetFirePos();
-                    var dir = GameBattleInputMgr.Instance.GetFireDirection();
-
-                    CreateBallEntity(playerEntityId, ballId, firePoint, dir);
-                    var cfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
-                    GameEffectMgr.Instance.PlayEffectOnce(cfg.nFireEffectId, firePoint);
-                }
-            }
-        }
     }
 
     public int CreateBallEntity(int ownerEntityId, int ballId, in Vector2 pos, in Vector2 dir)
@@ -285,8 +217,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         var entityId = ballData.CreateBallEntity(in ownerEntityId, in ballId, in pos, userData);
 
         var ballSpeed = GamePlayerMgr.Instance.GetBallSpeed(ownerEntityId);
-        var proCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(entityId, EnSceneEntityComType.Attribute);
-        proCom.SetBaseValue(EnEntityAttributeId.MoveSpeed, ballSpeed);
+        GameAttributeUtility.SetBaseValue(entityId, EnEntityAttributeId.MoveSpeed, ballSpeed);
 
         var data = ClassPoolMgr.Instance.Pull<GameBattleBallMoveData>();
         data.moveDir = dir;
@@ -355,6 +286,31 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     {
         entityIds.AddRange(_BallMoveDatas.Keys);
     }
+
+    public int GetBallCountByType(EnBallType ballType)
+    {
+        var count = 0;
+        foreach (var (ballId, _) in _BallRuntimeData)
+        {
+            var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
+            if (ballCfg.nBallType != (int)ballType)
+                continue;
+            count++;
+        }
+        return count;
+    }
+    public List<int> GetBallIdsByType(EnBallType ballType)
+    {
+        var list = new List<int>(_BallRuntimeData.Count);
+        foreach (var (ballId, _) in _BallRuntimeData)
+        {
+            var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
+            if (ballCfg.nBallType != (int)ballType)
+                continue;
+            list.Add(ballId);
+        }
+        return list;
+    }
     public GameBattleBallMoveData GetBallMoveData(int entityId)
     {
         var data = _BallMoveDatas[entityId];
@@ -390,10 +346,11 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
                 var entityId = rtData.GetEntity(i);
                 ballData.DestroyBallEntity(in entityId);
             }
-
+            var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
             var eventUserData = ClassPoolMgr.Instance.Pull<GameSkillBallRemoveEventData>();
             eventUserData.ballId = ballId;
-            ABBEventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_REMOVE, ballId, 0, eventUserData);
+            eventUserData.star = rtData.GetStar();
+            EventMgr.Instance.FireExecute(EnABBEvent.EVENT_SKILL_BALL_REMOVE, ballCfg.nBallType, ballId, eventUserData);
             ClassPoolMgr.Instance.Push(eventUserData);
             ClassPoolMgr.Instance.Push(rtData);
         }
@@ -425,7 +382,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
             _DelayFireBalls.RemoveAt(i--);
         }
     }
-    private bool TryGetNextFireBallId(out int ballId)
+    public bool TryGetNextFireBallId(out int ballId)
     {
         var curTime = GameUtility.GetGameTime();
         for (int i = 0; i < _DelayFireBalls.Count; i++)
@@ -442,7 +399,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         return false;
     }
 
-    public T GetBallStarData<T>(int ballId)
+    public T GetBallStarData<T>(in int ballId)
     {
         var star = GameBattleBallMgr.Instance.GetBallStar(ballId);
         var value = GetBallStarData<T>(ballId, star);
@@ -455,6 +412,18 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         if (data is not T value)
             return default;
         return value;
+    }
+    public GameBattleSkillBallStarData GetBallStarData(in int ballId)
+    {
+        var star = GameBattleBallMgr.Instance.GetBallStar(ballId);
+        var data = GetBallStarData(in ballId, in star);
+        return data;
+    }
+    public GameBattleSkillBallStarData GetBallStarData(in int ballId, in int star)
+    {
+        var ballData = GetBallData(in ballId);
+        var data = ballData.GetStarData(star);
+        return data;
     }
     public T CreateStarData<T>(int ballId, int starLevel, ISerializeToIntArrayUserData userData)
         where T : GameBattleSkillBallStarData, new()
@@ -473,4 +442,76 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         var starUserData = ClassPoolMgr.Instance.Pull<T>(userData);
         return starUserData;
     }
+
+
+    #region 融合相关
+    public void Fussion(int fussionCfgId)
+    {
+        var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(fussionCfgId);
+
+        for (int i = 0; i < fussionCfg.arrSourceBallIds.Length; i++)
+        {
+            var ballId = fussionCfg.arrSourceBallIds[i];
+            GameBattleBallMgr.Instance.RemoveBall(ballId);
+        }
+        GameBattleBallMgr.Instance.AddBall(fussionCfg.nFinalBallId, fussionCfg.nFinalBallStar);
+    }
+    public bool IsFussion(params int[] ballIds)
+    {
+        var ballId = ballIds[0];
+        if (!_BallId2FussionId.TryGetValue(ballId, out var fussionIds))
+            return false;
+        foreach (var fussionId in fussionIds)
+        {
+            var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(fussionId);
+            for (int k = 1; k < ballIds.Length; k++)
+            {
+                var index = Array.FindIndex(fussionCfg.arrSourceBallIds, id => id == ballIds[k]);
+                if (index < 0)
+                    return false;
+            }
+        }
+        return true;
+    }
+    public bool TryFussion(EnGameBallFussionCondition condition, ref List<int> fussionInfos, params int[] ballIds)
+    {
+        var ballHash = new HashSet<int>(ballIds.Length);
+        foreach (var item in ballIds)
+            ballHash.Add(item);
+
+        var testedFussionIds = new HashSet<int>(10);
+        var count = ballIds.Length;
+        for (int i = 0; i < count; i++)
+        {
+            var ballId = ballIds[i];
+            if (!_BallId2FussionId.TryGetValue(ballId, out var fussionIds))
+                continue;
+            foreach (var fussionId in fussionIds)
+            {
+                if (testedFussionIds.Contains(fussionId))
+                    continue;
+                testedFussionIds.Add(fussionId);
+                var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(fussionId);
+                for (int k = 0; k < fussionCfg.arrSourceBallIds.Length; k++)
+                {
+                    var testBallId = fussionCfg.arrSourceBallIds[k];
+                    if (!ballHash.Contains(testBallId))
+                        goto next;
+                    if ((condition & EnGameBallFussionCondition.Star) != EnGameBallFussionCondition.None)
+                    {
+                        var ballStar = GetBallStar(testBallId);
+                        var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(testBallId);
+                        if (ballStar < ballCfg.nMaxStar)
+                            goto next;
+                    }
+                }
+                fussionInfos.Add(fussionId);
+            next:
+                continue;
+            }
+        }
+        return fussionInfos.Count > 0;
+    }
+
+    #endregion
 }

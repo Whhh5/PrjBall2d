@@ -14,12 +14,12 @@ public class GameEffectFireLineEntityData : GameEntityData<GameEffectFireLineEnt
 
     public override void SetPosition(in Vector3 worldPos)
     {
-        var posZ = GameMapUtility.GetCurMapDepth() + (int)EnGameEntityOrderLayer.LineUp;
+        var posZ = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.LineUp);
         base.SetPosition(new Vector3(worldPos.x, worldPos.y, posZ));
     }
-    public override void OnGOCreate()
+    public override void OnGOCreate(GameEntity entity)
     {
-        base.OnGOCreate();
+        base.OnGOCreate(entity);
 
         _Entity.SetPoint3Active(_Point3Active);
         _Entity.SetPoint1(_Point1);
@@ -35,8 +35,9 @@ public class GameEffectFireLineEntityData : GameEntityData<GameEffectFireLineEnt
     }
     public void Update()
     {
-        var firePos = GameBattleInputMgr.Instance.GetFirePos();
-        var dir = GameBattleInputMgr.Instance.GetFireDirection();
+        var inputSystem = GameBattleMgr.Instance.GetSystem<GameBattleInputSystem>();
+        var firePos = inputSystem.GetFirePos();
+        var dir = inputSystem.GetFireDirection();
         var mapId = GameMapMgr.Instance.GetCurMapId();
         SetPoint1(firePos);
 
@@ -183,18 +184,18 @@ public class GameEffectFireLineEntity : GameEntity
     public void SetPoint1(in Vector2 pos)
     {
         _Point1.position = pos;
-        _Line1.SetPosition(0, new Vector3(pos.x, pos.y, GameMapUtility.GetCurMapDepth() + (int)_LineLayer));
+        _Line1.SetPosition(0, new Vector3(pos.x, pos.y, GameMapMgr.Instance.GetLayerDepth(_LineLayer)));
     }
     public void SetPoint2(in Vector2 pos)
     {
         _Point2.position = pos;
-        _Line1.SetPosition(1, new Vector3(pos.x, pos.y, GameMapUtility.GetCurMapDepth() + (int)_LineLayer));
-        _Line2.SetPosition(0, new Vector3(pos.x, pos.y, GameMapUtility.GetCurMapDepth() + (int)_LineLayer));
+        _Line1.SetPosition(1, new Vector3(pos.x, pos.y, GameMapMgr.Instance.GetLayerDepth(_LineLayer)));
+        _Line2.SetPosition(0, new Vector3(pos.x, pos.y, GameMapMgr.Instance.GetLayerDepth(_LineLayer)));
     }
     public void SetPoint3(in Vector2 pos)
     {
         _Point3.position = pos;
-        _Line2.SetPosition(1, new Vector3(pos.x, pos.y, GameMapUtility.GetCurMapDepth() + (int)_LineLayer));
+        _Line2.SetPosition(1, new Vector3(pos.x, pos.y, GameMapMgr.Instance.GetLayerDepth(_LineLayer)));
     }
     public void SetPoint3Active(in bool active)
     {

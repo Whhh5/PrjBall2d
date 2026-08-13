@@ -4,5 +4,8 @@
 public enum EnDotweenId
 {
     None,
-    GameEffectLaserEntityData,
+    UIBattleMainWindow,
+    GameMapMgr,
+    UIBattleUplevelWindow,
+    UIBattleBossInfoDialog,
 }

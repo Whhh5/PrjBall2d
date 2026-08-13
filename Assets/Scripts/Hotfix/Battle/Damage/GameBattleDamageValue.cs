@@ -26,7 +26,7 @@ public class GameBattleDamageValueData : GameEntityData<GameBattleDamageValue, G
 
     public override void SetPosition(in Vector3 worldPos)
     {
-        var posZ = GameMapUtility.GetCurMapDepth() + (int)EnGameEntityOrderLayer.DamageTxt;
+        var posZ = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.DamageTxt);
         base.SetPosition(new Vector3(worldPos.x, worldPos.y, posZ));
     }
     public override void Destroy()
@@ -43,14 +43,14 @@ public class GameBattleDamageValueData : GameEntityData<GameBattleDamageValue, G
         _DamageValue = userData.damageValue;
     }
 
-    public override void OnGOCreate()
+    public override void OnGOCreate(GameEntity entity)
     {
-        base.OnGOCreate();
+        base.OnGOCreate(entity);
 
         _Entity.Setting(_DamageValue, _DamageType, _DamageValueType);
     }
 }
-public class GameBattleDamageValue : GameEntity<GameBattleDamageValueData>
+public class GameBattleDamageValue : GameEntity
 {
     [SerializeField]
     private TextMeshPro _ValueTxt;
@@ -70,10 +70,6 @@ public class GameBattleDamageValue : GameEntity<GameBattleDamageValueData>
     {
         DOTween.Kill(GetHashCode());
         base.OnUnload();
-    }
-    public override void LoadCompeletion()
-    {
-        base.LoadCompeletion();
     }
 
     public void Setting(int value, EnDamageType damageType, EnDamageValueType damageValueType)

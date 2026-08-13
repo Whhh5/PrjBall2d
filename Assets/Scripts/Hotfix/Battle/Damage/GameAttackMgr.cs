@@ -1,6 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+public enum EnValueType
+{
+    None,
+    Value,
+    Percentage,
+    Count,
+}
 public interface IGameEnityCallback
 {
 
@@ -13,7 +21,41 @@ public interface IGameRestoreHealthCallback : IGameEnityCallback
 {
     public void RestoreHealthCallback(int sourceEntityId, int targetEntityId, float restoreHealthValue, Vector2 worldPos);
 }
+public struct AttackDamageResult
+{
+    public int value;
+    public EnDamageValueType valueType;
+    public EnDamageType damageType;
 
+    public AttackDamageResult(int value, EnDamageValueType valueType, EnDamageType damageType)
+    {
+        this.value = value;
+        this.valueType = valueType;
+        this.damageType = damageType;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is AttackDamageResult result &&
+               value == result.value &&
+               valueType == result.valueType &&
+               damageType == result.damageType;
+    }
+
+    public override int GetHashCode()
+    {
+        return System.HashCode.Combine(value, valueType, damageType);
+    }
+
+    public static bool operator ==(AttackDamageResult r1, AttackDamageResult r2)
+    {
+        return r1.value == r2.value && r1.valueType == r2.valueType && r1.damageType == r2.damageType;
+    }
+    public static bool operator !=(AttackDamageResult r1, AttackDamageResult r2)
+    {
+        return r1.value != r2.value && r1.valueType != r2.valueType && r1.damageType != r2.damageType;
+    }
+}
 public class GameAttackMgr : Singleton<GameAttackMgr>
 {
 
@@ -96,7 +138,23 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
     }
     #endregion
 
-    public int Attack(
+    public AttackDamageResult AttackMonster(
+        in int sourceEntityId,
+        in int targetEntityId,
+        in int value,
+        in EnDamageType damageType)
+    {
+        var pointInfo = EntityMgr.Instance.GetEntityData<GameBattleMonsterEntityData>(targetEntityId);
+        var center = pointInfo.GetCenterPointWorldPos();
+        var offset = new Vector2()
+        {
+            x = Random.Range(-0.3f, 0.3f),
+            y = Random.Range(-0.3f, 0.3f),
+        } * pointInfo.GetVolume();
+        var result = AttackMonster(in sourceEntityId, in targetEntityId, in value, center + offset, in damageType);
+        return result;
+    }
+    public AttackDamageResult AttackMonster(
         in int sourceEntityId,
         in int targetEntityId,
         in int value,
@@ -104,40 +162,93 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
         in EnDamageType damageType)
     {
         if (!GameMonsterUtility.EntityIsValid(in targetEntityId))
-            return 0;
+            return default;
+
         var targetProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(targetEntityId, EnSceneEntityComType.Attribute);
+        var damageResult = Attack(in sourceEntityId, in targetEntityId, in value, in worldPos, in damageType);
+
+        if (damageResult == default)
+            return default;
+
+        var curHp = targetProCom.GetValueInt(EnEntityAttributeId.Hp);
+
+        // 死亡
+        if (curHp <= 0)
+        {
+            GameMonsterMgr.Instance.MonsterDie(targetEntityId);
+        }
+        return damageResult;
+    }
+    public AttackDamageResult AttackPlayer(
+        in int sourceEntityId,
+        in int targetEntityId,
+        in int value,
+        in Vector2 worldPos,
+        in EnDamageType damageType)
+    {
+        if (!GamePlayerMgr.Instance.IsValid())
+            return default;
+
+        var targetProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(targetEntityId, EnSceneEntityComType.Attribute);
+        var damageResult = Attack(in sourceEntityId, in targetEntityId, in value, in worldPos, in damageType);
+        GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_Hero_Hit, worldPos);
+
+        if (damageResult == default)
+            return default;
+        var curHp = targetProCom.GetValueInt(EnEntityAttributeId.Hp);
+
+        // 死亡
+        if (curHp <= 0)
+        {
+            //SceneEntityMgr.Instance.AddCmd(sourceEntityId, EnEntityCmd.PlayerDie);
+            GamePlayerMgr.Instance.SetValid(false);
+        }
+        return damageResult;
+    }
+    private AttackDamageResult Attack(
+        in int sourceEntityId,
+        in int targetEntityId,
+        in int value,
+        in Vector2 worldPos,
+        in EnDamageType damageType)
+    {
+        var targetProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(targetEntityId, EnSceneEntityComType.Attribute);
+        var sourceProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(sourceEntityId, EnSceneEntityComType.Attribute);
         // 计算伤害数值
         var finalDamage = value;
+        var valueType = EnDamageValueType.Normal;
         switch (damageType)
         {
             case EnDamageType.Physic:
                 {
-                    var armorValue = targetProCom.GetValue(EnEntityAttributeId.PhysicsArmor);
-                    var criticalValue = targetProCom.GetValue(EnEntityAttributeId.Critical);
+                    var criticalValue = sourceProCom.GetValue(EnEntityAttributeId.Critical);
                     var testCriticalValue = Random.Range(0, 100);
                     if (testCriticalValue < criticalValue) // 暴击
                     {
-                        var criticalDamageValue = targetProCom.GetValue(EnEntityAttributeId.CriticalDamage);
+                        var criticalDamageValue = sourceProCom.GetValue(EnEntityAttributeId.CriticalDamage);
                         finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue);
+                        valueType = EnDamageValueType.Critical;
                     }
+                    var armorValue = targetProCom.GetValue(EnEntityAttributeId.PhysicsArmor);
                     var reduceValue = Mathf.Clamp01(armorValue / 100f);
                     finalDamage = Mathf.CeilToInt(finalDamage * (1 - reduceValue));
                 }
                 break;
             case EnDamageType.Magic:
                 {
-                    var armorValue = targetProCom.GetValue(EnEntityAttributeId.MagicArmor);
-                    var magicCritical = targetProCom.GetValue(EnEntityAttributeId.MagicCritical);
+                    var magicCritical = sourceProCom.GetValue(EnEntityAttributeId.MagicCritical);
                     if (magicCritical > 0)
                     {
-                        var criticalValue = targetProCom.GetValue(EnEntityAttributeId.Critical);
+                        var criticalValue = sourceProCom.GetValue(EnEntityAttributeId.Critical);
                         var testCriticalValue = Random.Range(0, 100);
                         if (testCriticalValue < criticalValue) // 暴击
                         {
-                            var criticalDamageValue = targetProCom.GetValue(EnEntityAttributeId.CriticalDamage);
+                            var criticalDamageValue = sourceProCom.GetValue(EnEntityAttributeId.CriticalDamage);
                             finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue);
+                            valueType = EnDamageValueType.Critical;
                         }
                     }
+                    var armorValue = targetProCom.GetValue(EnEntityAttributeId.MagicArmor);
                     var reduceValue = Mathf.Clamp01(armorValue / 100f);
                     finalDamage = Mathf.CeilToInt(finalDamage * (1 - reduceValue));
                 }
@@ -147,36 +258,46 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
             default:
                 break;
         }
-        var valueType = EnDamageValueType.Normal;
 
         // 减少血量
-        targetProCom.RemoveResultValue(EnEntityAttributeId.Hp, finalDamage);
         var maxHp = targetProCom.GetValue(EnEntityAttributeId.LimitHp);
         var curHp = targetProCom.GetValue(EnEntityAttributeId.Hp);
-        var slider = curHp / maxHp;
+        var slider = Mathf.Clamp01((curHp - finalDamage) / maxHp);
         var monsterEntityData = EntityMgr.Instance.GetEntityData<IGameEntityHpChange>(targetEntityId);
-        monsterEntityData.SetHpSliderValue(Mathf.Clamp01(slider));
-
+        monsterEntityData.SetHpSliderValue(slider);
         // 数值表现
         GameDamageMgr.Instance.EntityReduceHealth(in finalDamage, in worldPos, in damageType, in valueType);
-
+        // 数据变化
+        GameAttributeUtility.RemoveResultValue(targetEntityId, EnEntityAttributeId.Hp, finalDamage);
 
         // 广播订阅
         if (_DamageSourceCallback.TryGetValue(damageType, out var entityList))
             if (entityList.TryGetValue(sourceEntityId, out var list))
-                foreach (IGameDamageCallback callback in list)
-                    callback.DamageCallback(sourceEntityId, targetEntityId, finalDamage, damageType, valueType, worldPos);
+            {
+                var listCopy = list.ToList();
+                for (int i = 0; i < listCopy.Count; i++)
+                {
+                    var callback = listCopy[i];
+                    if (!list.Contains(callback))
+                        continue;
+                    (callback as IGameDamageCallback).DamageCallback(sourceEntityId, targetEntityId, finalDamage, damageType, valueType, worldPos);
+
+                }
+            }
         if (_DamageTargetCallback.TryGetValue(damageType, out var entityList2))
             if (entityList2.TryGetValue(targetEntityId, out var list))
-                foreach (IGameDamageCallback callback in list)
-                    callback.DamageCallback(sourceEntityId, targetEntityId, finalDamage, damageType, valueType, worldPos);
+            {
+                var listCopy = list.ToList();
+                for (int i = 0; i < listCopy.Count; i++)
+                {
+                    var callback = listCopy[i];
+                    if (!list.Contains(callback))
+                        continue;
+                    (callback as IGameDamageCallback).DamageCallback(sourceEntityId, targetEntityId, finalDamage, damageType, valueType, worldPos);
 
-        // 死亡
-        if (slider <= 0)
-        {
-            GameMonsterMgr.Instance.MonsterDie(targetEntityId);
-        }
-        return finalDamage;
+                }
+            }
+        return new(finalDamage, valueType, damageType);
     }
     public void RestoreHealth(
         in int sourceEntityId,
@@ -185,11 +306,10 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
         in Vector2 worldPos)
     {
         // 设置数值
-        var targetProCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(targetEntityId, EnSceneEntityComType.Attribute);
-        var curValue = targetProCom.GetValue(EnEntityAttributeId.Hp);
-        var maxValue = targetProCom.GetValue(EnEntityAttributeId.LimitHp);
+        var curValue = GameAttributeUtility.GetValue(targetEntityId, EnEntityAttributeId.Hp);
+        var maxValue = GameAttributeUtility.GetValue(targetEntityId, EnEntityAttributeId.LimitHp);
         var addValue = Mathf.Min(value, maxValue - curValue);
-        targetProCom.AddResultValue(EnEntityAttributeId.Hp, addValue);
+        GameAttributeUtility.AddResultValue(targetEntityId, EnEntityAttributeId.Hp, addValue);
         // 更新显示
         var sliderValue = (curValue + addValue) / maxValue;
         var monsterEntityData = EntityMgr.Instance.GetEntityData<IGameEntityHpChange>(targetEntityId);

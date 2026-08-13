@@ -8,7 +8,7 @@ public class GamePlayerMgr : Singleton<GamePlayerMgr>, IGameMapLifecycle
     private int _PlayerEntityId = -1;
     private float _BallFireInterval;
     private float _BallSpeed;
-
+    private bool _PlayerIsValid = false;
     public override async UniTask AwakeAsync()
     {
         await base.AwakeAsync();
@@ -35,13 +35,20 @@ public class GamePlayerMgr : Singleton<GamePlayerMgr>, IGameMapLifecycle
 
     public void ReenterMap(int mapId)
     {
-
+        DestroyPlayer();
+        CreatePlayer();
     }
     private void DestroyPlayer()
     {
+        var data = ClassPoolMgr.Instance.Pull<GameBattlePlayerDestroyEventData>();
+        data.entityId = _PlayerEntityId;
+        EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_PLAYER_DESTROY, 0, 0, data);
+        ClassPoolMgr.Instance.Push(data);
+
         SceneEntityMgr.Instance.RemoveCom(_PlayerEntityId, EnSceneEntityComType.Attribute);
         SceneEntityMgr.Instance.DestroyEntityData(_PlayerEntityId);
         _PlayerEntityId = -1;
+        _PlayerIsValid = false;
     }
 
     private void CreatePlayer()
@@ -62,6 +69,14 @@ public class GamePlayerMgr : Singleton<GamePlayerMgr>, IGameMapLifecycle
 
         EntityMgr.Instance.SetEntityWorldPos(_PlayerEntityId, pos);
         EntityMgr.Instance.LoadEntity(_PlayerEntityId);
+        _PlayerIsValid = true;
+
+        var data = ClassPoolMgr.Instance.Pull<GameBattlePlayerCreateEventData>();
+        data.entityId = _PlayerEntityId;
+        EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_PLAYER_CREATE, 0, 0, data);
+        ClassPoolMgr.Instance.Push(data);
+
+        EventMgr.Instance.Register<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
     }
 
     public int GetPlayerEntityId()
@@ -75,5 +90,28 @@ public class GamePlayerMgr : Singleton<GamePlayerMgr>, IGameMapLifecycle
     public float GetBallSpeed(int entityId)
     {
         return _BallSpeed;
+    }
+    public bool IsValid()
+    {
+        if (_PlayerEntityId <= 0)
+            return false;
+        return _PlayerIsValid;
+    }
+    public void SetValid(bool valid)
+    {
+        _PlayerIsValid = valid;
+    }
+
+    private void OnEvent_MouseClick(in int _, in int __, in GameBattleMouseClickEventData data)
+    {
+        var entityWoldPos = EntityMgr.Instance.GetEntityWorldPos2D(_PlayerEntityId);
+        var disSqr = Vector3.SqrMagnitude(data.worldPos - entityWoldPos);
+        if (disSqr > 1)
+            return;
+        var userData = ClassPoolMgr.Instance.Pull<UIBattleEntityAttributeWindowUserData>();
+        userData.title = "玩家";
+        userData.targetEntityId = _PlayerEntityId;
+        UIMgr.Instance.ShowWindow<UIBattleEntityAttributeWindowData>(userData);
+        ClassPoolMgr.Instance.Push(userData);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices.ComTypes;
 using UnityEngine;
 
 public static class GameEntityUtility
@@ -23,5 +24,18 @@ public static class GameEntityUtility
         entity.SetPosition(worldPos);
     }
 
+    public static void AddAttributeValue(in int ownerEntityId, in int entityId, in EnEntityAttributeId attId, in int value)
+    {
+        var pointInfo = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(entityId);
+        var targetPos = pointInfo.GetCenterPointWorldPos();
+        if (attId == EnEntityAttributeId.Hp)
+        {
+            GameAttackMgr.Instance.RestoreHealth(ownerEntityId, entityId, value, targetPos);
+        }
+        else
+        {
+            GameAttributeUtility.AddResultValue(entityId, attId, value);
+        }
+    }
 }
 

@@ -20,7 +20,7 @@ public class GameEffectEntityData : EffectEntityData
             EnGameEffectPos.Bottom => EnGameEntityOrderLayer.EffectGround,
             _ => EnGameEntityOrderLayer.None
         };
-        var posZ = GameMapUtility.GetCurMapDepth() + (int)layer;
+        var posZ = GameMapMgr.Instance.GetLayerDepth(layer);
         base.SetPosition(new Vector3(worldPos.x, worldPos.y, posZ));
     }
 }

@@ -9,12 +9,12 @@ public class GameEffectBallPart1003_2Entity : GameEffectEntity
     private Transform _TopEffect;
 
 
-    public override void SetPosition()
+    public override void SetPosition(in Vector3 worldPos)
     {
-        base.SetPosition();
+        base.SetPosition(in worldPos);
 
         var curPos = _TopEffect.position;
-        curPos.z = GameMapUtility.GetCurMapDepth() + (int)EnGameEntityOrderLayer.Effect;
+        curPos.z = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.Effect);
         _TopEffect.position = curPos;
     }
 }

@@ -459,66 +459,40 @@ public static class GamePhysicsUtility
             if (angle < 0)
                 continue;
 
-            if (true)
+            var validEage = EnDirection.None;
+            if (Mathf.Approximately(inDir.x, 0) && Mathf.Approximately(inDir.y, 0))
+                validEage |= EnDirection.All;
+            else
             {
-                var validEage = EnDirection.None;
-                if (Mathf.Approximately(inDir.x, 0) && Mathf.Approximately(inDir.y, 0))
-                    validEage |= EnDirection.All;
-                else
-                {
-                    if (inDir.x >= 0)
-                        validEage |= EnDirection.Left;
-                    if (inDir.x <= 0)
-                        validEage |= EnDirection.Right;
+                if (inDir.x >= 0)
+                    validEage |= EnDirection.Left;
+                if (inDir.x <= 0)
+                    validEage |= EnDirection.Right;
 
-                    if (inDir.y >= 0)
-                        validEage |= EnDirection.Bottom;
-                    if (inDir.y <= 0)
-                        validEage |= EnDirection.Top;
-                }
-                var dir = point - entitiyInfo.center;
-                var k = dir.y / dir.x;
+                if (inDir.y >= 0)
+                    validEage |= EnDirection.Bottom;
+                if (inDir.y <= 0)
+                    validEage |= EnDirection.Top;
+            }
+            var dir = point - entitiyInfo.center;
+            var k = dir.y / dir.x;
+            if (Mathf.Abs(k - 1) > 0.1f && Mathf.Abs(k - (-1)) > 0.1f)
+            {
                 if (k > 1 || k < -1)
                     validEage &= EnDirection.Top | EnDirection.Bottom;
                 else
                     validEage &= EnDirection.Left | EnDirection.Right;
-
-                validEage &= entitiyInfo.validEage;
-                if (!GameCollision2DUtil.TryGetCircleRectIntersectionPoints(in point, in radius, in entitiyInfo.center, in _GridSize, in validEage, out var rectInfo))
-                    continue;
-                hit.point = rectInfo.collisionPoint;
-                hit.entityId = entitiyInfo.entityId;
-                hit.normal = rectInfo.normal;
-                hit.dir = rectInfo.dir;
-                hit.inDir = inDir;
-                hit.pointGridIndex = entitiyInfo.centerIndex;
-            }
-            else
-            {
-                var hitPos = default(Vector2);
-                var normal = default(Vector2);
-                var collisionDir = default(EnDirection);
-                if (!TryGetFocusPoint(
-                    ref hitPos,
-                    ref normal,
-                    ref collisionDir,
-                    in entitiyInfo.center,
-                    in entitiyInfo.validEage,
-                    _GridSize.x / 2,
-                    _GridSize.y / 2,
-                    in point,
-                    radius,
-                    in inDir))
-                    continue;
-
-                hit.point = hitPos;
-                hit.entityId = entitiyInfo.entityId;
-                hit.normal = normal;
-                hit.dir = collisionDir;
-                hit.inDir = inDir;
-                hit.pointGridIndex = entitiyInfo.centerIndex;
             }
 
+            validEage &= entitiyInfo.validEage;
+            if (!GameCollision2DUtil.TryGetCircleRectIntersectionPoints(in point, in radius, in entitiyInfo.center, in _GridSize, in validEage, out var rectInfo))
+                continue;
+            hit.point = rectInfo.collisionPoint;
+            hit.entityId = entitiyInfo.entityId;
+            hit.normal = rectInfo.normal;
+            hit.dir = rectInfo.dir;
+            hit.inDir = inDir;
+            hit.pointGridIndex = entitiyInfo.centerIndex;
 
             return true;
         }
@@ -543,163 +517,6 @@ public static class GamePhysicsUtility
                 return count;
         }
         return count;
-    }
-
-    private static bool TryGetFocusPoint(ref Vector2 point,
-        ref Vector2 normal,
-        ref EnDirection collisionDir,
-        in Vector2 boxPos,
-        in EnDirection validEage,
-        float halfWidth,
-        float halfHeight,
-        in Vector2 spherePos,
-        float radius,
-        in Vector2 inDir)
-    {
-        var localPos = spherePos - boxPos;
-        var k = localPos.y / localPos.x;
-        var boxMinX = boxPos.x - halfWidth;
-        var boxMaxX = boxPos.x + halfWidth;
-        var boxMinY = boxPos.y - halfHeight;
-        var boxMaxY = boxPos.y + halfHeight;
-
-        //float a, b, c, n;
-        if (k > 1 || k < -1)
-        {
-            collisionDir = localPos.y > 0
-                ? EnDirection.Top
-                : EnDirection.Bottom;
-            if ((collisionDir & validEage) == EnDirection.None)
-                return false;
-            if (localPos.y > 0 && inDir.y > 0)
-                return false;
-            if (localPos.y < 0 && inDir.y < 0)
-                return false;
-            var n = localPos.y > 0
-                ? boxPos.y + halfHeight
-                : boxPos.y - halfHeight;
-            normal = localPos.y > 0
-                ? new Vector2(0, 1)
-                : new Vector2(0, -1);
-            var a = 1;
-            var b = -2 * spherePos.x;
-            var c = Mathf.Pow(spherePos.x, 2) + Mathf.Pow(n, 2) - 2 * n * spherePos.y + Mathf.Pow(spherePos.y, 2) - Mathf.Pow(radius, 2);
-
-            var da = Mathf.Pow(b, 2) - 4 * a * c;
-            if (da > 0)
-            {
-                var resutX1 = (-b - Mathf.Sqrt(da)) / (2 * a);
-                var resutX2 = (-b + Mathf.Sqrt(da)) / (2 * a);
-                if (resutX1 >= boxMinX && resutX1 <= boxMaxX)
-                {
-                    if (resutX2 >= boxMinX && resutX2 <= boxMaxX)
-                    {
-                        point.x = (resutX1 + resutX2) / 2;
-                        point.y = n;
-                    }
-                    else
-                    {
-                        point.x = resutX1;
-                        point.y = n;
-                    }
-                }
-                else if (resutX2 >= boxMinX && resutX2 <= boxMaxX)
-                {
-                    point.x = resutX2;
-                    point.y = n;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (da == 0)
-            {
-                var resutX1 = (-b - Mathf.Sqrt(da)) / (2 * a);
-                if (resutX1 >= boxMinX && resutX1 <= boxMaxX)
-                {
-                    point.x = resutX1;
-                    point.y = n;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            collisionDir = localPos.x > 0
-                ? EnDirection.Right
-                : EnDirection.Left;
-            if ((collisionDir & validEage) == EnDirection.None)
-                return false;
-            if (localPos.x > 0 && inDir.x > 0)
-                return false;
-            if (localPos.x < 0 && inDir.x < 0)
-                return false;
-            var m = localPos.x > 0
-                ? boxPos.x + halfWidth
-                : boxPos.x - halfWidth;
-            normal = localPos.x > 0
-                ? new Vector2(1, 0)
-                : new Vector2(-1, 0);
-            var a = 1;
-            var b = -2 * spherePos.y;
-            var c = Mathf.Pow(spherePos.y, 2) + Mathf.Pow(m, 2) - 2 * m * spherePos.x + Mathf.Pow(spherePos.x, 2) - Mathf.Pow(radius, 2);
-
-            var da = Mathf.Pow(b, 2) - 4 * a * c;
-            if (da > 0)
-            {
-                var resutY1 = (-b - Mathf.Sqrt(da)) / (2 * a);
-                var resutY2 = (-b + Mathf.Sqrt(da)) / (2 * a);
-                if (resutY1 >= boxMinY && resutY1 <= boxMaxY)
-                {
-                    if (resutY2 >= boxMinY && resutY2 <= boxMaxY)
-                    {
-                        point.x = m;
-                        point.y = (resutY1 + resutY2) / 2;
-                    }
-                    else
-                    {
-                        point.x = m;
-                        point.y = resutY1;
-                    }
-                }
-                else if (resutY2 >= boxMinY && resutY2 <= boxMaxY)
-                {
-                    point.x = m;
-                    point.y = resutY2;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (da == 0)
-            {
-                var resutY1 = (-b - Mathf.Sqrt(da)) / (2 * a);
-                if (resutY1 >= boxMinY && resutY1 <= boxMaxY)
-                {
-                    point.x = m;
-                    point.y = resutY1;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
     private static void SortByDistance(ref List<GamePhysicsEntity> entityInfos)
     {
@@ -984,6 +801,65 @@ public static class GamePhysicsUtility
                 return true;
             if (testRu.y > lb.y && testRu.y < ru.y)
                 return true;
+        }
+        return false;
+    }
+
+
+    public static bool TryLineCaseRect(in Vector2 lb, in Vector2 ru, in Vector2 target, in float rad, ref Vector2 point1, ref Vector2 point2)
+    {
+        var b = target.y - Mathf.Tan(rad) * target.x;
+        var count = 0;
+        { // left
+            var y = Mathf.Tan(rad) * lb.x + b;
+            if (y >= lb.y && y <= ru.y)
+            {
+                point1 = new Vector2(lb.x, y);
+                count++;
+            }
+        }
+        { // bottom
+            var x = (lb.y - b) / Mathf.Tan(rad);
+            if (x >= lb.x && x <= ru.x)
+            {
+                if (count == 0)
+                {
+                    point1 = new Vector2(x, lb.y);
+                    count++;
+                }
+                else
+                {
+                    point2 = new Vector2(x, lb.y);
+                    return true;
+                }
+            }
+        }
+        { // right
+            var y = Mathf.Tan(rad) * ru.x + b;
+            if (y >= lb.y && y <= ru.y)
+            {
+                if (count == 0)
+                {
+                    point1 = new Vector2(ru.x, y);
+                    count++;
+                }
+                else
+                {
+                    point2 = new Vector2(ru.x, y);
+                    return true;
+                }
+            }
+        }
+        { // up
+            if (count == 0)
+                return false;
+
+            var x = (ru.y - b) / Mathf.Tan(rad);
+            if (x >= lb.x && x <= ru.x)
+            {
+                point2 = new Vector2(x, ru.y);
+                return true;
+            }
         }
         return false;
     }

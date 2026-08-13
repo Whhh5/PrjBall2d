@@ -34,6 +34,21 @@ public class GameBattleWaveData : IClassPoolDestroy
         createInfo = monsters[index];
         return true;
     }
+    public ref readonly List<GameMonsterCreateInfo> GetMonsterCreateInfos()
+    {
+        return ref monsters;
+    }
+    public bool IsCreateWaveMonsters()
+    {
+        foreach (var createInfo in monsters)
+        {
+            var posList = GameEntityUtility.GetEntityGridPosList(createInfo.monsterId, createInfo.row, createInfo.col);
+            if (!GameMapUtility.GridsIsIdle(posList))
+                return false;
+        }
+        return true;
+    }
+
     public void CreateFinish(int index)
     {
         delayCreateList.Remove(index);

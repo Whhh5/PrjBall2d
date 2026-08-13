@@ -1,5 +1,5 @@
-using Spine.Unity;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public interface IEntityGridPointInfo
 {
@@ -12,6 +12,13 @@ public interface IEntityGridPointInfo
 public class GameBattleMonsterEntityUserData : SceneMonsterEntityUserData
 {
     public GameBattleGridIndex gridPos;
+    public int energyCount;
+    public override void OnPoolDestroy()
+    {
+        base.OnPoolDestroy();
+        gridPos = default;
+        energyCount = -1;
+    }
 }
 public abstract class GameBattleMonsterEntityData<T> : GameBattleMonsterEntityData
     where T : GameBattleMonsterEntity
@@ -23,43 +30,46 @@ public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameB
 {
     public GameBattleGridIndex _MainGridIndex;
     private float _HpSliderValue;
+    private bool _IsDown;
+    private int _EnergyCount;
+    private float _MonsterUpdateTime;
 
-    #region 方法重写
     public override void SetPosition(in Vector3 worldPos)
     {
         var mapId = GameMapMgr.Instance.GetCurMapId();
         var lbPos = GameMapUtility.GetGridLbPosition(mapId);
         var ruPos = GameMapUtility.GetGridRuPosition(mapId);
-        var testValue = Mathf.Clamp((worldPos.y - lbPos.y) / (ruPos.y - lbPos.y), 0, 0.9f);
-        var depth = GameMapUtility.GetMapDepth(mapId);
-        var posOffset = depth + (int)EnGameEntityOrderLayer.Monster + testValue;
-        base.SetPosition(new Vector3(worldPos.x, worldPos.y, posOffset));
+        var testValue = Mathf.Lerp(0, 0.9f, (worldPos.y - lbPos.y) / (ruPos.y - lbPos.y));
+        var depth = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.Monster, testValue);
+        base.SetPosition(new Vector3(worldPos.x, worldPos.y, depth));
     }
-    #endregion
 
     public override void Destroy()
     {
         base.Destroy();
         _HpSliderValue = -1;
+        _EnergyCount = -1;
+        _IsDown = false;
     }
     protected override void OnPoolInit(GameBattleMonsterEntityUserData userData)
     {
+        _EnergyCount = userData.energyCount;
         SetGridIndex(userData.gridPos);
         SetHpSliderValue(0);
     }
 
-    public override void OnGOCreate()
+    public override void OnGOCreate(GameEntity entity)
     {
-        base.OnGOCreate();
+        base.OnGOCreate(entity);
 
-        SceneMonsterEntity.SetHpSliderValue(_HpSliderValue);
+        _SceneMonsterEntity.SetHpSliderValue(_HpSliderValue);
     }
     #region entity 方法
     public void SetHpSliderValue(float value)
     {
         _HpSliderValue = value;
         if (IsLoadSuccess)
-            SceneMonsterEntity.SetHpSliderValue(value);
+            _SceneMonsterEntity.SetHpSliderValue(value);
     }
     #endregion
     #region 排序 和 层
@@ -86,8 +96,6 @@ public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameB
         return ref monsterCfg.arrGridValidEdge;
     }
     #endregion
-
-
     #region 参考点
     protected abstract Vector2 GetLocalCenterPointPos();
     public Vector2 GetCenterPointWorldPos()
@@ -96,32 +104,38 @@ public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameB
         return result;
     }
     #endregion
-}
-
-public abstract class GameBattleMonsterEntity : SceneMonsterEntity<GameBattleMonsterEntityData>, IEntitySpineCom
-{
-    [SerializeField]
-    private SkeletonAnimation _SkeletonAnimation = null;
-    [SerializeField]
-    private SpriteRenderer _HpSlider;
-
-    [SerializeField]
-    private float _HpMaxSliderValue;
-    public SkeletonAnimation GetSkeletonAnimation()
+    public int GetEnergyCount()
     {
-        return _SkeletonAnimation;
+        return _EnergyCount;
     }
 
-
-    public void SetHpSliderValue(float value)
+    public void SetIsDown(bool isDown)
     {
-        _HpSlider.size = new Vector2(_HpMaxSliderValue * value, _HpSlider.size.y);
+        _IsDown = isDown;
+    }
+    public bool GetIsDown()
+    {
+        return _IsDown;
+    }
+    public abstract void EnterMapDown();
+    public abstract void UpdateMapDown();
+    public abstract void ExitMapDown();
+    public virtual void MonsterUpdate()
+    {
+        _MonsterUpdateTime += GameUtility.GetGameTimeDelta();
+    }
+    protected float GetLocalTime()
+    {
+        return _MonsterUpdateTime;
+    }
+    public virtual void ApplyData()
+    {
+
     }
 }
 
-
-public abstract class GameBattleMonsterEntity<T> : GameBattleMonsterEntity
-    where T : GameBattleMonsterEntityData
+[RequireComponent(typeof(SortingGroup))]
+public abstract class GameBattleMonsterEntity : SceneMonsterEntity
 {
-
+    public abstract void SetHpSliderValue(float value);
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using static Codice.Client.Commands.WkTree.WorkspaceTreeNode;
+﻿using UnityEngine;
 
 public static class GameMonsterUtility
 {
@@ -13,18 +11,23 @@ public static class GameMonsterUtility
     }
     public static bool EntityIsCanMove(int entityId)
     {
-        if (!MonsterUtility.EntityIsValid(entityId,
-            EnSceneEntityStatus.Die
-                | EnSceneEntityStatus.ForceMove
-                | EnSceneEntityStatus.Freeze
-                //| EnSceneEntityStatus.Fly
-                | EnSceneEntityStatus.Atk
-                | EnSceneEntityStatus.Skill1
-                | EnSceneEntityStatus.Skill2
-                | EnSceneEntityStatus.Skill3,
+        if (MonsterUtility.EntityIsValid(entityId,
+            EnSceneEntityStatus.Idle
+                | EnSceneEntityStatus.Move
+                | EnSceneEntityStatus.Hit, 
             EnSceneEntityStatus.None))
-            return false;
-        return true;
+            return true;
+        return false;
+    }
+    public static bool EntityIsAttack(int entityId)
+    {
+        if (MonsterUtility.EntityIsValid(entityId,
+            EnSceneEntityStatus.Idle
+                | EnSceneEntityStatus.Move
+                | EnSceneEntityStatus.Hit,
+            EnSceneEntityStatus.None))
+            return true;
+        return false;
     }
 
     public static void GetMonsterMainGridData(ref GameMonsterGridIndexData data, int entityId)
@@ -49,80 +52,6 @@ public static class GameMonsterUtility
     }
 
 
-    #region 状态
-    public static bool EnterStatus(int entityId, EnSceneEntityStatus status, IClassPoolDestroy userData)
-    {
-        return false;
-        var entityData = EntityMgr.Instance.GetEntityData<GameBattleMonsterEntityData>(entityId);
-        ref readonly var curStatus = ref entityData.GetSceneEntityStatus();
-        if (curStatus > status)
-            return false;
-        entityData.AddMonsterStatus(status);
-        PlayStatusAnim(entityId, status, userData);
-        return true;
-    }
-    public static void ExitStatus(int entityId, EnSceneEntityStatus status, EnGameSpineCompleteStatus animStatus)
-    {
-        return;
-        var entityData = EntityMgr.Instance.GetEntityData<GameBattleMonsterEntityData>(entityId);
-        var curStatus = entityData.GetSceneEntityStatus();
-        if ((curStatus & status) != status)
-            return;
-        switch (status)
-        {
-            case EnSceneEntityStatus.Die:
-                if (animStatus == EnGameSpineCompleteStatus.Normal)
-                {
-                    GameMonsterMgr.Instance.DestroyMonsterEntity(entityId);
-                }
-                return;
-            default:
-                if (animStatus == EnGameSpineCompleteStatus.Normal)
-                {
-                    entityData.RemoveMonsterStatus(status);
-                    EnterStatus(entityId, EnSceneEntityStatus.Idle, null);
-                }
-                break;
-        }
-    }
-    public static void PlayStatusAnim(int entityId, EnSceneEntityStatus status, IClassPoolDestroy userData)
-    {
-        return;
-        var animId = EnSpineAnimId.None;
-        switch (status)
-        {
-            case EnSceneEntityStatus.Hit:
-                {
-                    //var data = userData as GameMonsterHitStatusUserData;
-                    //switch (data.dir)
-                    //{
-                    //    case EnDirection.Top:
-                    //    case EnDirection.Bottom:
-                    //        animId = EnSpineAnimId.hit_3;
-                    //        break;
-                    //    case EnDirection.Left:
-                    //        animId = EnSpineAnimId.hit_2;
-                    //        break;
-                    //    case EnDirection.Right:
-                    //        animId = EnSpineAnimId.hit_3;
-                    //        break;
-                    //    default:
-                    //        break;
-                    //}
-                }
-                break;
-            case EnSceneEntityStatus.Die: animId = EnSpineAnimId.die; break;
-            case EnSceneEntityStatus.Idle: animId = EnSpineAnimId.stand; break;
-            case EnSceneEntityStatus.Move: animId = EnSpineAnimId.stand; break;
-            case EnSceneEntityStatus.Fly: animId = EnSpineAnimId.appear; break;
-            case EnSceneEntityStatus.Atk: animId = EnSpineAnimId.attack; break;
-            default:
-                break;
-        }
-        var skeleCom = SceneEntityMgr.Instance.GetEntityCom<EntitySpineComData>(entityId, EnSceneEntityComType.Spine);
-        skeleCom.PlayAnim(animId, status);
-    }
-    #endregion
     #region 碰撞
     public static void OnCollision(int entityId, EnDirection dir)
     {

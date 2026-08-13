@@ -31,7 +31,7 @@ public class GameGridInfo : IClassPoolInit
         pos = Vector3.zero;
     }
 
-    public void OnPoolInit<T>(T userData) where T : IClassPoolDestroy
+    public void OnPoolInit<T>(T userData) where T : IClassPool
     {
         status = EnGridStatus.Idle;
     }

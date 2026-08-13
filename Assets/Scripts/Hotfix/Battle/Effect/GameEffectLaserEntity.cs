@@ -36,12 +36,12 @@ public class GameEffectLaserEntityData : SceneEntityData<GameEffectLaserEntity>
     }
     public override void SetPosition(in Vector3 worldPos)
     {
-        var posZ = GameMapUtility.GetCurMapDepth() + (int)EnGameEntityOrderLayer.Effect;
+        var posZ = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.Effect);
         base.SetPosition(new Vector3(worldPos.x, worldPos.y, posZ));
     }
-    public override void OnGOCreate()
+    public override void OnGOCreate(GameEntity entity)
     {
-        base.OnGOCreate();
+        base.OnGOCreate(entity);
 
         _SceneEntity.SetPoint2(_Point1, _Point2);
         _SceneEntity.SetLaserWidth(_LaserWidth);
@@ -82,13 +82,13 @@ public class GameEffectLaserEntity : SceneEntity
         }
     }
 
-    public override void SetLocalScale()
+    public override void SetLocalScale(in Vector3 localScale)
     {
-        base.SetLocalScale();
+        base.SetLocalScale(in localScale);
 
         foreach (var item in _Lines)
         {
-            item.startWidth = _EntityData.LocalScale.y * _LaserWidth;
+            item.startWidth = localScale.y * _LaserWidth;
         }
     }
 }

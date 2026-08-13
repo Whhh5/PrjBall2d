@@ -9,7 +9,7 @@ public class GameBalletBallPartPosEntityData : SceneEntityData<GameBalletBallPar
 
     public override void SetPosition(in Vector3 worldPos)
     {
-        var posZ = GameMapUtility.GetCurMapDepth() + (int)EnGameEntityOrderLayer.Grid;
+        var posZ = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.Grid);
         base.SetPosition(new Vector3(worldPos.x, worldPos.y, posZ));
     }
 }
