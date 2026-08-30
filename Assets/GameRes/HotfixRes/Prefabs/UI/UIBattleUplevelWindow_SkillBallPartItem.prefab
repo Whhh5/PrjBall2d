@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4979638783108641497}
   - component: {fileID: 5915909869385647415}
   - component: {fileID: 4946684620525766426}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _IcomImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,7 +107,7 @@ GameObject:
   - component: {fileID: 7977617792673315490}
   - component: {fileID: 3651197975665998097}
   - component: {fileID: 9032901990919712020}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _DescriptionTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -245,7 +245,7 @@ GameObject:
   - component: {fileID: 8848975703182137872}
   - component: {fileID: 309110288698374191}
   - component: {fileID: 4118810653921751636}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: starList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -333,7 +333,7 @@ GameObject:
   - component: {fileID: 2830995148302026925}
   - component: {fileID: 2947691998260555451}
   - component: {fileID: 7103315820902684820}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UIBattleUplevelWindow_SkillBallPartItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -520,7 +520,7 @@ GameObject:
   - component: {fileID: 1827913976140170890}
   - component: {fileID: 947974147772852900}
   - component: {fileID: 9011239659551593520}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _StarGo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -596,7 +596,7 @@ GameObject:
   - component: {fileID: 2310257383972739062}
   - component: {fileID: 2589375480343751039}
   - component: {fileID: 93754882892833770}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _NameTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -751,7 +751,7 @@ GameObject:
   - component: {fileID: 3564695564332995307}
   - component: {fileID: 5596739433010293832}
   - component: {fileID: 100213050049341903}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

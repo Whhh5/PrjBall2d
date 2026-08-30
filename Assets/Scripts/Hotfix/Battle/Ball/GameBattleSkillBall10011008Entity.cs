@@ -6,14 +6,14 @@ public class GameBattleSkillBall10011008EntityData : GameBattleSkillBallEntityDa
 
     protected override void OnCollision(in GamePhysicsHit hit)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var lbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var ruPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
         var starData = GetStarUserData();
 
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
-        var atkValue = ownerAtk + starData.damageValue;
+        var atkValue = ballAtkValue + ownerAtk + starData.damageValue;
         var damageResult = GameAttackMgr.Instance.AttackMonster(_OwnerEntityId, hit.entityId, atkValue, hit.point, starData.damageType);
         PlayHitAudio(in damageResult);
 

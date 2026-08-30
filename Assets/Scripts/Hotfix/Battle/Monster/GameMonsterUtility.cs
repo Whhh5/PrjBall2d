@@ -38,14 +38,13 @@ public static class GameMonsterUtility
     }
     public static void GetGridDataByWorldPos(ref GameMonsterGridIndexData data, in Vector2 worldPos)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
-        var maxRowCol = GameMapUtility.GetMapGridRowCol(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         var maxIndex = maxRowCol.x * maxRowCol.y - 1;
 
-        var top = GameMapUtility.WorldPosToGridIndex(mapId, worldPos + new Vector2(0, gridSize.y * 0.5f));
-        var center = GameMapUtility.WorldPosToGridIndex(mapId, worldPos);
-        var bottom = GameMapUtility.WorldPosToGridIndex(mapId, worldPos - new Vector2(0, gridSize.y * 0.5f));
+        var top = GameMapUtility.WorldPosToGridIndex(worldPos + new Vector2(0, gridSize.y * 0.5f));
+        var center = GameMapUtility.WorldPosToGridIndex( worldPos);
+        var bottom = GameMapUtility.WorldPosToGridIndex( worldPos - new Vector2(0, gridSize.y * 0.5f));
         data.top = Mathf.Clamp(top, 0, maxIndex);
         data.center = Mathf.Clamp(center, 0, maxIndex);
         data.bottom = Mathf.Clamp(bottom, 0, maxIndex);

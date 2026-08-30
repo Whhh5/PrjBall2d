@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 
-public class UIBattleSkillBallPartInfoTipsUserData : UIWindowUserData
+public class UIBattleSkillBallPartInfoTipsUserData : UITipsUserData
 {
     public int partId;
     public int star;
@@ -14,10 +14,8 @@ public class UIBattleSkillBallPartInfoTipsUserData : UIWindowUserData
             = -1;
     }
 }
-public class UIBattleSkillBallPartInfoTipsData : UIWindowData<UIBattleSkillBallInfoTips, UIBattleSkillBallPartInfoTipsUserData>
+public class UIBattleSkillBallPartInfoTipsData : UITipsData<UIBattleSkillBallInfoTips, UIBattleSkillBallPartInfoTipsUserData>
 {
-    public override EnUIWindowType WindowType => EnUIWindowType.Tips;
-
     public override EnLoadTarget LoadTarget => EnLoadTarget.Pre_UIBattleSkillBallInfoTips;
 
 
@@ -47,7 +45,7 @@ public class UIBattleSkillBallPartInfoTipsData : UIWindowData<UIBattleSkillBallI
         starData.GetDescriptionList(ref list, EnDescriptionLevel.Level1);
 
         var nameStr = LanguageUtility.GetLanguage(partCfg.nNameLangId);
-        _UIWindow.SettingBallInfo(nameStr, list, _Star);
+        _UITips.SettingBallInfo(nameStr, list, _Star);
 
         for (int i = 0; i < list.Count; i++)
         {

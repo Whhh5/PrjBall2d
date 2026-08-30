@@ -19,8 +19,9 @@ public class GameBattleSkillBall1005EntityData : GameBattleSkillBallEntityData<G
         var starData = GetStarUserData();
 
         // 球攻击
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
-        var atkValue = ownerAtk + starData.damageValue;
+        var atkValue = ballAtkValue + ownerAtk + starData.damageValue;
         var damageResult = GameAttackMgr.Instance.AttackMonster(_OwnerEntityId, hit.entityId, atkValue, hit.point, starData.damageType);
         // 地震效果
         EffectAttack(in damageResult.value, in hit, in starData);
@@ -32,12 +33,11 @@ public class GameBattleSkillBall1005EntityData : GameBattleSkillBallEntityData<G
         var addOwnerAtk = Mathf.CeilToInt(finalDamaage * starData.effectAtkPercentage01);
         var effectAtkDamage = starData.effectAtkDamageValue + addOwnerAtk;
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         var gridPos = GameBattleGridMgr.Instance.GetGridWorldPos(hit.pointGridIndex);
 
         GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_buff_dizhen, gridPos);
 
-        var (row, col) = GameMapUtility.IndexToRowCol(mapId, hit.pointGridIndex);
+        var (row, col) = GameMapUtility.IndexToRowCol(hit.pointGridIndex);
         var entityIds = new List<int>(10);
         var extendGridRow = (starData.effectRowCount - 1) / 2;
         var extendGridCol = (starData.effectColCount - 1) / 2;
@@ -46,9 +46,9 @@ public class GameBattleSkillBall1005EntityData : GameBattleSkillBallEntityData<G
         {
             for (int j = col - extendGridCol; j <= col + extendGridCol; j++)
             {
-                if (!GameMapUtility.RowColIsValid(mapId, i, j))
+                if (!GameMapUtility.RowColIsValid(i, j))
                     continue;
-                var index = GameMapUtility.RowColToIndex(mapId, i, j);
+                var index = GameMapUtility.RowColToIndex(i, j);
                 GameBattleGridMgr.Instance.GetGridEntityIds(index, ref entityIds);
             }
         }

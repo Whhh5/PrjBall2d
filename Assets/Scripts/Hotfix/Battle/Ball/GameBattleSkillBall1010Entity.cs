@@ -12,15 +12,16 @@ public class GameBattleSkillBall1010EntityData : GameBattleSkillBallEntityData<G
     protected override void OnCollision(in GamePhysicsHit hit)
     {
         var starData = GetStarUserData();
+
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
-        var atkValue = ownerAtk + starData.damageValue;
+        var atkValue = ballAtkValue + ownerAtk + starData.damageValue;
         var damageResult = GameAttackMgr.Instance.AttackMonster(_OwnerEntityId, hit.entityId, atkValue, hit.point, starData.damageType);
         PlayHitAudio(in damageResult);
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
 
-        var gridLbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var gridRuPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var gridLbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var gridRuPos = ref GameMapMgr.Instance.GetGridRuPosition();
         var laserPoint1 = new Vector2(hit.point.x, gridLbPos.y);
         var laserPoint2 = new Vector2(hit.point.x, gridRuPos.y);
         var effectEntityId = SceneEntityMgr.Instance.CreateEntityData<GameEffectLaserEntityData>();

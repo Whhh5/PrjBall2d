@@ -36,9 +36,8 @@ public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameB
 
     public override void SetPosition(in Vector3 worldPos)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var lbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var ruPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
         var testValue = Mathf.Lerp(0, 0.9f, (worldPos.y - lbPos.y) / (ruPos.y - lbPos.y));
         var depth = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.Monster, testValue);
         base.SetPosition(new Vector3(worldPos.x, worldPos.y, depth));

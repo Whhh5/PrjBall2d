@@ -19,6 +19,8 @@ public class UIBattleMainWindow : UIWindow
     private Image _PauseImg = null;
     [SerializeField]
     private Button _PlaySpeedBtn = null;
+    [SerializeField, AutoReference]
+    private TextMeshProUGUI _TitleTxt = null;
     [SerializeField]
     private TextMeshProUGUI _PlaySpeedTxt = null;
     [SerializeField]
@@ -27,6 +29,10 @@ public class UIBattleMainWindow : UIWindow
     private UIBattleMainWindow_SkillBallIconItem _SkillPassivityIconImg = null;
     [SerializeField]
     private RectTransform _SelectFrameRect = null;
+    [SerializeField,AutoReference]
+    private Button _RestartBtn = null;
+    [SerializeField,AutoReference]
+    private Button _ExitBtn = null;
 
     private readonly Dictionary<int, UIBattleMainWindow_SkillBallIconItem> _SkillBallIconItems = new();
     private readonly Dictionary<int, int> _Ball2Index = new();
@@ -34,7 +40,6 @@ public class UIBattleMainWindow : UIWindow
     private readonly Dictionary<int, int> _SkillPassivity2Index = new();
 
 
-    private Vector2 _IconSize;
     private int _TipsWindowId = -1;
     private bool _IsSettingTime = false;
 
@@ -70,6 +75,8 @@ public class UIBattleMainWindow : UIWindow
         }
         _PlaySpeedBtn.RemoveListener(OnClick_PlaySpeedBtn);
         _PauseBtn.RemoveListener(OnClick_PauseBtn);
+        _RestartBtn.RemoveListener(OnClick_RestartBtn);
+        _ExitBtn.RemoveListener(OnClick_ExitBtn);
         base.OnUnload();
         _SkillBallIconItems.Clear();
         _SkillPassivityIconItems.Clear();
@@ -80,17 +87,18 @@ public class UIBattleMainWindow : UIWindow
         _SpeedSetId = -1;
         _IsSettingTime = false;
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
-        base.LoadCompeletion();
+        base.LoadCompletion();
 
         _SkillBallIconItem.gameObject.SetActive(false);
         _SkillPassivityIconImg.gameObject.SetActive(false);
         _SelectFrameRect.gameObject.SetActive(false);
-        _IconSize = _SkillBallIconItem.GetComponent<RectTransform>().sizeDelta;
 
         _PlaySpeedBtn.AddListener(OnClick_PlaySpeedBtn);
         _PauseBtn.AddListener(OnClick_PauseBtn);
+        _RestartBtn.AddListener(OnClick_RestartBtn);
+        _ExitBtn.AddListener(OnClick_ExitBtn);
 
         var playerEntityId = GamePlayerMgr.Instance.GetPlayerEntityId();
         EventMgr.Instance.Register<GameSkillBallAddEventData>(EnABBEvent.EVENT_SKILL_BALL_ADD, (int)EnBallType.Skill, 0, OnEvent_BallAdd);
@@ -109,6 +117,12 @@ public class UIBattleMainWindow : UIWindow
         }
         SetSpeed(0);
         _PauseImg.LoadSprirte(_IsSettingTime ? EnLoadTarget.Sp_img_pause1 : EnLoadTarget.Sp_img_pause2);
+
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        var chapterName = LanguageUtility.GetLanguage(chapterCfg.nNameLangId);
+        var titleStr = LanguageUtility.GetLanguage_10014(chapterId, chapterName);
+        _TitleTxt.SetText(titleStr);
     }
 
     private void OnClick_PlaySpeedBtn()
@@ -120,6 +134,16 @@ public class UIBattleMainWindow : UIWindow
         _IsSettingTime = !_IsSettingTime;
         TimeMgr.Instance.SetPause(_IsSettingTime, false);
         _PauseImg.LoadSprirte(_IsSettingTime ? EnLoadTarget.Sp_img_pause1 : EnLoadTarget.Sp_img_pause2);
+    }
+    private void OnClick_RestartBtn()
+    {
+        GameMapMgr.Instance.ReenterMap();
+    }
+    private void OnClick_ExitBtn()
+    {
+        GameMapMgr.Instance.ExitMap();
+
+        UIMgr.Instance.ShowLobby();
     }
 
     private void SetSpeed(int index)

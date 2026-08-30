@@ -165,9 +165,9 @@ public class BattleMapBg_1 : GameEntity
     }
     public void SetEnergyValue(int value)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        if (mapCfg.nMaxEnergyStage > 0 && _Level >= mapCfg.nMaxEnergyStage)
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        if (chapterCfg.nMaxEnergyStage > 0 && _Level >= chapterCfg.nMaxEnergyStage)
         {
             _EnergyValue.text = $"MAX";
         }

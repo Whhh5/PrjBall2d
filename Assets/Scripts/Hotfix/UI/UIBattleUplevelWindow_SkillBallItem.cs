@@ -77,10 +77,10 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
             = _Star
             = -1;
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
         _Rect = GetComponent<RectTransform>();
-        base.LoadCompeletion();
+        base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
         _StarGo.SetActive(false);
         _FussionImg.gameObject.SetActive(false);

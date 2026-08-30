@@ -2,6 +2,7 @@
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.U2D;
 
 public enum EnGameMonsterType
 {
@@ -14,6 +15,8 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
 {
     private readonly HashSet<int> _MonsterEntityIds = new(100);
     private readonly Dictionary<int, GameMonsterGridIndexData> _MonsterGridDatas = new(100);
+    private bool _DirtyMonster = false;
+    private readonly List<int> _TempMonsterIds = new(100);
 
     public override void Destroy()
     {
@@ -30,17 +33,15 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
     {
         return EnGameMapLifecycleOrder.GameMonsterMgr;
     }
-    public void EnterMap(int mapId)
+    public void EnterMap(int mapId, int chapterId)
     {
-
         EventMgr.Instance.Register<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
         EventMgr.Instance.Register<GameSkillMonsterDieEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Die, OnEvent_SkillMonsterDie);
         EventMgr.Instance.Register<GameSkillMonsterAttack1EventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Attack, OnEvent_SkillMonsterAttack);
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
-
         EventMgr.Instance.Unregister<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
         EventMgr.Instance.Unregister<GameSkillMonsterDieEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Die, OnEvent_SkillMonsterDie);
         EventMgr.Instance.Unregister<GameSkillMonsterAttack1EventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Attack, OnEvent_SkillMonsterAttack);
@@ -48,7 +49,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         ClearMonster();
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
         ClearMonster();
     }
@@ -80,11 +81,17 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         }
         _MonsterEntityIds.Clear();
         _MonsterGridDatas.Clear();
+        _DirtyMonster = true;
     }
     public List<int> GetMonsterList()
     {
-        var list = _MonsterEntityIds.ToList();
-        return list;
+        if (_DirtyMonster)
+        {
+            _DirtyMonster = false;
+            _TempMonsterIds.Clear();
+            _TempMonsterIds.AddRange(_MonsterEntityIds);
+        }
+        return _TempMonsterIds;
     }
     public int GetMonsterCount()
     {
@@ -112,6 +119,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
     {
         if (!_MonsterEntityIds.Remove(entityId))
             return;
+        _DirtyMonster = true;
         var gridData = _MonsterGridDatas[entityId];
         ClassPoolMgr.Instance.Push(gridData);
         _MonsterGridDatas.Remove(entityId);
@@ -126,7 +134,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
     }
     public int CreateMonsterEntity(in int monsterId, in int row, in int col, in int attValueCfgId, in int energyCount)
     {
-        var gridIndex = GameMapUtility.CreateCurMapGridIndex(row, col); ;
+        var gridIndex = GameMapUtility.CreateGridIndex(row, col);
         var userData = ClassPoolMgr.Instance.Pull<GameBattleMonsterEntityUserData>();
         userData.monsterId = monsterId;
         userData.gridPos = gridIndex;
@@ -135,6 +143,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         var entityId = SceneEntityMgr.Instance.CreateEntityData(monsterCfg.nEntityTypeId, userData);
         ClassPoolMgr.Instance.Push(userData);
         _MonsterEntityIds.Add(entityId);
+        _DirtyMonster = true;
 
         var pos = GameBattleGridMgr.Instance.GetGridWorldPos(gridIndex.index);
         EntityMgr.Instance.SetEntityWorldPos(entityId, pos);
@@ -173,7 +182,6 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         _BallEntityIds.Clear();
         GameBattleBallMgr.Instance.GetBallEntityIds(ref _BallEntityIds);
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(monsterCfgId);
         for (int i = 0; i < _BallEntityIds.Count; i++)
         {
@@ -184,7 +192,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
                 continue;
 
             var ballWorldPos = EntityMgr.Instance.GetEntityWorldPos2D(ballEntityId);
-            if (!GameMapUtility.WorldPosToGridRowCol(in mapId, in ballWorldPos, out var ballRow, out var ballCol))
+            if (!GameMapUtility.WorldPosToGridRowCol(in ballWorldPos, out var ballRow, out var ballCol))
                 continue;
             for (int j = 0; j < monsterCfg.arrGridLocalPos.Length; j += 2)
             {
@@ -202,8 +210,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
 
     private void SetEntityGrid(int entityId, Vector3 pos)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
 
         var monsterCfg = MonsterUtility.GetMonsterCfg(entityId);
 
@@ -224,7 +231,6 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
 
     public void CheckUpdateEntityGrid(int entityId)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         var lastGridData = _MonsterGridDatas[entityId];
 
 
@@ -242,8 +248,8 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         }
         var lastPos = lastGridData.lastPos;
         lastGridData.lastPos = entityWorldPos;
-        var curGridIndex = GameMapUtility.WorldPosToGridIndex(mapId, entityWorldPos);
-        var gridIndexData = GameMapUtility.CreateGridIndex(mapId, curGridIndex);
+        var curGridIndex = GameMapUtility.WorldPosToGridIndex(entityWorldPos);
+        var gridIndexData = GameMapUtility.CreateGridIndex(curGridIndex);
         entityData.SetGridIndex(gridIndexData);
         if (gridData.top != lastGridData.top)
             lastGridData.top = gridData.top;
@@ -255,7 +261,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
 
 
         var monsterCfg = MonsterUtility.GetMonsterCfg(entityId);
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         var lastGridIndexData = ClassPoolMgr.Instance.Pull<GameMonsterGridIndexData>();
         var curGridIndexData = ClassPoolMgr.Instance.Pull<GameMonsterGridIndexData>();
         for (int i = 0; i < monsterCfg.arrGridLocalPos.Length; i += 2)
@@ -291,8 +297,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
     private List<int> _MouseEntityIds = new();
     private void OnEvent_MouseClick(in int _, in int __, in GameBattleMouseClickEventData data)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var index = GameMapUtility.WorldPosToGridIndex(mapId, data.worldPos);
+        var index = GameMapUtility.WorldPosToGridIndex(data.worldPos);
         _MouseEntityIds.Clear();
         GameBattleGridMgr.Instance.GetGridEntityIds(index, ref _MouseEntityIds);
         for (int i = 0; i < _MouseEntityIds.Count; i++)
@@ -305,10 +310,10 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
             var monsterId = monsterData.GetMonsterCfgId();
             var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(monsterId);
             var monsterName = LanguageUtility.GetLanguage(monsterCfg.nNameLangId);
-            var tipsUserData = ClassPoolMgr.Instance.Pull<UIBattleEntityAttributeWindowUserData>();
+            var tipsUserData = ClassPoolMgr.Instance.Pull<UIBattleEntityAttributeTipsUserData>();
             tipsUserData.title = monsterName;
             tipsUserData.targetEntityId = entityId;
-            UIMgr.Instance.ShowWindow<UIBattleEntityAttributeWindowData>(tipsUserData);
+            UIMgr.Instance.ShowWindow<UIBattleEntityAttributeTipsData>(tipsUserData);
 
             break;
         }
@@ -316,8 +321,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
     }
     private bool IsMouseDownMoster(in int entityId, in Vector2 mousePos)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         var testDisSqr = gridSize.x * gridSize.y / 2 / 2;
         var monsterData = EntityMgr.Instance.GetEntityData<GameBattleMonsterEntityData>(entityId);
         var monsterId = monsterData.GetMonsterCfgId();

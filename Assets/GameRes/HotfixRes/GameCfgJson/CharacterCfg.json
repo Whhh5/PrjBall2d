@@ -1,1 +1,1 @@
-﻿[{"nCharacterID":1,"nClassTypeId":5001,"fBallSpeed":10.0,"fBallFireInterval":0.2,"nAttributeValueCfgId":1}]
+﻿[{"nCharacterID":1,"nNameLangId":21011,"nClassTypeId":5001,"fBallSpeed":10.0,"fBallFireInterval":0.2,"nMaxLevel":60,"nBaseAttributeValueId":1010001,"fLevelCoefficient":0.3},{"nCharacterID":2,"nNameLangId":21021,"nClassTypeId":5001,"fBallSpeed":10.0,"fBallFireInterval":0.2,"nMaxLevel":80,"nBaseAttributeValueId":1020001,"fLevelCoefficient":0.5}]

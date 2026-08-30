@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 
 public interface IBattleSystem
@@ -16,18 +17,25 @@ public enum EnGameBattleStatus
     Finish,
     Faild,
     Success,
+    Resurrection,
 }
 public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
 {
     public override EnManagerFuncType FuncType => base.FuncType | EnManagerFuncType.Update;
     private readonly Dictionary<string, IBattleSystem> _BattleSystems = new();
+    private readonly HashSet<string> _DisableSystem = new();
 
     private int _BossEntityId;
     private EnGameBattleStatus _BattleStatus = EnGameBattleStatus.None;
-    public override async UniTask OnEnableAsync()
-    {
-        await base.OnEnableAsync();
 
+    public override void Destroy()
+    {
+        GameMapMgr.Instance.UnregisterLifecycle(this);
+        base.Destroy();
+    }
+    public override async UniTask AwakeAsync()
+    {
+        await base.AwakeAsync();
         GameMapMgr.Instance.RegisterLifecycle(this);
 
         var types = typeof(GameBattleMgr).Assembly.GetTypes();
@@ -41,6 +49,13 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
             _BattleSystems.Add(type.FullName, ins);
         }
     }
+
+    public IBattleSystem GetSystem(string key)
+    {
+        if (!_BattleSystems.TryGetValue(key, out var system))
+            return default;
+        return system;
+    }
     public T GetSystem<T>()
         where T : IBattleSystem
     {
@@ -49,16 +64,12 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
             return default;
         return (T)system;
     }
-    public override void OnDisable()
-    {
-        GameMapMgr.Instance.UnregisterLifecycle(this);
-        base.OnDisable();
-    }
 
     public EnGameMapLifecycleOrder GetMapLifecycleOrder() => EnGameMapLifecycleOrder.GameBattleMgr;
 
-    public void EnterMap(int mapId)
+    public void EnterMap(int mapId, int chapterId)
     {
+        EventMgr.Instance.Register(EnABBEvent.EVENT_BATTLE_PLAYER_DIE, 0, 0, OnEvent_PlayerDie);
         EventMgr.Instance.Register<GameSkillBossDebutEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Debut, OnEvent_BossDebut);
         foreach (var item in _BattleSystems)
         {
@@ -67,8 +78,9 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
         SetBattleStatus(EnGameBattleStatus.Battle);
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
+        EventMgr.Instance.Unregister(EnABBEvent.EVENT_BATTLE_PLAYER_DIE, 0, 0, OnEvent_PlayerDie);
         EventMgr.Instance.Unregister<GameSkillBossDebutEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Debut, OnEvent_BossDebut);
         foreach (var item in _BattleSystems)
         {
@@ -82,7 +94,7 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
         SetBattleStatus(EnGameBattleStatus.Finish);
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
         foreach (var item in _BattleSystems)
         {
@@ -107,6 +119,8 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
         {
             foreach (var item in _BattleSystems)
             {
+                if (_DisableSystem.Contains(item.Key))
+                    continue;
                 item.Value.OnUpdate();
             }
 
@@ -123,12 +137,29 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
     {
         return _BattleStatus == gameStatus;
     }
+    public EnGameBattleStatus GetBattleStatus()
+    {
+        return _BattleStatus;
+    }
     public void SetBattleStatus(EnGameBattleStatus gameStatus)
     {
         if (gameStatus == _BattleStatus)
             return;
-        _BattleStatus = gameStatus; 
+        AotDebug.Log($"game start change:{_BattleStatus}->{gameStatus}");
+        _BattleStatus = gameStatus;
 
+        switch (gameStatus)
+        {
+            case EnGameBattleStatus.Success:
+            case EnGameBattleStatus.Faild:
+                UIMgr.Instance.ShowWindow<UIBattleFinishWindowData>();
+                break;
+            case EnGameBattleStatus.Resurrection:
+                UIMgr.Instance.ShowWindow<UIBattleDieWindowData>();
+                break;
+            default:
+                break;
+        }
         EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_STATUS_CHANGLE, (int)gameStatus);
     }
 
@@ -142,12 +173,16 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
         EventMgr.Instance.Register<GameBattleMonsterDieEventData>(EnABBEvent.EVENT_BATTLE_MONSTER_DIE, bossEntityId, 0, OnEvent_BossDie);
     }
 
+    private void OnEvent_PlayerDie(in int playerEntityId, in int _)
+    {
+        SetBattleStatus(EnGameBattleStatus.Resurrection);
+    }
     private void OnEvent_BossDebut(in int mapBossEntityId, in int __, in GameSkillBossDebutEventData data)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
         var waveSystem = GameBattleMgr.Instance.GetSystem<GameBattleWaveSystem>();
-        waveSystem.CreateWaveMonsterEntitys(mapCfg.nBossWaveId);
+        waveSystem.CreateWaveMonsterEntitys(chapterCfg.nBossWaveId);
     }
     private void OnEvent_BossDie(in int entityId, in int _, in GameBattleMonsterDieEventData data)
     {
@@ -163,6 +198,35 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
         eventUserData.entityId = entityId;
         EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_BOSS_DIE, 0, 0, eventUserData);
         ClassPoolMgr.Instance.Push(eventUserData);
+
+    }
+    public Dictionary<string, IBattleSystem> GetBattleSystems()
+    {
+        return _BattleSystems;
+    }
+    public bool IsEnableSystem(string systemKey)
+    {
+        return _BattleSystems.ContainsKey(systemKey) && !_DisableSystem.Contains(systemKey);
+    }
+    public void EnableSystem(string systemKey)
+    {
+        _DisableSystem.Remove(systemKey);
+    }
+    public void DisableSystem(string systemKey)
+    {
+        _DisableSystem.Add(systemKey);
+    }
+
+    public void Resurrection()
+    {
+        var playerEntityId = GamePlayerMgr.Instance.GetPlayerEntityId();
+        var limitHp = GameAttributeUtility.GetValue(playerEntityId, EnEntityAttributeId.LimitHp);
+        //GameAttributeUtility.AddResultValue(playerEntityId, EnEntityAttributeId.Hp, limitHp);
+        var pointInfo = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(playerEntityId);
+        var center = pointInfo.GetCenterPointWorldPos();
+        GameAttackMgr.Instance.RestoreHealth(playerEntityId, playerEntityId, limitHp, center);
+
+        GamePlayerMgr.Instance.SetValid(true);
 
     }
 }

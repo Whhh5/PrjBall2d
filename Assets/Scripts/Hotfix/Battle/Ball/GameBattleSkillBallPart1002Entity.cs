@@ -31,26 +31,24 @@ public class GameBattleSkillBallPart1002EntityData : GameBattleSkillBallPartEnti
         if (testValue > starData.fireProbability0100)
             return;
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-
         var rangeMax = 5;
         var rangeMin = 1;
 
-        var pointRowCol = GameMapUtility.IndexToRowCol(mapId, hit.pointGridIndex);
+        var pointRowCol = GameMapUtility.IndexToRowCol(hit.pointGridIndex);
         _TargetIndexPool.Clear();
         for (int row = pointRowCol.row - rangeMax; row <= pointRowCol.row + rangeMax; row++)
         {
-            if (!GameMapUtility.RowIsValid(mapId, row))
+            if (!GameMapUtility.RowIsValid(row))
                 continue;
             if (row > pointRowCol.row - rangeMin && row <= pointRowCol.row + rangeMin)
                 continue;
             for (int col = pointRowCol.col - rangeMax; col <= pointRowCol.col + rangeMax; col++)
             {
-                if (!GameMapUtility.ColIsValid(mapId, col))
+                if (!GameMapUtility.ColIsValid(col))
                     continue;
                 if (col > pointRowCol.col - rangeMin && col <= pointRowCol.col + rangeMin)
                     continue;
-                var testIndex = GameMapUtility.RowColToIndex(mapId, in row, in col);
+                var testIndex = GameMapUtility.RowColToIndex(in row, in col);
                 _TargetIndexPool.Add(testIndex);
             }
         }
@@ -99,7 +97,8 @@ public class GameBattleSkillBallPart1002EntityData : GameBattleSkillBallPartEnti
         if (targetCount > 0)
         {
             var starData = GetBallPartStarData();
-            var atkDamage = starData.atkDamage + Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+            var ownerDamage = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+            var atkDamage = starData.atkDamage + ownerDamage;
             for (int i = 0; i < targetCount; i++)
             {
                 ref readonly var hit = ref _Hits[i];

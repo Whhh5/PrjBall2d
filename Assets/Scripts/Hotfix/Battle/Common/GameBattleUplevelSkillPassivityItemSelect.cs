@@ -15,7 +15,7 @@ public class GameBattleUplevelSkillPassivityItemSelect : IBattleEnergyUplevelIte
         _MaxCount = 0;
     }
 
-    public void Init(int mapId)
+    public void Init(int chapterId)
     {
     }
 
@@ -35,9 +35,10 @@ public class GameBattleUplevelSkillPassivityItemSelect : IBattleEnergyUplevelIte
     {
         _IgnoreHistory.Clear();
         _SkillPassivityPool.Clear();
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        _SkillPassivityPool.AddRange(mapCfg.arrSkillPassivityIds);
+        var mapId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(mapId);
+        if (chapterCfg.arrSkillPassivityIds != null)
+            _SkillPassivityPool.AddRange(chapterCfg.arrSkillPassivityIds);
         var curSkillList = GameSkillPassivityMgr.Instance.GetSkillPassivityIds();
         for (int i = 0; i < curSkillList.Count; i++)
         {

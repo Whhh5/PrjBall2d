@@ -153,9 +153,9 @@ public class UIBattleUplevelWindow : UIWindow
         }
         _SelectItemEntitys.Clear();
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
-        base.LoadCompeletion();
+        base.LoadCompletion();
 
         _DescLevel2Txt.gameObject.SetActive(false);
         _DescLevel3Txt.gameObject.SetActive(false);

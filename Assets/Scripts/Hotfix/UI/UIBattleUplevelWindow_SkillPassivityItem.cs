@@ -64,10 +64,10 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
             = _Star
             = -1;
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
         _Rect = GetComponent<RectTransform>();
-        base.LoadCompeletion();
+        base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
         _StarGo.SetActive(false);
 

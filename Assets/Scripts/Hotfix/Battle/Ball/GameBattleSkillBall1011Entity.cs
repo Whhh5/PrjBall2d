@@ -42,12 +42,13 @@ public class GameBattleSkillBall1011EntityData : GameBattleSkillBallEntityData<G
     protected override void OnCollision(in GamePhysicsHit hit)
     {
         var starData = GetStarUserData();
+
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
-        var atkValue = ownerAtk + starData.damageValue;
+        var atkValue = ballAtkValue + ownerAtk + starData.damageValue;
         var damageResult = GameAttackMgr.Instance.AttackMonster(_OwnerEntityId, hit.entityId, atkValue, hit.point, starData.damageType);
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var (row, col) = GameMapUtility.IndexToRowCol(mapId, hit.pointGridIndex);
+        var (row, col) = GameMapUtility.IndexToRowCol(hit.pointGridIndex);
         var changeRow = (starData.effectRowCount - 1) / 2;
         var changeCol = (starData.effectColCount - 1) / 2;
         _TempEntityIds.Clear();
@@ -57,9 +58,9 @@ public class GameBattleSkillBall1011EntityData : GameBattleSkillBallEntityData<G
         {
             for (int j = col - changeCol; j <= col + changeCol; j++)
             {
-                if (!GameMapUtility.RowColIsValid(mapId, i, j))
+                if (!GameMapUtility.RowColIsValid(i, j))
                     continue;
-                var gridIndex = GameMapUtility.RowColToIndex(mapId, i, j);
+                var gridIndex = GameMapUtility.RowColToIndex(i, j);
                 GameBattleGridMgr.Instance.GetGridEntityIds(gridIndex, ref _TempEntityIds);
             }
         }

@@ -54,10 +54,9 @@ public class GameBattleSkillBallPart1003EntityData : GameBattleSkillBallPartEnti
         var entityPointInfo = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(in enityId);
         var mainIndex = entityPointInfo.GetMainGridIndex();
         var gridPoss = entityPointInfo.GetGridIndexs();
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         for (int i = 0; i < gridPoss.Length; i += 2)
         {
-            var index = GameMapUtility.RowColToIndex(mapId, mainIndex.row + gridPoss[i], mainIndex.col + gridPoss[i + 1]);
+            var index = GameMapUtility.RowColToIndex( mainIndex.row + gridPoss[i], mainIndex.col + gridPoss[i + 1]);
             if (!_EffectGridIndex.TryGetValue(index, out var data))
             {
                 var gridWorldPos = GameBattleGridMgr.Instance.GetGridWorldPos(index);
@@ -107,7 +106,8 @@ public class GameBattleSkillBallPart1003EntityData : GameBattleSkillBallPartEnti
             return;
 
         var starData = GetBallPartStarData();
-        var damage = starData.atkDamage + Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
+        var ownerDamage = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
+        var damage = starData.atkDamage + ownerDamage;
         foreach (var entityId in entitys)
         {
             var pointCom = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(entityId);

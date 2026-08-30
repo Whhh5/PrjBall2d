@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7816949822468616636}
   - component: {fileID: 8389038278970570687}
   - component: {fileID: 1616344876098534649}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _DescriptionTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 104979405422884145}
   - component: {fileID: 3841674056925647483}
   - component: {fileID: 261074564514406109}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: sourcelist
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,7 +249,7 @@ GameObject:
   - component: {fileID: 4979638783108641497}
   - component: {fileID: 5915909869385647415}
   - component: {fileID: 4946684620525766426}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _FinalBallImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -344,7 +344,7 @@ GameObject:
   - component: {fileID: 5540397316126766772}
   - component: {fileID: 3935638526900383753}
   - component: {fileID: 4546722976237753332}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _SourceImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -423,7 +423,7 @@ GameObject:
   - component: {fileID: 2830995148302026925}
   - component: {fileID: 7103315820902684820}
   - component: {fileID: 6797130084257786056}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UIBattleUplevelWindow_SkillBallFussionItem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -611,7 +611,7 @@ GameObject:
   - component: {fileID: 2310257383972739062}
   - component: {fileID: 2589375480343751039}
   - component: {fileID: 93754882892833770}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _NameTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -766,7 +766,7 @@ GameObject:
   - component: {fileID: 3564695564332995307}
   - component: {fileID: 5596739433010293832}
   - component: {fileID: 100213050049341903}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

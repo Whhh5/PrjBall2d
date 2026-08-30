@@ -202,6 +202,8 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
         {
             //SceneEntityMgr.Instance.AddCmd(sourceEntityId, EnEntityCmd.PlayerDie);
             GamePlayerMgr.Instance.SetValid(false);
+
+            EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_PLAYER_DIE, targetEntityId, 0);
         }
         return damageResult;
     }
@@ -226,7 +228,7 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
                     if (testCriticalValue < criticalValue) // 暴击
                     {
                         var criticalDamageValue = sourceProCom.GetValue(EnEntityAttributeId.CriticalDamage);
-                        finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue);
+                        finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue / 100f);
                         valueType = EnDamageValueType.Critical;
                     }
                     var armorValue = targetProCom.GetValue(EnEntityAttributeId.PhysicsArmor);
@@ -244,7 +246,7 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
                         if (testCriticalValue < criticalValue) // 暴击
                         {
                             var criticalDamageValue = sourceProCom.GetValue(EnEntityAttributeId.CriticalDamage);
-                            finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue);
+                            finalDamage += Mathf.CeilToInt(finalDamage * criticalDamageValue / 100f);
                             valueType = EnDamageValueType.Critical;
                         }
                     }

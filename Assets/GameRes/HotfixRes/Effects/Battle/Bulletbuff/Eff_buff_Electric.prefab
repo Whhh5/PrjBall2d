@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4018609125551330824}
   - component: {fileID: 2662320488268179299}
   - component: {fileID: 5239159354316512545}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Eff_buff_Electric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4856,7 +4856,7 @@ GameObject:
   - component: {fileID: 5059204400907264137}
   - component: {fileID: 3965868687768834971}
   - component: {fileID: 5849738465051590496}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: guang
   m_TagString: Untagged
   m_Icon: {fileID: 0}

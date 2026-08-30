@@ -17,7 +17,7 @@ public class GameGridInfo : IClassPoolInit
     private int chunkEntityId;
     private readonly Dictionary<int, int> monsterEntityIds = new(3);
     private EnGridStatus status;
-    private readonly Dictionary<EnGridStatus, int> statusCountDic = new();
+    private readonly Dictionary<EnGridStatus, int> statusCountDic = new(5);
     private Vector3 pos;
 
     public void OnPoolDestroy()
@@ -153,6 +153,9 @@ public class GameGridInfo : IClassPoolInit
     }
     public void GetEntityIds(ref List<int> entityIds)
     {
-        entityIds.AddRange(monsterEntityIds.Keys);
+        foreach (var item in monsterEntityIds)
+        {
+            entityIds.Add(item.Key);
+        }
     }
 }

@@ -2,111 +2,60 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public static class GameMapUtility
 {
-    public static Vector2 GetGridLbPosition(in int mapId)
+    public static bool RowColIsValid(int row, int col)
     {
-        var lbPos = GetMapStartPosition(mapId);
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        var pos = new Vector2(mapCfg.fMapBound[2], mapCfg.fMapBound[1]);
-        return pos + lbPos;
-    }
-    public static Vector2 GetGridRuPosition(in int mapId)
-    {
-        var chunkLbPos = GetGridLbPosition(mapId);
-        var size = GetBattleAreaBoundSize(mapId);
-        return chunkLbPos + size;
-    }
-    public static Vector2 GetBattleAreaBoundSize(in int mapId)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        var size = new Vector3(mapCfg.fMapBound[3] - mapCfg.fMapBound[2], mapCfg.fMapBound[0] - mapCfg.fMapBound[1]);
-        return size;
-    }
-    public static Vector2 GetMapStartPosition(in int mapId)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        var pos = new Vector2(mapCfg.fMapLbPos[0], mapCfg.fMapLbPos[1]);
-        return pos;
-    }
-    public static Vector2 GetMapPlayerStartPosition(in int mapId)
-    {
-        var lbPos = GetMapStartPosition(mapId);
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        var localPos = new Vector2(mapCfg.fPlayerLocalPos[0], mapCfg.fPlayerLocalPos[1]);
-        return lbPos + localPos;
-
-    }
-    public static Vector2 GetMapSize(in int mapId)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        return new Vector2(mapCfg.fMapSize[0], mapCfg.fMapSize[1]);
-    }
-    public static Vector2 GetMapGridSize(in int mapId)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        return new Vector2(mapCfg.nGridSize[0], mapCfg.nGridSize[1]);
-    }
-    public static Vector2Int GetMapGridRowCol(in int mapId)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        return new Vector2Int(mapCfg.nGridRowCol[0], mapCfg.nGridRowCol[1]);
-    }
-    public static Vector2Int GetCurMapGridRowCol()
-    {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var result = GetMapGridRowCol(mapId);
-        return result;
-    }
-    public static bool RowColIsValid(int mapId, int row, int col)
-    {
-        var maxRowCol = GetMapGridRowCol(mapId);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         if (row < 0 || row >= maxRowCol.x)
             return false;
         if (col < 0 || col >= maxRowCol.y)
             return false;
         return true;
     }
-    public static bool RowIsValid(int mapId, int row)
+    public static bool RowIsValid(int row)
     {
-        var maxRowCol = GetMapGridRowCol(mapId);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         if (row < 0 || row >= maxRowCol.x)
             return false;
         return true;
     }
-    public static bool ColIsValid(int mapId, int col)
+    public static bool ColIsValid(int col)
     {
-        var maxRowCol = GetMapGridRowCol(mapId);
-        if (col < 0 || col >= maxRowCol.y)
+        if (col < 0)
+            return false;
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
+        if (col >= maxRowCol.y)
             return false;
         return true;
     }
-    public static bool IndexIsValid(int mapId, int index)
+    public static bool IndexIsValid(int index)
     {
-        var maxRowCol = GetMapGridRowCol(mapId);
         if (index < 0)
             return false;
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         if (index >= maxRowCol.x * maxRowCol.y)
             return false;
         return true;
     }
-    public static int RowColToIndex(in int mapId, in int row, in int col)
+    public static int RowColToIndex(in int row, in int col)
     {
-        var maxRowCol = GetMapGridRowCol(mapId);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         return row * maxRowCol.y + col;
     }
-    public static (int row, int col) IndexToRowCol(int mapId, int index)
+    public static (int row, int col) IndexToRowCol(int index)
     {
-        var maxRowCol = GetMapGridRowCol(mapId);
-        var row = Mathf.FloorToInt(index / maxRowCol.y);
-        var col = Mathf.FloorToInt(index % maxRowCol.y);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
+        var row = (int)(index / maxRowCol.y);
+        var col = (int)(index % maxRowCol.y);
         return (Mathf.Clamp(row, 0, maxRowCol.x - 1), col);
     }
 
-    public static bool IsValidWorldPos(in int mapId, in Vector2 worldPos)
+    public static bool IsValidWorldPos(in Vector2 worldPos)
     {
-        var lbPos = GetGridLbPosition(mapId);
-        var ruPos = GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
         if (worldPos.x < lbPos.x || worldPos.x > ruPos.x)
             return false;
         if (worldPos.y < lbPos.y || worldPos.y > ruPos.y)
@@ -114,58 +63,48 @@ public static class GameMapUtility
         return true;
     }
     #region grid index
-    public static int WorldPosY2Row(in int mapId, in float posY)
+    public static int WorldPosY2Row(in float posY)
     {
-        var startPos = GetGridLbPosition(mapId);
-        var size = GetMapGridSize(mapId);
+        ref readonly var startPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var size = ref GameMapMgr.Instance.GetMapGridSize();
         var localPosY = posY - startPos.y;
-        var row = Mathf.FloorToInt(localPosY / size.y);
+        var row = (int)(localPosY / size.y);
         return Mathf.Max(row, 0);
     }
-    public static int WorldPosToGridIndex(int mapId, Vector2 worldPos)
+    public static int WorldPosToGridIndex(Vector2 worldPos)
     {
-        var startPos = GetGridLbPosition(mapId);
-        var size = GetMapGridSize(mapId);
+        ref readonly var startPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var size = ref GameMapMgr.Instance.GetMapGridSize();
         var localPos = worldPos - startPos;
-        var row = Mathf.FloorToInt(localPos.y / size.y);
-        var col = Mathf.FloorToInt(localPos.x / size.x);
-        var maxRowCol = GetMapGridRowCol(mapId);
+        var row = (int)(localPos.y / size.y);
+        var col = (int)(localPos.x / size.x);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         var index = Mathf.Clamp(row, 0, maxRowCol.x - 1) * maxRowCol.y + Mathf.Clamp(col, 0, maxRowCol.y - 1);
         return index;
     }
-    public static bool WorldPosToGridRowCol(in int mapId, in Vector2 worldPos, out int row, out int col)
+    public static bool WorldPosToGridRowCol(in Vector2 worldPos, out int row, out int col)
     {
-        var startPos = GetGridLbPosition(mapId);
-        var size = GetMapGridSize(mapId);
+        ref readonly var startPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var size = ref GameMapMgr.Instance.GetMapGridSize();
         var localPos = worldPos - startPos;
-        row = Mathf.FloorToInt(localPos.y / size.y);
-        col = Mathf.FloorToInt(localPos.x / size.x);
-        var maxRowCol = GetMapGridRowCol(mapId);
+        row = (int)(localPos.y / size.y);
+        col = (int)(localPos.x / size.x);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         return row >= 0 && row < maxRowCol.x && col >= 0 && col <= maxRowCol.y;
     }
-    public static GameBattleGridIndex CreateGridIndex(int mapId, int index)
+
+    public static GameBattleGridIndex CreateGridIndex(int row, int col)
     {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        var col = mapCfg.nGridRowCol[1];
-        return new GameBattleGridIndex(index, Mathf.FloorToInt(index / col), index % col);
-    }
-    public static GameBattleGridIndex CreateGridIndex(int mapId, int row, int col)
-    {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        var maxCol = mapCfg.nGridRowCol[1];
-        var index = row * maxCol + col;
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
+        var index = row * maxRowCol.y + col;
         return new GameBattleGridIndex(index, row, col);
     }
 
-    public static GameBattleGridIndex CreateCurMapGridIndex(int index)
+    public static GameBattleGridIndex CreateGridIndex(int index)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        return GameMapUtility.CreateGridIndex(mapId, index);
-    }
-    public static GameBattleGridIndex CreateCurMapGridIndex(int row, int col)
-    {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        return GameMapUtility.CreateGridIndex(mapId, row, col);
+        ref readonly var maxRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
+        var col = maxRowCol.y;
+        return new GameBattleGridIndex(index, (int)(index / col), index % col);
     }
     #endregion
 
@@ -183,15 +122,13 @@ public static class GameMapUtility
 
     public static void CheckMoveBoundsTopY(ref float worldPosY)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GetMapGridSize(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         CheckMoveBoundsY(ref worldPosY, -gridSize.y / 2, gridSize.y / 2);
     }
     public static void CheckMoveBoundsY(ref float worldPosY, in float offsetTop, in float offsetDown)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var lbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var ruPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
         var moveLbBoundY = lbPos.y + offsetDown;
         var moveRuBoundY = ruPos.y + offsetTop;
@@ -202,9 +139,8 @@ public static class GameMapUtility
     }
     public static void CheckMoveBounds(ref Vector2 worldPos, in Vector2 halfSize)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var lbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var ruPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
         var moveLbBound = lbPos + halfSize;
         var moveRuBound = ruPos + halfSize;
@@ -218,17 +154,17 @@ public static class GameMapUtility
         }
     }
 
-    public static int GetMapEagePoint(in int mapId, in Vector2 startPoint, in Vector2 dir, in EnDirection validEage, ref GamePhysicsHit[] points)
+    public static int GetMapEagePoint(in Vector2 startPoint, in Vector2 dir, in EnDirection validEage, ref GamePhysicsHit[] points)
     {
-        var count = GetMapEagePoint(in mapId, in startPoint, in dir, in validEage, ref points, points.Length);
+        var count = GetMapEagePoint(in startPoint, in dir, in validEage, ref points, points.Length);
         return count;
     }
-    public static int GetMapEagePoint(in int mapId, in Vector2 startPoint, in Vector2 dir, in EnDirection validEage, ref GamePhysicsHit[] points, in int maxCount)
+    public static int GetMapEagePoint(in Vector2 startPoint, in Vector2 dir, in EnDirection validEage, ref GamePhysicsHit[] points, in int maxCount)
     {
-        var lbPos = GetGridLbPosition(mapId);
-        var ruPos = GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
         var count = GamePhysicsUtility.CastBoxEage(in lbPos, ruPos, in startPoint, in dir, in validEage, ref points, maxCount);
-        return  count;
+        return count;
     }
 }
 

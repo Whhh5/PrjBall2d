@@ -72,8 +72,10 @@ public class GameBattleSkillBall10071011EntityData : GameBattleSkillBallEntityDa
         if (count == 0)
             return;
 
+
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
-        var damageValue = ownerAtk + starData.damageValue;
+        var damageValue = ballAtkValue + ownerAtk + starData.damageValue;
 
         for (int i = 0; i < starData.atkCount; i++)
         {

@@ -278,3 +278,197 @@ public class GameSkillBallReflectEventData : IClassPoolDestroy
             = -1;
     }
 }
+
+
+public class GameCoreAddEventData : IClassPoolDestroy
+{
+    public int coreId;
+    public void OnPoolDestroy()
+    {
+        coreId = -1;
+    }
+    public void Setting(in int coreId)
+    {
+        this.coreId = coreId;
+    }
+}
+public class GameCoreRemoveEventData : IClassPoolDestroy
+{
+    public int coreId;
+    public void OnPoolDestroy()
+    {
+        coreId = -1;
+    }
+    public void Setting(in int coreId)
+    {
+        this.coreId = coreId;
+    }
+}
+
+public class GameCoreWearEventData : IClassPoolDestroy
+{
+    public int coreId;
+    public int wearIndex;
+    public void OnPoolDestroy()
+    {
+        coreId
+            = wearIndex
+            = -1;
+    }
+    public void Setting(in int coreId, in int wearIndex)
+    {
+        this.coreId = coreId;
+        this.wearIndex = wearIndex;
+    }
+}
+public class GameCoreUnwearEventData : IClassPoolDestroy
+{
+    public int coreId;
+    public int lastWearIndex;
+    public void OnPoolDestroy()
+    {
+        coreId
+            = lastWearIndex
+            = -1;
+    }
+    public void Setting(in int coreId, in int lastWearIndex)
+    {
+        this.coreId = coreId;
+        this.lastWearIndex = lastWearIndex;
+    }
+}
+
+public class GameCoreChangeEffectValueEventData : IClassPoolDestroy
+{
+    public int coreId;
+    public float lastEffectValue;
+    public float curEffectValue;
+    public void OnPoolDestroy()
+    {
+        lastEffectValue
+            = curEffectValue
+            = coreId
+            = -1;
+    }
+    public void Setting(in int coreId, in float lastEffectValue, in float curEffectValue)
+    {
+        this.coreId = coreId;
+        this.lastEffectValue = lastEffectValue;
+        this.curEffectValue = curEffectValue;
+    }
+}
+public class GameCoreInlayGemEventData : IClassPoolDestroy
+{
+    public int grooveIndex;
+    public int gemId;
+    public void OnPoolDestroy()
+    {
+        grooveIndex
+            = gemId
+            = -1;
+    }
+    public void Setting(in int grooveIndex, in int gemId)
+    {
+        this.grooveIndex = grooveIndex;
+        this.gemId = gemId;
+    }
+}
+public class GameCharacterUplevelEventData : IClassPoolDestroy
+{
+    public int characterId;
+    public int lastLevel;
+    public int curLevel;
+    public void OnPoolDestroy()
+    {
+        characterId
+            = lastLevel
+            = curLevel
+            = -1;
+    }
+    public void Setting(in int characterId, in int lastLevel, in int curLevel)
+    {
+        this.characterId = characterId;
+        this.lastLevel = lastLevel;
+        this.curLevel = curLevel;
+    }
+}
+public class GameCharacterAptitudeChangeEventData : IClassPoolDestroy
+{
+    public int lastValue;
+    public int curValue;
+    public void OnPoolDestroy()
+    {
+        lastValue
+            = curValue
+            = -1;
+    }
+    public void Setting(in int lastValue, in int curValue)
+    {
+        this.lastValue = lastValue;
+        this.curValue = curValue;
+    }
+}
+public class GameGoodsChangeEventData : IClassPoolDestroy
+{
+    public int lastValue;
+    public int curValue;
+    public void OnPoolDestroy()
+    {
+        lastValue
+            = curValue
+            = -1;
+    }
+    public void Setting(in int lastValue, in int curValue)
+    {
+        this.lastValue = lastValue;
+        this.curValue = curValue;
+    }
+}
+public class GameAccountExpChangeEventData : IClassPoolDestroy
+{
+    public int lastValue;
+    public int curValue;
+    public void OnPoolDestroy()
+    {
+        lastValue
+            = curValue
+            = -1;
+    }
+    public void Setting(in int lastValue, in int curValue)
+    {
+        this.lastValue = lastValue;
+        this.curValue = curValue;
+    }
+}
+public class GameAccountLevelChangeEventData : IClassPoolDestroy
+{
+    public int lastValue;
+    public int curValue;
+    public void OnPoolDestroy()
+    {
+        lastValue
+            = curValue
+            = -1;
+    }
+    public void Setting(in int lastValue, in int curValue)
+    {
+        this.lastValue = lastValue;
+        this.curValue = curValue;
+    }
+}
+public class GameGemInlayEventData : IClassPoolDestroy
+{
+    public int coreId;
+    public int grooveIndex;
+    public void OnPoolDestroy()
+    {
+        coreId
+            = grooveIndex
+            = -1;
+    }
+    public void Setting(in int coreId, in int grooveIndex)
+    {
+        this.coreId = coreId;
+        this.grooveIndex = grooveIndex;
+    }
+}

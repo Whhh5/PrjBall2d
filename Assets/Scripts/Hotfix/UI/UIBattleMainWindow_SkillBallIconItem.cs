@@ -1,5 +1,4 @@
 using System;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,11 +38,11 @@ public class UIBattleMainWindow_SkillBallIconItem : MonoBehaviour
     {
         _BtnCallback?.Invoke();
     }
-    public Vector2 GetScreenPosition()
-    {
-        var screenPos = UIUtil.WorldToView(_Rect.position);
-        return screenPos;
-    }
+    //public Vector2 GetScreenPosition()
+    //{
+    //    var screenPos = UIUtil.WorldToView(_Rect.position);
+    //    return screenPos;
+    //}
     public Vector3 GetWorldPos()
     {
         return _Rect.position;

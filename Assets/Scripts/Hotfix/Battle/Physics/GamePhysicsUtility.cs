@@ -1,8 +1,4 @@
-
-
-
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 
 public enum EnDirection
@@ -50,9 +46,9 @@ public static class GamePhysicsUtility
     public static void InitParams(int mapId)
     {
         _MapId = mapId;
-        _GridSize = GameMapUtility.GetMapGridSize(mapId);
-        _MaxGridRowCol = GameMapUtility.GetMapGridRowCol(mapId);
-        _GridLbPos = GameMapUtility.GetGridLbPosition(mapId);
+        _GridSize = GameMapMgr.Instance.GetMapGridSize();
+        _MaxGridRowCol = GameMapMgr.Instance.GetMapGridRowCol();
+        _GridLbPos = GameMapMgr.Instance.GetGridLbPosition();
         _GridMaxRadius = Vector2.Distance(_GridSize / 2f, Vector2.zero);
     }
     private static int RowColToIndex(in int row, in int col)
@@ -81,15 +77,15 @@ public static class GamePhysicsUtility
     }
     private static (int row, int col) IndexToRowCol(int index)
     {
-        var row = Mathf.FloorToInt(index / _MaxGridRowCol.y);
-        var col = Mathf.FloorToInt(index % _MaxGridRowCol.y);
+        var row = (int)(index / _MaxGridRowCol.y);
+        var col = (int)(index % _MaxGridRowCol.y);
         return (Mathf.Clamp(row, 0, _MaxGridRowCol.x - 1), col);
     }
     private static int WorldPosToGridIndex(in Vector2 worldPos)
     {
         var localPos = worldPos - _GridLbPos;
-        var row = Mathf.FloorToInt(localPos.y / _GridSize.y);
-        var col = Mathf.FloorToInt(localPos.x / _GridSize.x);
+        var row = (int)(localPos.y / _GridSize.y);
+        var col = (int)(localPos.x / _GridSize.x);
 
         var index = Mathf.Clamp(row, 0, _MaxGridRowCol.x - 1) * _MaxGridRowCol.y + Mathf.Clamp(col, 0, _MaxGridRowCol.y - 1);
         return index;
@@ -97,8 +93,8 @@ public static class GamePhysicsUtility
     private static (int, int) WorldPosToRowCol(in Vector2 worldPos)
     {
         var localPos = worldPos - _GridLbPos;
-        var row = Mathf.FloorToInt(localPos.y / _GridSize.y);
-        var col = Mathf.FloorToInt(localPos.x / _GridSize.x);
+        var row = (int)(localPos.y / _GridSize.y);
+        var col = (int)(localPos.x / _GridSize.x);
         return (row, col);
     }
     private static Vector2 GetGridWorldPos(int row, int col)
@@ -161,129 +157,18 @@ public static class GamePhysicsUtility
         var v1 = A * x1 + B * y0 + C;
         var v2 = A * x1 + B * y1 + C;
         var v3 = A * x0 + B * y1 + C;
-        var minv = Mathf.Min(v0, v1, v2, v3);
-        var maxv = Mathf.Max(v0, v1, v2, v3);
+        var minv = Mathf.Min(v0, v1);
+        minv = Mathf.Min(minv, v2);
+        minv = Mathf.Min(minv, v3);
+        var maxv = Mathf.Max(v0, v1);
+        maxv = Mathf.Max(maxv, v2);
+        maxv = Mathf.Max(maxv, v3);
         // 正负都有，穿过矩形
         return minv <= 0.0001f && maxv >= -0.0001f;
     }
-    public static int TryLineCast(in Vector2 point1, in Vector2 point2, float halfWidth, ref GamePhysicsHit[] hits)
+    private static bool TryGetLineEntityIds(in Vector2 point1, in Vector2 point2, float halfWidth, ref List<int> entityIds)
     {
-        var (row1, col1) = WorldPosToRowCol(in point1);
-        var (row2, col2) = WorldPosToRowCol(in point2);
 
-        var lineA = point1.y - point2.y;
-        var lineB = point2.x - point1.x;
-        var lineC = point1.x * point2.y - point2.x * point1.y;
-
-        int testRow = row1, testCol = col1;
-        var nextRowOffset = row1 < row2 ? 1 : row1 > row2 ? -1 : 0;
-        var nextColOffset = col1 < col2 ? 1 : col1 > col2 ? -1 : 0;
-
-        while (!RowIsValid(testRow) || !ColIsValid(testCol))
-        {
-            if (testRow == row2)
-                return 0;
-            if (testCol == col2)
-                return 0;
-            if (!RowIsValid(testRow))
-                testRow += nextRowOffset;
-            if (!ColIsValid(testCol))
-                testCol += nextColOffset;
-        }
-
-        _IndexIds.Clear();
-        _EntityIds.Clear();
-        _EntityIdHas.Clear();
-        _IndexIds.Add((testRow, testCol));
-
-        do
-        {
-            if (nextRowOffset != 0 && testRow != row2)
-            {
-                var testCenter = GetGridWorldPos(testRow + nextRowOffset, testCol);
-                var testLbPoint = testCenter - _GridSize / 2;
-                var testRuPoint = testCenter + _GridSize / 2;
-                if (LineCrossRect(lineA, lineB, lineC, testLbPoint.x, testLbPoint.y, testRuPoint.x, testRuPoint.y))
-                {
-                    testRow += nextRowOffset;
-                    _IndexIds.Add((testRow, testCol));
-                    continue;
-                }
-            }
-            if (nextColOffset != 0 && testCol != col2)
-            {
-                var testCenter = GetGridWorldPos(testRow, testCol + nextColOffset);
-                var testLbPoint = testCenter - _GridSize / 2;
-                var testRuPoint = testCenter + _GridSize / 2;
-                if (LineCrossRect(lineA, lineB, lineC, testLbPoint.x, testLbPoint.y, testRuPoint.x, testRuPoint.y))
-                {
-                    testCol += nextColOffset;
-                    _IndexIds.Add((testRow, testCol));
-                    continue;
-                }
-            }
-            break;
-
-        } while (testRow != row2 || testCol != col2);
-
-        var extend = Mathf.CeilToInt(halfWidth / (_GridSize.x / 2));
-        for (int k = 0; k < _IndexIds.Count; k++)
-        {
-            var (row, col) = _IndexIds[k];
-            for (int i = -extend; i <= extend; i++)
-            {
-                if (!RowIsValid(row + i))
-                    continue;
-                for (int j = -extend; j <= extend; j++)
-                {
-                    if (!ColIsValid(col + j))
-                        continue;
-                    var gridIndex = RowColToIndex(row + i, col + j);
-                    GameBattleGridMgr.Instance.GetGridEntityIds(gridIndex, ref _EntityIds);
-                }
-            }
-        }
-
-        for (int i = 0; i < _EntityIds.Count; i++)
-        {
-            var entityId = _EntityIds[i];
-            _EntityIdHas.Add(entityId);
-        }
-
-        var count = 0;
-        foreach (var entityId in _EntityIdHas)
-        {
-            var gridData = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(in entityId);
-            var centerPos = gridData.GetCenterPointWorldPos();
-            ref readonly var mainGridIndex = ref gridData.GetMainGridIndex();
-            var mainGridPos = gridData.GetMainGridPos();
-            ref readonly var arrGridIndesx = ref gridData.GetGridIndexs();
-            for (int i = 0; i < arrGridIndesx.Length; i += 2)
-            {
-                ref readonly var row = ref arrGridIndesx[i];
-                ref readonly var col = ref arrGridIndesx[i + 1];
-
-                var testCenterPos = mainGridPos + new Vector2(col, row) * _GridSize;
-                var disSqr = Mathf.Pow(lineA * testCenterPos.x + lineB * testCenterPos.y + lineC, 2) / (Mathf.Pow(lineA, 2) + Mathf.Pow(lineB, 2));
-                if (disSqr > Mathf.Pow(halfWidth + _GridSize.y / 2, 2))
-                    continue;
-                if (count >= hits.Length)
-                    return count;
-
-                ref var item = ref hits[count++];
-                item.point = testCenterPos;
-                item.pointGridIndex = mainGridIndex.index;
-                item.entityId = entityId;
-                item.normal = Vector2.up;
-                item.dir = EnDirection.None;
-                item.inDir = -item.normal;
-                break;
-            }
-        }
-        return count;
-    }
-    public static int TryLineCastSort(in Vector2 point1, in Vector2 point2, float halfWidth, ref GamePhysicsHit[] hits)
-    {
         var (row1, col1) = WorldPosToRowCol(in point1);
         var (row2, col2) = WorldPosToRowCol(in point2);
 
@@ -298,18 +183,18 @@ public static class GamePhysicsUtility
         while (!ColIsValid(testCol))
         {
             if (testCol == col2)
-                return 0;
+                return false;
             testCol += nextColOffset;
         }
         while (!RowIsValid(testRow))
         {
             if (testRow == row2)
-                return 0;
+                return false;
             testRow += nextRowOffset;
         }
 
         _IndexIds.Clear();
-        _EntityIds.Clear();
+        entityIds.Clear();
         _EntityIdHas.Clear();
         _IndexIds.Add((testRow, testCol));
 
@@ -356,32 +241,27 @@ public static class GamePhysicsUtility
                     if (!ColIsValid(col + j))
                         continue;
                     var gridIndex = RowColToIndex(row + i, col + j);
-                    GameBattleGridMgr.Instance.GetGridEntityIds(gridIndex, ref _EntityIds);
+                    GameBattleGridMgr.Instance.GetGridEntityIds(gridIndex, ref entityIds);
                 }
             }
         }
 
-        for (int i = 0; i < _EntityIds.Count; i++)
+        for (int i = 0; i < entityIds.Count; i++)
         {
-            var entityId = _EntityIds[i];
+            var entityId = entityIds[i];
             _EntityIdHas.Add(entityId);
         }
-        _EntityIds.Clear();
-        _EntityIds.AddRange(_EntityIdHas);
-
-        var testPoint1 = point1;
-        _EntityIds.Sort((item1, item2) =>
-        {
-            var pos1 = EntityMgr.Instance.GetEntityWorldPos2D(item1);
-            var pos2 = EntityMgr.Instance.GetEntityWorldPos2D(item2);
-            var dis1 = Vector2.SqrMagnitude(pos1 - testPoint1);
-            var dis2 = Vector2.SqrMagnitude(pos2 - testPoint1);
-            if (dis1 < dis2)
-                return -1;
-            if (dis1 > dis2)
-                return 1;
+        entityIds.Clear();
+        entityIds.AddRange(_EntityIdHas);
+        return entityIds.Count > 0;
+    }
+    public static int TryLineCast(in Vector2 point1, in Vector2 point2, float halfWidth, ref GamePhysicsHit[] hits)
+    {
+        if (!TryGetLineEntityIds(in point1, in point2, halfWidth, ref _EntityIds))
             return 0;
-        });
+        var lineA = point1.y - point2.y;
+        var lineB = point2.x - point1.x;
+        var lineC = point1.x * point2.y - point2.x * point1.y;
 
         var count = 0;
         foreach (var entityId in _EntityIds)
@@ -410,13 +290,69 @@ public static class GamePhysicsUtility
                 item.normal = Vector2.up;
                 item.dir = EnDirection.None;
                 item.inDir = -item.normal;
-
-                if (count >= hits.Length)
-                    return count;
                 break;
             }
         }
         return count;
+    }
+    public static bool TryLineCastSort(in Vector2 point1, in Vector2 point2, float halfWidth, ref GamePhysicsHit hits)
+    {
+        if (!TryGetLineEntityIds(in point1, in point2, halfWidth, ref _EntityIds))
+            return false;
+
+        var minDis = float.MaxValue;
+        var halfSize = _GridSize / 2;
+        var lineDir = (point2 - point1).normalized;
+        var rad = Mathf.Atan(lineDir.y / lineDir.x);
+        Vector2 hitPoint1 = default, hitPoint2 = default;
+        hits.entityId = -1;
+        for (int j = 0; j < _EntityIds.Count; j++)
+        {
+            var entityId = _EntityIds[j];
+
+            var gridData = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(in entityId);
+            ref readonly var mainGridIndex = ref gridData.GetMainGridIndex();
+            var mainGridPos = gridData.GetMainGridPos();
+            ref readonly var arrGridIndesx = ref gridData.GetGridIndexs();
+
+            for (int i = 0; i < arrGridIndesx.Length; i += 2)
+            {
+                ref readonly var row = ref arrGridIndesx[i];
+                ref readonly var col = ref arrGridIndesx[i + 1];
+
+                var testCenterPos = mainGridPos + new Vector2(col, row) * _GridSize;
+                if (!TryLineCaseRect(testCenterPos - halfSize, testCenterPos + halfSize, point1, rad, ref hitPoint1, ref hitPoint2))
+                    continue;
+                var testIndex = -1;
+                if (DisTest(in hitPoint1, in point1, in minDis, out var disSqr))
+                {
+                    minDis = disSqr;
+                    testIndex++;
+                }
+                if (DisTest(in hitPoint2, in point1, in minDis, out disSqr))
+                {
+                    minDis = disSqr;
+                    testIndex++;
+                }
+                if (testIndex < 0)
+                    continue;
+
+                hits.point = testCenterPos;
+                hits.pointGridIndex = mainGridIndex.index;
+                hits.entityId = entityId;
+                hits.normal = Vector2.up;
+                hits.dir = EnDirection.None;
+                hits.inDir = -hits.normal;
+            }
+        }
+        static bool DisTest(in Vector2 point1, in Vector2 point2, in float value, out float dis)
+        {
+            dis = Vector2.SqrMagnitude(point1 - point2);
+            if (dis >= value)
+                return false;
+            return true;
+        }
+        return hits.entityId > 0;
     }
     private static bool TrySphereCast(in Vector2 point, in float radius, ref List<GamePhysicsEntity> entityInfos)
     {

@@ -15,7 +15,7 @@ public class GameBattleSkillBallPart1010EntityData : GameBattleSkillBallPartEnti
     private GamePhysicsHit[] _Hits = new GamePhysicsHit[30];
     private int _DelayFireCount = 0;
     private Vector2[] _BallPosArray = new Vector2[5];
-    private List<int> _TempIntList = new(10);
+    private readonly List<int> _TempIntList = new(10);
 
     private float _LastFireTime;
 
@@ -59,11 +59,10 @@ public class GameBattleSkillBallPart1010EntityData : GameBattleSkillBallPartEnti
         if (ballCount == 0)
             return false;
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         _TempIntList.Clear();
         for (int i = 0; i < ballCount; i++)
         {
-            if (!GameMapUtility.IsValidWorldPos(in mapId, in _BallPosArray[i]))
+            if (!GameMapUtility.IsValidWorldPos(in _BallPosArray[i]))
                 continue;
             _TempIntList.Add(i);
         }
@@ -81,7 +80,7 @@ public class GameBattleSkillBallPart1010EntityData : GameBattleSkillBallPartEnti
         var validEage = dir.x > 0
             ? EnDirection.Top | EnDirection.Bottom | EnDirection.Right
             : EnDirection.Top | EnDirection.Bottom | EnDirection.Left;
-        var pointCount = GameMapUtility.GetMapEagePoint(mapId, in point1, in dir, validEage, ref _Hits);
+        var pointCount = GameMapUtility.GetMapEagePoint(in point1, in dir, validEage, ref _Hits);
         if (pointCount == 0)
             return false;
         var point2 = _Hits[0].point;
@@ -90,7 +89,8 @@ public class GameBattleSkillBallPart1010EntityData : GameBattleSkillBallPartEnti
         if (count == 0)
             return false;
 
-        var effectAtkDamage = starData.damageValue + Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+        var ownerDamage = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+        var effectAtkDamage = starData.damageValue + ownerDamage;
         for (int i = 0; i < count; i++)
         {
             ref readonly var atkHit = ref _Hits[i];

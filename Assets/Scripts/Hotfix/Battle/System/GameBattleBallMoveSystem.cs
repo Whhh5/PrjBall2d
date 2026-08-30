@@ -30,9 +30,8 @@ public class GameBattleBallMoveSystem : IBattleSystem
 
         if (_EntityIds.Count > 0)
         {
-            var mapId = GameMapMgr.Instance.GetCurMapId();
-            var mapLbPos = GameMapUtility.GetMapStartPosition(mapId);
-            var gridLbPos = GameMapUtility.GetGridLbPosition(mapId);
+            ref readonly var mapLbPos = ref GameMapMgr.Instance.GetMapStartPosition();
+            ref readonly var gridLbPos = ref GameMapMgr.Instance.GetGridLbPosition();
             for (int i = 0; i < _EntityIds.Count; i++)
             {
                 var entityId = _EntityIds[i];
@@ -102,9 +101,8 @@ public class GameBattleBallMoveSystem : IBattleSystem
 
     private bool CheckGridEage(ref Vector2 pos, ref Vector2 dir)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var lbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var ruPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
         var result = false;
         if ((dir.y == 0 || dir.x < 0) && pos.x < lbPos.x)

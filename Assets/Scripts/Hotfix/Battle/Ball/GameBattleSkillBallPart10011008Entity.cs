@@ -22,9 +22,8 @@ public class GameBattleSkillBallPart10011008EntityData : GameBattleSkillBallPart
 
     private void OnEvent_Attack(in int _, in int __, in GameBattleBall10011008AttackEventData data)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var lbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var ruPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
         var starData = GetBallPartStarData();
         Vector2 point1 = Vector2.zero, point2 = Vector2.zero;

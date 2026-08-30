@@ -8,6 +8,12 @@ public class GameBattleSkillBall10031004EntityData : GameBattleSkillBallEntityDa
 
     protected override void OnCollision(in GamePhysicsHit hit)
     {
+        var starData = GetStarUserData();
+
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
+        var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
+        var damageValue = ballAtkValue + starData.damageValue + ownerAtk;
+
         var sys = GameBattleMgr.Instance.GetSystem<GameBattleFireSpinSystem>();
         var star = GameBattleBallMgr.Instance.GetBallStar(_SkillBallId);
         var angle = Random.Range(0, Mathf.PI * 2);
@@ -16,7 +22,7 @@ public class GameBattleSkillBall10031004EntityData : GameBattleSkillBallEntityDa
             x = Mathf.Cos(angle),
             y = Mathf.Sin(angle),
         };
-        sys.CreateFireSpinEntity(_OwnerEntityId, _SkillBallId, star, hit.point, dir);
+        sys.CreateFireSpinEntity(_OwnerEntityId, _SkillBallId, star, hit.point, dir, damageValue);
 
         AudioMgr.Instance.Play(EnAudioId.Dark);
 

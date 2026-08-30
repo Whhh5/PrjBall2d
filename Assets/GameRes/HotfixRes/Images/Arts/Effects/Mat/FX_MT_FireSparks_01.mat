@@ -37,21 +37,19 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FX_MT_FireSparks_01
-  m_Shader: {fileID: -6465566751694194690, guid: e4c314a5c99ab7845b9f7057f076ddf4,
-    type: 3}
+  m_Shader: {fileID: 4800000, guid: f371484d55ddc694282ad1d616fe6860, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _BUILTIN_SURFACE_TYPE_TRANSPARENT
   - _SURFACE_TYPE_TRANSPARENT
-  m_InvalidKeywords:
   - _USESOFTPARTICLES
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
-  stringTagMap:
-    RenderType: Transparent
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses:
   - TransparentDepthPrepass
   - TransparentDepthPostpass
@@ -84,7 +82,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 37bc7e5664c51f74b9bf28dc028d0d16, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexture:
@@ -118,6 +116,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AddPrecomputedVelocity: 0
+    - _Alpha: 1
     - _AlphaClip: 0
     - _AlphaCutoffEnable: 0
     - _AlphaDstBlend: 0
@@ -139,6 +138,8 @@ Material:
     - _BlendMode: 0
     - _BumpScale: 1
     - _CastShadows: 0
+    - _ColorMask: 14
+    - _ColorMode: 0
     - _ConservativeDepthOffsetEnable: 0
     - _Cull: 0
     - _CullMode: 2
@@ -176,6 +177,10 @@ Material:
     - _SoftParticle: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 5
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
     - _StencilRef: 0
     - _StencilRefDepth: 8
     - _StencilRefDistortionVec: 4
@@ -196,6 +201,7 @@ Material:
     - _TransparentSortPriority: 0
     - _TransparentWritingMotionVec: 0
     - _TransparentZWrite: 0
+    - _TwoSide: 0
     - _USESOFTPARTICLES: 1
     - _USEVERTEXALPHA: 1
     - _UVSec: 0
@@ -207,11 +213,13 @@ Material:
     - _ZTestTransparent: 4
     - _ZWrite: 0
     - _ZWriteControl: 0
+    - _Ztest: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _MainColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TintColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
 --- !u!114 &3755650853930280512
 MonoBehaviour:

@@ -8,31 +8,31 @@ public class GameBattleGridMgr : Singleton<GameBattleGridMgr>, IGameMapLifecycle
     private readonly Dictionary<int, GameGridInfo> _GridDic = new();
     private readonly Dictionary<int, HashSet<int>> _Entity2Index = new();
 
-    public override async UniTask AwakeAsync()
-    {
-        await base.AwakeAsync();
-        GameMapMgr.Instance.RegisterLifecycle(this);
-    }
     public override void Destroy()
     {
         GameMapMgr.Instance.UnregisterLifecycle(this);
         base.Destroy();
     }
+    public override async UniTask AwakeAsync()
+    {
+        await base.AwakeAsync();
+        GameMapMgr.Instance.RegisterLifecycle(this);
+    }
     public EnGameMapLifecycleOrder GetMapLifecycleOrder()
     {
         return EnGameMapLifecycleOrder.GameBattleGridMgr;
     }
-    public void EnterMap(int mapId)
+    public void EnterMap(int mapId, int chapterId)
     {
 
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
         ClearGridEntity();
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
         ResetGridInfo();
     }

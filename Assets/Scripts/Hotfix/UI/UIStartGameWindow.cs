@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.AudioSettings;
-using Object = UnityEngine.Object;
 
 public class UIStartGameWindowData : UIWindowData<UIStartGameWindow>
 {
@@ -14,92 +11,74 @@ public class UIStartGameWindowData : UIWindowData<UIStartGameWindow>
 }
 public class UIStartGameWindow : UIWindow
 {
-    [SerializeField] private Button _EnterBtn = null;
-    [SerializeField] private Button _RestartBtn = null;
-    [SerializeField] private Button _ExitBtn = null;
+    [SerializeField]
+    private Button _EnterBtn = null;
 
-
-    private int _BattleMainWindowId;
+    [SerializeField]
+    private Button _SystemBtn = null;
+    [SerializeField]
+    private Button _SystemItem = null;
+    private readonly Dictionary<string, Button> _SystemItems = new();
 
     public override void OnUnload()
     {
         base.OnUnload();
         UIMgr.Instance.RemoveBtnListener(_EnterBtn, EnterGame);
-        UIMgr.Instance.RemoveBtnListener(_RestartBtn, RestartGame);
-        UIMgr.Instance.RemoveBtnListener(_ExitBtn, ExitGame);
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
-        base.LoadCompeletion();
+        base.LoadCompletion();
         UIMgr.Instance.AddBtnListener(_EnterBtn, EnterGame);
-        UIMgr.Instance.AddBtnListener(_RestartBtn, RestartGame);
-        UIMgr.Instance.AddBtnListener(_ExitBtn, ExitGame);
 
-        UpdateButtonStatus();
+        _SystemItem.gameObject.SetActive(false);
+        _SystemBtn.AddListener(() => _SystemItem.transform.parent.gameObject.SetActive(!_SystemItem.transform.parent.gameObject.activeSelf));
     }
 
     private void EnterGame()
     {
-        //var content = await ServerMgr.Instance.REQ_DOWNLOAD_FILE("path/path");
-        //Debug.LogWarning(content);
-
-        //return;
-        var mapId = 1;
-        GameMapMgr.Instance.EnterMap(mapId);
-
-        _BattleMainWindowId = UIMgr.Instance.ShowWindow<UIBattleMainWindowData>();
-
-        UpdateButtonStatus();
-    }
-    private void RestartGame()
-    {
-        UIMgr.Instance.HideWindow(_BattleMainWindowId);
-        GameMapMgr.Instance.ReenterMap();
-        _BattleMainWindowId = UIMgr.Instance.ShowWindow<UIBattleMainWindowData>();
-
-        UpdateButtonStatus();
-    }
-    private void ExitGame()
-    {
-        UIMgr.Instance.HideWindow(_BattleMainWindowId);
-        GameMapMgr.Instance.ExitMap();
-
-        UpdateButtonStatus();
-        _BattleMainWindowId = -1;
+        UIMgr.Instance.HideWindow(_WindowId);
+        UIMgr.Instance.ShowLobby();
     }
 
-    private void UpdateButtonStatus()
+    protected override void Update()
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        _EnterBtn.interactable = mapId <= 0;
-        _RestartBtn.interactable
-            = _ExitBtn.interactable
-            = mapId > 0;
-    }
+        base.Update();
 
-    private float _LastFpsUpdateTime = 0;
-    private int _Fps = 0;
-    void OnGUI()
-    {
-        if (Time.time - _LastFpsUpdateTime > 1f)
+        if (_SystemItem.transform.parent.gameObject.activeSelf)
         {
-            if (Time.deltaTime > 0)
+            var systems = GameBattleMgr.Instance.GetBattleSystems();
+            foreach (var (key, value) in systems)
             {
-                _Fps = Mathf.RoundToInt(1 / Time.deltaTime);
-                _LastFpsUpdateTime = Time.time;
+                if (!_SystemItems.TryGetValue(key, out var btn))
+                {
+                    var clickKey = key;
+                    btn = GameObject.Instantiate(_SystemItem, _SystemItem.transform.parent);
+                    btn.gameObject.SetActive(true);
+                    _SystemItems.Add(clickKey, btn);
+                    btn.onClick.AddListener(() => OnClick_SystemItem(clickKey));
+                    var sys = GameBattleMgr.Instance.GetSystem(clickKey);
+                    var txtCom = btn.transform.GetComponentInChildren<TextMeshProUGUI>();
+                    txtCom.text = $"{sys.GetType().Name.Replace("Game", "").Replace("System", "").Replace("Battle", "")}";
+                }
             }
         }
-        GUI.Label(
-            new Rect(10, 10, 300, 30),
-            $"{_Fps:F0}",
-            new GUIStyle
-            {
-                fontSize = 70,
-                normal = new GUIStyleState { textColor = Color.yellow }
-            }
-        );
     }
 
+    private void OnClick_SystemItem(string sysKey)
+    {
+        var btn = _SystemItems[sysKey];
+        var isEnable = GameBattleMgr.Instance.IsEnableSystem(sysKey);
+        if (isEnable)
+        {
+            GameBattleMgr.Instance.DisableSystem(sysKey);
+        }
+        else
+        {
+            GameBattleMgr.Instance.EnableSystem(sysKey);
+        }
+        var img = btn.GetComponent<Image>();
+        img.color = isEnable ? Color.red : Color.green;
+    }
     //private void EnterGame()
     //{
     //    _EnterBtn.gameObject.SetActive(false);

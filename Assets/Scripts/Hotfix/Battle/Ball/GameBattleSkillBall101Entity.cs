@@ -22,8 +22,10 @@ public class GameBattleSkillBall101EntityData : GameBattleSkillBallEntityData<Ga
     protected override void OnCollision(in GamePhysicsHit hit)
     {
         var starData = GetStarUserData(_Star);
+
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage);
-        var atkValue = ownerAtk + starData.damageValue;
+        var atkValue = ballAtkValue + ownerAtk + starData.damageValue;
         var damageResult = GameAttackMgr.Instance.AttackMonster(_OwnerEntityId, hit.entityId, atkValue, hit.point, starData.damageType);
         PlayHitAudio(in damageResult);
 

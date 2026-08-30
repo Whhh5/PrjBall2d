@@ -17,10 +17,12 @@ public class GameBattleEnergySystem : IBattleSystem
     {
         var mapId = GameMapMgr.Instance.GetCurMapId();
         var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
         _EnergyTargetPos = new Vector2(mapCfg.arrEnergyCollisionPoint[0], mapCfg.arrEnergyCollisionPoint[1]);
         EventMgr.Instance.Register<GameBattleMonsterDieEventData>(EnABBEvent.EVENT_BATTLE_MONSTER_DIE, 0, 0, OnEvent_MonsterDie);
 
-        _MaxEnergyValue = mapCfg.arrEnergyStageValue[_EnergyLevel];
+        _MaxEnergyValue = chapterCfg.arrEnergyStageValue[_EnergyLevel];
     }
     public void OnDisable()
     {
@@ -30,11 +32,11 @@ public class GameBattleEnergySystem : IBattleSystem
 
     public void OnReset()
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         ClearEnergyEntity();
 
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        _MaxEnergyValue = mapCfg.arrEnergyStageValue[_EnergyLevel];
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        _MaxEnergyValue = chapterCfg.arrEnergyStageValue[_EnergyLevel];
     }
     private void ClearEnergyEntity()
     {
@@ -59,8 +61,7 @@ public class GameBattleEnergySystem : IBattleSystem
 
         if (energyCount <= 0)
             return;
-        var curMapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GameMapUtility.GetMapGridSize(curMapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         var targetPos = GetFlyTargetPosition();
         for (int i = 0; i < energyCount; i++)
         {
@@ -116,22 +117,22 @@ public class GameBattleEnergySystem : IBattleSystem
 
                 while (curEnergyValue >= _MaxEnergyValue)
                 {
-                    var mapId = GameMapMgr.Instance.GetCurMapId();
-                    var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-                    if (mapCfg.nMaxEnergyStage > 0)
+                    var chapterId = GameMapMgr.Instance.GetCurChapterId();
+                    var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+                    if (chapterCfg.nMaxEnergyStage > 0)
                     {
-                        if (_EnergyLevel == mapCfg.nMaxEnergyStage)
+                        if (_EnergyLevel == chapterCfg.nMaxEnergyStage)
                             break;
-                        _EnergyLevel = Mathf.Min(_EnergyLevel + 1, mapCfg.nMaxEnergyStage);
+                        _EnergyLevel = Mathf.Min(_EnergyLevel + 1, chapterCfg.nMaxEnergyStage);
                     }
                     else
                     {
                         _EnergyLevel++;
                     }
-                    if (_EnergyLevel != mapCfg.nMaxEnergyStage)
+                    if (_EnergyLevel != chapterCfg.nMaxEnergyStage)
                     {
                         curEnergyValue -= _MaxEnergyValue;
-                        _MaxEnergyValue = mapCfg.arrEnergyStageValue[Mathf.Min(mapCfg.arrEnergyStageValue.Length - 1, _EnergyLevel)];
+                        _MaxEnergyValue = chapterCfg.arrEnergyStageValue[Mathf.Min(chapterCfg.arrEnergyStageValue.Length - 1, _EnergyLevel)];
                     }
 
                     var levelEvUd = ClassPoolMgr.Instance.Pull<GameBattleEnergyUplevelEventData>();

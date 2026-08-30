@@ -73,9 +73,9 @@ public class GameBattleLciclcSystem : IBattleSystem
     private void Move(in int entityId)
     {
         var rtData = _LciclcEntityId2RuntimeData[entityId];
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapLb = GameMapUtility.GetGridLbPosition(mapId);
-        var mapRu = GameMapUtility.GetGridRuPosition(mapId);
+
+        ref readonly var mapLb = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var mapRu = ref GameMapMgr.Instance.GetGridRuPosition();
 
         var curPos = EntityMgr.Instance.GetEntityWorldPos2D(entityId);
         var nextPos = rtData.speed * GameUtility.GetGameTimeDelta() * rtData.dir + curPos;

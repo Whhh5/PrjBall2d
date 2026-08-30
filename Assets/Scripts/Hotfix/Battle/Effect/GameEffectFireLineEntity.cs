@@ -7,6 +7,7 @@ public class GameEffectFireLineEntityData : GameEntityData<GameEffectFireLineEnt
     public override EnLoadTarget LoadTarget => EnLoadTarget.Pre_GameEffectFireLineEntity;
 
     private GamePhysicsHit[] _Hits = new GamePhysicsHit[1];
+    private GamePhysicsHit _Hit = new();
     private Vector3 _Point1;
     private Vector3 _Point2;
     private Vector3 _Point3;
@@ -38,25 +39,22 @@ public class GameEffectFireLineEntityData : GameEntityData<GameEffectFireLineEnt
         var inputSystem = GameBattleMgr.Instance.GetSystem<GameBattleInputSystem>();
         var firePos = inputSystem.GetFirePos();
         var dir = inputSystem.GetFireDirection();
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         SetPoint1(firePos);
 
-        var eagePointCount = GameMapUtility.GetMapEagePoint(mapId, in firePos, in dir, EnDirection.All & ~EnDirection.Bottom, ref _Hits);
+        var eagePointCount = GameMapUtility.GetMapEagePoint(in firePos, in dir, EnDirection.All & ~EnDirection.Bottom, ref _Hits);
         if (eagePointCount == 0)
             return;
         var mapPoint1 = _Hits[0].point;
         var normal = _Hits[0].normal;
         var mapDir = _Hits[0].dir;
 
-        var btmPointCount = GameMapUtility.GetMapEagePoint(mapId, in firePos, in dir, EnDirection.Bottom, ref _Hits);
+        var btmPointCount = GameMapUtility.GetMapEagePoint(in firePos, in dir, EnDirection.Bottom, ref _Hits);
         if (btmPointCount == 0)
             return;
         var startPoint = _Hits[0].point;
-        var count = GamePhysicsUtility.TryLineCastSort(in startPoint, in mapPoint1, 0, ref _Hits);
-        if (count > 0)
+        if (GamePhysicsUtility.TryLineCastSort(in startPoint, in mapPoint1, 0, ref _Hit))
         {
-            var hit = _Hits[0];
-            if (TryGetEntityEageCastPoint(hit.entityId, in startPoint, in dir, out var entityPoint))
+            if (TryGetEntityEageCastPoint(_Hit.entityId, in startPoint, in dir, out var entityPoint))
             {
                 SetPoint2(in entityPoint);
                 SetPoint3Active(false);
@@ -75,15 +73,14 @@ public class GameEffectFireLineEntityData : GameEntityData<GameEffectFireLineEnt
             {
                 validEdge &= ~EnDirection.Bottom;
             }
-            var eagePointCount2 = GameMapUtility.GetMapEagePoint(mapId, in mapPoint1, in dir2, in validEdge, ref _Hits);
+            var eagePointCount2 = GameMapUtility.GetMapEagePoint(in mapPoint1, in dir2, in validEdge, ref _Hits);
             if (eagePointCount2 > 0)
             {
                 var mapPoint2 = _Hits[0].point;
 
-                var entityCount2 = GamePhysicsUtility.TryLineCastSort(in mapPoint1, in mapPoint2, 0, ref _Hits);
-                if (entityCount2 > 0)
+                if (GamePhysicsUtility.TryLineCastSort(in mapPoint1, in mapPoint2, 0, ref _Hit))
                 {
-                    var entityId = _Hits[0].entityId;
+                    var entityId = _Hit.entityId;
                     if (TryGetEntityEageCastPoint(entityId, in mapPoint1, in dir2, out var entityPoint))
                     {
                         SetPoint3Active(true);
@@ -108,8 +105,7 @@ public class GameEffectFireLineEntityData : GameEntityData<GameEffectFireLineEnt
     }
     private bool TryGetEntityEageCastPoint(int entityId, in Vector2 startPoint, in Vector2 dir, out Vector2 point)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         var pointInfo = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(entityId);
         var entityPos = pointInfo.GetMainGridPos();
         ref readonly var arrPos = ref pointInfo.GetGridIndexs();

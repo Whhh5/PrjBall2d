@@ -3,7 +3,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-public class UIBattleSkillBallInfoTipsUserData : UIWindowUserData
+public class UIBattleSkillBallInfoTipsUserData : UITipsUserData
 {
     public int ballId;
     public int star;
@@ -16,10 +16,8 @@ public class UIBattleSkillBallInfoTipsUserData : UIWindowUserData
             = -1;
     }
 }
-public class UIBattleSkillBallInfoTipsData : UIWindowData<UIBattleSkillBallInfoTips, UIBattleSkillBallInfoTipsUserData>
+public class UIBattleSkillBallInfoTipsData : UITipsData<UIBattleSkillBallInfoTips, UIBattleSkillBallInfoTipsUserData>
 {
-    public override EnUIWindowType WindowType => EnUIWindowType.Tips;
-
     public override EnLoadTarget LoadTarget => EnLoadTarget.Pre_UIBattleSkillBallInfoTips;
 
 
@@ -48,7 +46,7 @@ public class UIBattleSkillBallInfoTipsData : UIWindowData<UIBattleSkillBallInfoT
         starData.GetDescriptionList(ref list, EnDescriptionLevel.Level1);
 
         var nameStr = LanguageUtility.GetLanguage(ballCfg.nNameLangId);
-        _UIWindow.SettingBallInfo(nameStr, list, _Star);
+        _UITips.SettingBallInfo(nameStr, list, _Star);
 
         for (int i = 0; i < list.Count; i++)
         {
@@ -57,7 +55,7 @@ public class UIBattleSkillBallInfoTipsData : UIWindowData<UIBattleSkillBallInfoT
     }
 }
 
-public class UIBattleSkillBallInfoTips : UIWindow
+public class UIBattleSkillBallInfoTips : UITips
 {
     [SerializeField]
     private TextMeshProUGUI _NameTxt;
@@ -87,27 +85,10 @@ public class UIBattleSkillBallInfoTips : UIWindow
         _StarGods.Clear();
         _DescLevelTxts.Clear();
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
-        base.LoadCompeletion();
+        base.LoadCompletion();
         _StarGo.SetActive(false);
-    }
-    protected override void Awake()
-    {
-        base.Awake();
-
-    }
-    protected override void Update()
-    {
-        base.Update();
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (UIMgr.Instance.IsValid(_WindowId))
-            {
-                UIMgr.Instance.HideWindow(_WindowId);
-            }
-        }
     }
     public async void SettingBallInfo(string title, List<DescriptionInfo> descInfos, int star)
     {

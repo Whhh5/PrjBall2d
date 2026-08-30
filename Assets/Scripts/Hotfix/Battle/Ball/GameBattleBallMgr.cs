@@ -76,31 +76,33 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     {
         return EnGameMapLifecycleOrder.GameBattleBallMgr;
     }
-    public void EnterMap(int mapId)
+    public void EnterMap(int mapId, int chapterId)
     {
-        InitBallConfig(mapId);
+        InitBallConfig(mapId, chapterId);
     }
-    private void InitBallConfig(int mapId)
+    private void InitBallConfig(int mapId, int chapterId)
     {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        for (int i = 0; i < mapCfg.arrDefaultBalls.Length; i++)
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        for (int i = 0; i < chapterCfg.arrDefaultBalls.Length; i++)
         {
-            var ballId = mapCfg.arrDefaultBalls[i];
+            var ballId = chapterCfg.arrDefaultBalls[i];
             SetBallStar(ballId, 1);
 
             AddDelayFireBall(ballId, float.MinValue);
         }
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
         ClearBalls();
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
+        var curMapId = GameMapMgr.Instance.GetCurMapId();
+        var curChapterId = GameMapMgr.Instance.GetCurChapterId();
         ClearBalls();
-        InitBallConfig(mapId);
+        InitBallConfig(curMapId, curChapterId);
     }
 
     private GameBattleSkillBallData GetBallData(in int ballId)

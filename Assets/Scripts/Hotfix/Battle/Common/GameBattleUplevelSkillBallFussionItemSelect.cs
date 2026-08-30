@@ -13,7 +13,7 @@ public class GameBattleUplevelSkillBallFussionItemSelect : IBattleEnergyUplevelI
         _FussionInfos.Clear();
     }
 
-    public void Init(int mapId)
+    public void Init(int chapterId)
     {
     }
 

@@ -18,8 +18,9 @@ public class GameBattleSkillBall1002EntityData : GameBattleSkillBallEntityData<G
             FireSubBall(starData.subBallId, count, in hit.point, hit.dir);
         }
 
+        var ballAtkValue = GameAttributeUtility.GetValueInt(_EntityID, EnEntityAttributeId.Attack);
         var ownerAtk = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.attPercentage01);
-        var atkValue = ownerAtk + starData.damageValue;
+        var atkValue = ballAtkValue + ownerAtk + starData.damageValue;
         var damageResult = GameAttackMgr.Instance.AttackMonster(_OwnerEntityId, hit.entityId, atkValue, hit.point, starData.damageType);
 
         PlayHitAudio(in damageResult);

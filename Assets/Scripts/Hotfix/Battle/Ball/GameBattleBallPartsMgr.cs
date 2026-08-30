@@ -26,10 +26,21 @@ public class GameBattleBallPartsMgr : Singleton<GameBattleBallPartsMgr>, IGameMa
     private readonly Dictionary<int, GameBatteSkillBallPartRuntimeData> _PartId2RuntimeDatas = new();
     private readonly Dictionary<int, List<int>> _BallId2PartIds = new();
 
-    public override async UniTask OnEnableAsync()
-    {
-        await base.OnEnableAsync();
 
+    public override void Destroy()
+    {
+        EventMgr.Instance.Unregister<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
+        EventMgr.Instance.Unregister<GameSkillBallRemoveEventData>(EnABBEvent.EVENT_SKILL_BALL_REMOVE, (int)EnBallType.Skill, 0, OnEvent_SkillBallRemove);
+        EventMgr.Instance.Unregister<GameSkillBallOnCollisionEventData>(EnABBEvent.EVENT_SKILL_BALL_ONCOLLISION, 0, 0, OnEvent_SkillBallOnCollision);
+        EventMgr.Instance.Unregister<GameSkillBallAddEventData>(EnABBEvent.EVENT_SKILL_BALL_ADD, (int)EnBallType.Skill, 0, OnEvent_SkillBallStar);
+        EventMgr.Instance.Unregister<GameSkillBallUpStarEventData>(EnABBEvent.EVENT_SKILL_BALL_UPSTAR, (int)EnBallType.Skill, 0, OnEvent_SkillBallUpstar);
+        GameMapMgr.Instance.UnregisterLifecycle(this);
+        base.Destroy();
+
+    }
+    public override async UniTask AwakeAsync()
+    {
+        await base.AwakeAsync();
         EventMgr.Instance.Register<GameSkillBallRemoveEventData>(EnABBEvent.EVENT_SKILL_BALL_REMOVE, (int)EnBallType.Skill, 0, OnEvent_SkillBallRemove);
         EventMgr.Instance.Register<GameSkillBallOnCollisionEventData>(EnABBEvent.EVENT_SKILL_BALL_ONCOLLISION, 0, 0, OnEvent_SkillBallOnCollision);
         EventMgr.Instance.Register<GameSkillBallAddEventData>(EnABBEvent.EVENT_SKILL_BALL_ADD, (int)EnBallType.Skill, 0, OnEvent_SkillBallStar);
@@ -37,39 +48,28 @@ public class GameBattleBallPartsMgr : Singleton<GameBattleBallPartsMgr>, IGameMa
         EventMgr.Instance.Register<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
         GameMapMgr.Instance.RegisterLifecycle(this);
     }
-    public override void OnDisable()
-    {
-        base.OnDisable();
-
-        EventMgr.Instance.Unregister<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
-        EventMgr.Instance.Unregister<GameSkillBallRemoveEventData>(EnABBEvent.EVENT_SKILL_BALL_REMOVE, (int)EnBallType.Skill, 0, OnEvent_SkillBallRemove);
-        EventMgr.Instance.Unregister<GameSkillBallOnCollisionEventData>(EnABBEvent.EVENT_SKILL_BALL_ONCOLLISION, 0, 0, OnEvent_SkillBallOnCollision);
-        EventMgr.Instance.Unregister<GameSkillBallAddEventData>(EnABBEvent.EVENT_SKILL_BALL_ADD, (int)EnBallType.Skill, 0, OnEvent_SkillBallStar);
-        EventMgr.Instance.Unregister<GameSkillBallUpStarEventData>(EnABBEvent.EVENT_SKILL_BALL_UPSTAR, (int)EnBallType.Skill, 0, OnEvent_SkillBallUpstar);
-        GameMapMgr.Instance.UnregisterLifecycle(this);
-    }
 
     public EnGameMapLifecycleOrder GetMapLifecycleOrder()
     {
         return EnGameMapLifecycleOrder.GameBattleBallPartsMgr;
     }
-    public void EnterMap(int mapId)
+    public void EnterMap(int mapId, int chapterId)
     {
-        var gridLbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var gridRuPos = GameMapUtility.GetGridRuPosition(mapId);
-        var gridAreaSize = GameMapUtility.GetBattleAreaBoundSize(mapId);
+        ref readonly var gridLbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var gridRuPos = ref GameMapMgr.Instance.GetGridRuPosition();
+        ref readonly var gridAreaSize = ref GameMapMgr.Instance.GetBattleAreaBoundSize();
 
         var posCount = 6;
         var interval = gridAreaSize.y / (posCount + 1);
 
-        CreateColPartPosData(gridLbPos.x - 0.8f);
-        CreateColPartPosData(gridRuPos.x + 0.8f);
+        CreateColPartPosData(gridLbPos.x - 0.8f, gridLbPos.y);
+        CreateColPartPosData(gridRuPos.x + 0.8f, gridLbPos.y);
 
-        void CreateColPartPosData(float posX)
+        void CreateColPartPosData(float posX, float lbY)
         {
             for (int i = 0; i < posCount; i++)
             {
-                var posY = interval * (i + 1) + gridLbPos.y;
+                var posY = interval * (i + 1) + lbY;
                 var data = ClassPoolMgr.Instance.Pull<GameBallPartPosData>();
                 data.worldPos = new Vector2(posX, posY);
                 _PartPosDatas.Add(_PartPosDatas.Count, data);
@@ -82,7 +82,7 @@ public class GameBattleBallPartsMgr : Singleton<GameBattleBallPartsMgr>, IGameMa
         }
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
         foreach (var (_, data) in _PartPosDatas)
         {
@@ -92,7 +92,7 @@ public class GameBattleBallPartsMgr : Singleton<GameBattleBallPartsMgr>, IGameMa
         _PartPosDatas.Clear();
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
     }
     public List<int> GetPartIds()

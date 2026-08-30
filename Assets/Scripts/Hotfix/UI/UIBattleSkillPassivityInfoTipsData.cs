@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 
-public class UIBattleSkillPassivityInfoTipsUserData : UIWindowUserData
+public class UIBattleSkillPassivityInfoTipsUserData : UITipsUserData
 {
     public int skillPassivityId;
     public int star;
@@ -14,10 +14,8 @@ public class UIBattleSkillPassivityInfoTipsUserData : UIWindowUserData
             = -1;
     }
 }
-public class UIBattleSkillPassivityInfoTipsData : UIWindowData<UIBattleSkillBallInfoTips, UIBattleSkillPassivityInfoTipsUserData>
+public class UIBattleSkillPassivityInfoTipsData : UITipsData<UIBattleSkillBallInfoTips, UIBattleSkillPassivityInfoTipsUserData>
 {
-    public override EnUIWindowType WindowType => EnUIWindowType.Tips;
-
     public override EnLoadTarget LoadTarget => EnLoadTarget.Pre_UIBattleSkillBallInfoTips;
 
 
@@ -50,7 +48,7 @@ public class UIBattleSkillPassivityInfoTipsData : UIWindowData<UIBattleSkillBall
         data.GetDescriptionList(ref list, EnDescriptionLevel.Level2);
 
         var nameStr = LanguageUtility.GetLanguage(partCfg.nNameLangId);
-        _UIWindow.SettingBallInfo(nameStr, list, _Star);
+        _UITips.SettingBallInfo(nameStr, list, _Star);
 
         for (int i = 0; i < list.Count; i++)
         {

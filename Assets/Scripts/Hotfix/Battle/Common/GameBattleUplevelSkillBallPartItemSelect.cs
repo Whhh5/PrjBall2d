@@ -13,7 +13,7 @@ public class GameBattleUplevelSkillBallPartItemSelect : IBattleEnergyUplevelItem
         _IgnoreHistory.Clear();
     }
 
-    public void Init(int mapId)
+    public void Init(int chapterId)
     {
     }
 

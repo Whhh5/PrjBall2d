@@ -60,9 +60,9 @@ public class UIBattleBossInfoDialog : UIWindow
         base.OnUnload();
         _BossEntityId = default;
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
-        base.LoadCompeletion();
+        base.LoadCompletion();
     }
 
     public void SetBossEntityId(int bossEntityId)

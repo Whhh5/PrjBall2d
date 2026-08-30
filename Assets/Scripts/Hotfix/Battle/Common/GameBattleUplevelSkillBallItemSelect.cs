@@ -15,7 +15,7 @@ public class GameBattleUplevelSkillBallItemSelect : IBattleEnergyUplevelItemSele
         _MaxCount = 0;
     }
 
-    public void Init(int mapId)
+    public void Init(int chapterId)
     {
     }
 
@@ -34,9 +34,9 @@ public class GameBattleUplevelSkillBallItemSelect : IBattleEnergyUplevelItemSele
     {
         _IgnoreHistory.Clear();
         _SkillBallPool.Clear();
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        _SkillBallPool.AddRange(mapCfg.arrSkillBallIds);
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        _SkillBallPool.AddRange(chapterCfg.arrSkillBallIds);
         var curSkillList = GameBattleBallMgr.Instance.GetBallIdsByType(EnBallType.Skill);
         for (int i = 0; i < curSkillList.Count; i++)
         {

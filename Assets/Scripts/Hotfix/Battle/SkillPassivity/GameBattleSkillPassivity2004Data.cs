@@ -65,7 +65,7 @@ public class GameBattleSkillPassivity2004Data : GameBattleSkillPassivityData<Gam
         var curRound = Mathf.FloorToInt(_DieCount / starData.killCount);
         var changeRound = curRound - _RoundCount;
 
-        var finalChangeAttValue = changeRound * starData.addAttValue + changeAttValue * _RoundCount;
+        var finalChangeAttValue = changeRound * starData.addAttValue + changeAttValue / 100f * _RoundCount;
 
         GameAttributeUtility.AddAddtionalValue(_OwnerEntityId, starData.addAttId, finalChangeAttValue);
         _RoundCount = curRound;

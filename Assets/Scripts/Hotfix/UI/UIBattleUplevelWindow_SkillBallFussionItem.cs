@@ -59,10 +59,10 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
         _SourceImgs.Clear();
         _DescInfos.Clear();
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
         _Rect = GetComponent<RectTransform>();
-        base.LoadCompeletion();
+        base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
         _SourceImg.gameObject.SetActive(false);
     }

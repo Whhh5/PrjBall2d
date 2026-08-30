@@ -57,11 +57,10 @@ public class GameBattleSkillBallPart1009EntityData : GameBattleSkillBallPartEnti
         if (ballCount == 0)
             return false;
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         _TempIntList.Clear();
         for (int i = 0; i < ballCount; i++)
         {
-            if (!GameMapUtility.IsValidWorldPos(in mapId, in _BallPosArray[i]))
+            if (!GameMapUtility.IsValidWorldPos(in _BallPosArray[i]))
                 continue;
             _TempIntList.Add(i);
         }
@@ -79,7 +78,7 @@ public class GameBattleSkillBallPart1009EntityData : GameBattleSkillBallPartEnti
         var validEage = dir.x > 0
             ? EnDirection.Top | EnDirection.Bottom | EnDirection.Right
             : EnDirection.Top | EnDirection.Bottom | EnDirection.Left;
-        var pointCount = GameMapUtility.GetMapEagePoint(mapId, in point1, in dir, validEage, ref _Hits);
+        var pointCount = GameMapUtility.GetMapEagePoint(in point1, in dir, validEage, ref _Hits);
         if (pointCount == 0)
             return false;
         var point2 = _Hits[0].point;
@@ -88,7 +87,8 @@ public class GameBattleSkillBallPart1009EntityData : GameBattleSkillBallPartEnti
         if (count == 0)
             return false;
 
-        var effectAtkDamage = starData.damageValue + Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+        var ownerDamage = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+        var effectAtkDamage = starData.damageValue + ownerDamage;
         for (int i = 0; i < count; i++)
         {
             ref readonly var atkHit = ref _Hits[i];

@@ -65,8 +65,7 @@ public class GameBattleMonster1000301EntityData : GameBattleMonsterBossEntityDat
 
     private void OnEvent_SkillBossSummon(in int nEntityId, in int nSkillEventId, in GameSkillBossSummonEventData data)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapRowCol = GameMapUtility.GetMapGridRowCol(mapId);
+        ref readonly var mapRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
 
         var maxIndex = mapRowCol.x * mapRowCol.y;
         var validGridIndexs = new List<int>(maxIndex);
@@ -96,7 +95,7 @@ public class GameBattleMonster1000301EntityData : GameBattleMonsterBossEntityDat
                 break;
             var listIndex = Random.Range(0, validGridIndexs.Count);
             var gridIndex = validGridIndexs[listIndex];
-            var (row, col) = GameMapUtility.IndexToRowCol(mapId, gridIndex);
+            var (row, col) = GameMapUtility.IndexToRowCol(gridIndex);
 
             var testMonsterIndex = Random.Range(0, summonEntityIds.Count);
             for (int j = testMonsterIndex; j >= 0; j--)
@@ -109,7 +108,7 @@ public class GameBattleMonster1000301EntityData : GameBattleMonsterBossEntityDat
                 {
                     var monsterRow = row + monsterCfg.arrGridLocalPos[k];
                     var monsterCol = col + monsterCfg.arrGridLocalPos[k + 1];
-                    var monsterIndex = GameMapUtility.RowColToIndex(mapId, monsterRow, monsterCol);
+                    var monsterIndex = GameMapUtility.RowColToIndex(monsterRow, monsterCol);
                     if (!validGridIndexs.Remove(monsterIndex))
                     {
                         throw new System.Exception($"{monsterIndex}");
@@ -123,15 +122,14 @@ public class GameBattleMonster1000301EntityData : GameBattleMonsterBossEntityDat
     }
     private bool TestMonsterGridIndex(in int monsterId, in int row, in int col)
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(monsterId);
         for (int k = 0; k < monsterCfg.arrGridLocalPos.Length; k += 2)
         {
             var testRow = row + monsterCfg.arrGridLocalPos[k];
             var testCol = col + monsterCfg.arrGridLocalPos[k + 1];
-            if (!GameMapUtility.RowColIsValid(mapId, testRow, testCol))
+            if (!GameMapUtility.RowColIsValid(testRow, testCol))
                 return false;
-            var testIndex = GameMapUtility.RowColToIndex(mapId, testRow, testCol);
+            var testIndex = GameMapUtility.RowColToIndex(testRow, testCol);
             if (!GameBattleGridMgr.Instance.GridStatusIs(testIndex, EnGridStatus.Idle))
                 return false;
         }

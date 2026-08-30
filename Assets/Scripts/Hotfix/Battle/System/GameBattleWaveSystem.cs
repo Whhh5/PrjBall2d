@@ -31,19 +31,21 @@ public class GameBattleWaveSystem : IBattleSystem
 
     private void InitMonsterGrid(int mapId)
     {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        for (int waveId = mapCfg.nMinWaveId; waveId <= mapCfg.nMaxWaveId; waveId++)
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        for (int waveId = chapterCfg.nMinWaveId; waveId <= chapterCfg.nMaxWaveId; waveId++)
         {
-            RegisterWaveInfo(mapId, waveId);
+            RegisterWaveInfo(waveId);
             _WaveInfo.Enqueue(waveId);
         }
-        _MaxWaveId = mapCfg.nMaxWaveId;
-        RegisterWaveInfo(mapId, mapCfg.nBossWaveId);
+        _MaxWaveId = chapterCfg.nMaxWaveId;
+        if (chapterCfg.nBossWaveId > 0)
+            RegisterWaveInfo(chapterCfg.nBossWaveId);
     }
 
-    public void RegisterWaveInfo(in int mapId, in int waveId)
+    public void RegisterWaveInfo(in int waveId)
     {
-        var mapRowCol = GameMapUtility.GetMapGridRowCol(mapId);
+        ref readonly var mapRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         var waveCfg = GameSchedule.Instance.GetBattleWaveCfg0(waveId);
         var index = 0;
         var userData = ClassPoolMgr.Instance.Pull<CommonSerializeToIntArrayUserData>();
@@ -126,9 +128,9 @@ public class GameBattleWaveSystem : IBattleSystem
         EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_NEXT_WAVE, 0, 0, evUserData);
         ClassPoolMgr.Instance.Push(evUserData);
 
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        if (waveId == mapCfg.nMaxWaveId)
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        if (waveId == chapterCfg.nMaxWaveId)
         {
             EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_WAVE_FINISH);
         }

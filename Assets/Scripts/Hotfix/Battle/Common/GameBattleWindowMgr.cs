@@ -7,7 +7,7 @@ using UnityEngine;
 
 public interface IBattleEnergyUplevelItemSelect
 {
-    public void Init(int mapId);
+    public void Init(int chapterId);
     public void Destroy();
     public void Reset();
     public bool IsValid();
@@ -41,27 +41,26 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
 
     private CancellationTokenSource _TokenSource = null;
 
-    public override async UniTask OnEnableAsync()
-    {
-        await base.OnEnableAsync();
-
-        EventMgr.Instance.Register<GameBattleEnergyUplevelEventData>(EnABBEvent.EVENT_BATTLE_ENERGY_UPLEVEL, 0, 0, OnEvent_EnergyUplevel);
-        GameMapMgr.Instance.RegisterLifecycle(this);
-    }
-    public override void OnDisable()
+    public override void Destroy()
     {
         GameMapMgr.Instance.UnregisterLifecycle(this);
         EventMgr.Instance.Unregister<GameBattleEnergyUplevelEventData>(EnABBEvent.EVENT_BATTLE_ENERGY_UPLEVEL, 0, 0, OnEvent_EnergyUplevel);
-        base.OnDisable();
+        base.Destroy();
+    }
+    public override async UniTask AwakeAsync()
+    {
+        await base.AwakeAsync();
+        EventMgr.Instance.Register<GameBattleEnergyUplevelEventData>(EnABBEvent.EVENT_BATTLE_ENERGY_UPLEVEL, 0, 0, OnEvent_EnergyUplevel);
+        GameMapMgr.Instance.RegisterLifecycle(this);
     }
 
     public EnGameMapLifecycleOrder GetMapLifecycleOrder() => EnGameMapLifecycleOrder.GameBattleMgr;
 
-    public void EnterMap(int mapId)
+    public void EnterMap(int mapId, int chapterId)
     {
         _TokenSource = new();
         foreach (var item in _UplevelItemSelects)
-            item.Value.Init(mapId);
+            item.Value.Init(chapterId);
 
         var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
         _UplevelEntityWorldPos = new Vector2(mapCfg.arrUplevelPos[0], mapCfg.arrUplevelPos[1]);
@@ -77,7 +76,7 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
         EventMgr.Instance.Register<GameBattleBossDebutEventData>(EnABBEvent.EVENT_BATTLE_BOSS_DEBUT, 0, 0, OnEvent_BossDebut);
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
         _TokenSource.Cancel();
         EventMgr.Instance.Unregister<GameSkillBallAddEventData>(EnABBEvent.EVENT_SKILL_BALL_ADD, (int)EnBallType.Skill, 0, OnEvent_SkillBallAdd);
@@ -112,10 +111,11 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
         _BossInfoDialogWindowId = -1;
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
         _TokenSource.Cancel();
         _TokenSource = new();
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
         if (UIMgr.Instance.IsValid(_UplevelWindowId))
         {
             UIMgr.Instance.HideWindow(_UplevelWindowId);
@@ -131,7 +131,7 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
         foreach (var item in _UplevelItemSelects)
         {
             item.Value.Destroy();
-            item.Value.Init(mapId);
+            item.Value.Init(chapterId);
         }
 
         if (_BossInfoDialogWindowId > 0)

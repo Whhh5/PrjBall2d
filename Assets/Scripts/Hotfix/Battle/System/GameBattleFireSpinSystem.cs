@@ -117,7 +117,7 @@ public class GameBattleFireSpinSystem : IBattleSystem
         _FireSpinRuntimeData.Remove(entityId);
     }
 
-    public void CreateFireSpinEntity(in int ownerEntityId, in int ballId, in int ballStar, in Vector2 startPos, in Vector2 moveDir)
+    public void CreateFireSpinEntity(in int ownerEntityId, in int ballId, in int ballStar, in Vector2 startPos, in Vector2 moveDir, in int damageValue)
     {
         var ballStarData = GameBattleBallMgr.Instance.GetBallStarData<GameBattleSkillBall10031004StarData>(ballId, ballStar);
         var entityId = GameEffectMgr.Instance.PlayEffect(EnGameEffectId.Eff_buff_huoyanlongjuanfeng, startPos, ballStarData.atkRadius * 2);
@@ -133,9 +133,7 @@ public class GameBattleFireSpinSystem : IBattleSystem
         rtData.startTime = GameUtility.GetGameTime();
         rtData.extraRadius = 0;
         rtData.ownerEntityId = ownerEntityId;
-
-        var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(ownerEntityId, EnSceneEntityComType.Attribute);
-        rtData.damageValue = Mathf.CeilToInt(ballStarData.damageValue + attCom.GetValue(ballStarData.attId) * ballStarData.attPercentage01);
+        rtData.damageValue = damageValue;
         _FireSpinRuntimeData.Add(entityId, rtData);
     }
 

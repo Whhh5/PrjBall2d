@@ -59,9 +59,9 @@ public class UIBattleSkillBallFussionWindow : UIWindow
         base.OnUnload();
         _ImgLoadHandle.Clear();
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
-        base.LoadCompeletion();
+        base.LoadCompletion();
         _CloseBtn.AddListener(OnClick_CloseBtn);
     }
     private void OnClick_CloseBtn()

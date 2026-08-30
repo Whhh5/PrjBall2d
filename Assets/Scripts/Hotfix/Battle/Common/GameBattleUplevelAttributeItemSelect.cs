@@ -14,10 +14,10 @@ public class GameBattleUplevelAttributeItemSelect : IBattleEnergyUplevelItemSele
         _IgnoreHistory.Clear();
     }
 
-    public void Init(int mapId)
+    public void Init(int chapterId)
     {
-        var mapCfg = GameSchedule.Instance.GetMapCfg0(mapId);
-        _AttributePool.AddRange(mapCfg.arrAttributeIds);
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        _AttributePool.AddRange(chapterCfg.arrAttributeIds);
     }
     public int GetTestValue()
     {

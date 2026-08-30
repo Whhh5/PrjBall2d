@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <linker>
   <assembly fullname="AOTAssembly">
+    <type fullname="AotDebug" preserve="all" />
     <type fullname="AssetbundleUtil" preserve="all" />
     <type fullname="EnLoaderType" preserve="all" />
+    <type fullname="GameStart" preserve="all" />
     <type fullname="GameStartAttribute" preserve="all" />
     <type fullname="GlobalConfigSO" preserve="all" />
   </assembly>
@@ -105,7 +107,6 @@
     <type fullname="UnityEngine.Audio.AudioMixerPlayable" preserve="all" />
     <type fullname="UnityEngine.Audio.AudioPlayableOutput" preserve="all" />
     <type fullname="UnityEngine.AudioClip" preserve="all" />
-    <type fullname="UnityEngine.AudioSettings" preserve="all" />
     <type fullname="UnityEngine.AudioSource" preserve="all" />
   </assembly>
   <assembly fullname="UnityEngine.CoreModule">
@@ -113,6 +114,7 @@
     <type fullname="Unity.Collections.NativeArray`1/Enumerator" preserve="all" />
     <type fullname="UnityEngine.AnimationCurve" preserve="all" />
     <type fullname="UnityEngine.Application" preserve="all" />
+    <type fullname="UnityEngine.AsyncInstantiateOperation" preserve="all" />
     <type fullname="UnityEngine.AsyncInstantiateOperation`1" preserve="all" />
     <type fullname="UnityEngine.AsyncOperation" preserve="all" />
     <type fullname="UnityEngine.Camera" preserve="all" />
@@ -123,6 +125,7 @@
     <type fullname="UnityEngine.Events.UnityEvent" preserve="all" />
     <type fullname="UnityEngine.Events.UnityEventBase" preserve="all" />
     <type fullname="UnityEngine.GameObject" preserve="all" />
+    <type fullname="UnityEngine.HeaderAttribute" preserve="all" />
     <type fullname="UnityEngine.KeyCode" preserve="all" />
     <type fullname="UnityEngine.LineRenderer" preserve="all" />
     <type fullname="UnityEngine.Material" preserve="all" />
@@ -164,11 +167,6 @@
     <type fullname="UnityEngine.Vector2Int" preserve="all" />
     <type fullname="UnityEngine.Vector3" preserve="all" />
   </assembly>
-  <assembly fullname="UnityEngine.IMGUIModule">
-    <type fullname="UnityEngine.GUI" preserve="all" />
-    <type fullname="UnityEngine.GUIStyle" preserve="all" />
-    <type fullname="UnityEngine.GUIStyleState" preserve="all" />
-  </assembly>
   <assembly fullname="UnityEngine.InputLegacyModule">
     <type fullname="UnityEngine.Input" preserve="all" />
   </assembly>
@@ -204,10 +202,12 @@
     <type fullname="UnityEngine.CanvasGroup" preserve="all" />
     <type fullname="UnityEngine.RectTransformUtility" preserve="all" />
   </assembly>
+  <assembly fullname="Wx">
+    <type fullname="WeChatWASM.WX" preserve="all" />
+  </assembly>
   <assembly fullname="mscorlib">
     <type fullname="System.Action" preserve="all" />
     <type fullname="System.Activator" preserve="all" />
-    <type fullname="System.AppDomain" preserve="all" />
     <type fullname="System.Array" preserve="all" />
     <type fullname="System.ArraySegment`1" preserve="all" />
     <type fullname="System.AsyncCallback" preserve="all" />
@@ -215,7 +215,6 @@
     <type fullname="System.AttributeTargets" preserve="all" />
     <type fullname="System.AttributeUsageAttribute" preserve="all" />
     <type fullname="System.BitConverter" preserve="all" />
-    <type fullname="System.Boolean" preserve="all" />
     <type fullname="System.Byte" preserve="all" />
     <type fullname="System.Collections.Generic.Dictionary`2" preserve="all" />
     <type fullname="System.Collections.Generic.Dictionary`2/Enumerator" preserve="all" />
@@ -305,5 +304,9 @@
   <assembly fullname="spine-unity">
     <type fullname="Spine.Unity.SkeletonAnimation" preserve="all" />
     <type fullname="Spine.Unity.SkeletonRenderer" preserve="all" />
+  </assembly>
+  <assembly fullname="wx-runtime">
+    <type fullname="WeChatWASM.SafeArea" preserve="all" />
+    <type fullname="WeChatWASM.SystemInfo" preserve="all" />
   </assembly>
 </linker>

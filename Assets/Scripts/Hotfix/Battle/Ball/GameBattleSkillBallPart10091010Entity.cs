@@ -31,10 +31,9 @@ public class GameBattleSkillBallPart10091010EntityData : GameBattleSkillBallPart
         //AudioMgr.Instance.Play(EnAudioId.Laser);
 
         var ballPoint = EntityMgr.Instance.GetEntityWorldPos2D(data.ballEntityId);
-        var mapId = GameMapMgr.Instance.GetCurMapId();
 
-        var gridLbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var gridRuPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var gridLbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var gridRuPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
         for (int j = 0; j < starData.laserCount; j++)
         {

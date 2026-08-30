@@ -34,17 +34,17 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<AbbAssetbundleLoader.<LoadAssetAsync>d__10<object>,object>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<AbbAssetbundleLoader.<LoadAssetbundleAsync>d__16,object>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<AudioMgr.<AwakeAsync>d__12>
-	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<AudioMgr.<Play>d__21>
+	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<AudioMgr.<Play>d__22>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<CfgMgr.<AwakeAsync>d__0>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<CmdMgr.<AwakeAsync>d__1>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleBallMgr.<AwakeAsync>d__6>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleBallMgr.<OnEnableAsync>d__8>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleBallPartsMgr.<OnEnableAsync>d__4>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleGridMgr.<AwakeAsync>d__2>
-	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleMgr.<OnEnableAsync>d__5>
+	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleMgr.<OnEnableAsync>d__6>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameBattleWindowMgr.<OnEnableAsync>d__9>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameCfgMgr.<AwakeAsync>d__3>
-	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameMonsterMgr.<AwakeAsync>d__3>
+	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameMonsterMgr.<AwakeAsync>d__5>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GamePlayerMgr.<AwakeAsync>d__4>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameSchedule.<AwakeAsync>d__4>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask.<>c<GameSchedule.<ReadCfgAsync>d__7,object>
@@ -78,17 +78,17 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<AbbAssetbundleLoader.<LoadAssetAsync>d__10<object>,object>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<AbbAssetbundleLoader.<LoadAssetbundleAsync>d__16,object>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<AudioMgr.<AwakeAsync>d__12>
-	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<AudioMgr.<Play>d__21>
+	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<AudioMgr.<Play>d__22>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<CfgMgr.<AwakeAsync>d__0>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<CmdMgr.<AwakeAsync>d__1>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleBallMgr.<AwakeAsync>d__6>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleBallMgr.<OnEnableAsync>d__8>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleBallPartsMgr.<OnEnableAsync>d__4>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleGridMgr.<AwakeAsync>d__2>
-	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleMgr.<OnEnableAsync>d__5>
+	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleMgr.<OnEnableAsync>d__6>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameBattleWindowMgr.<OnEnableAsync>d__9>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameCfgMgr.<AwakeAsync>d__3>
-	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameMonsterMgr.<AwakeAsync>d__3>
+	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameMonsterMgr.<AwakeAsync>d__5>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GamePlayerMgr.<AwakeAsync>d__4>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameSchedule.<AwakeAsync>d__4>
 	// Cysharp.Threading.Tasks.CompilerServices.AsyncUniTask<GameSchedule.<ReadCfgAsync>d__7,object>
@@ -1430,10 +1430,10 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameBattleBallMgr.<OnEnableAsync>d__8>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameBattleBallMgr.<OnEnableAsync>d__8&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameBattleBallPartsMgr.<OnEnableAsync>d__4>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameBattleBallPartsMgr.<OnEnableAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameBattleGridMgr.<AwakeAsync>d__2>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameBattleGridMgr.<AwakeAsync>d__2&)
-		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameBattleMgr.<OnEnableAsync>d__5>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameBattleMgr.<OnEnableAsync>d__5&)
+		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameBattleMgr.<OnEnableAsync>d__6>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameBattleMgr.<OnEnableAsync>d__6&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameBattleWindowMgr.<OnEnableAsync>d__9>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameBattleWindowMgr.<OnEnableAsync>d__9&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameCfgMgr.<AwakeAsync>d__3>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameCfgMgr.<AwakeAsync>d__3&)
-		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameMonsterMgr.<AwakeAsync>d__3>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameMonsterMgr.<AwakeAsync>d__3&)
+		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameMonsterMgr.<AwakeAsync>d__5>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameMonsterMgr.<AwakeAsync>d__5&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GamePlayerMgr.<AwakeAsync>d__4>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GamePlayerMgr.<AwakeAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameSchedule.<AwakeAsync>d__4>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameSchedule.<AwakeAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,GameSkillPassivityMgr.<OnEnableAsync>d__5>(Cysharp.Threading.Tasks.UniTask.Awaiter&,GameSkillPassivityMgr.<OnEnableAsync>d__5&)
@@ -1444,7 +1444,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,Singleton.<OnEnableAsync>d__6>(Cysharp.Threading.Tasks.UniTask.Awaiter&,Singleton.<OnEnableAsync>d__6&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,UIWindowData.<HideAsync>d__6>(Cysharp.Threading.Tasks.UniTask.Awaiter&,UIWindowData.<HideAsync>d__6&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter,VirtualTimelineMgr.<AwakeAsync>d__4>(Cysharp.Threading.Tasks.UniTask.Awaiter&,VirtualTimelineMgr.<AwakeAsync>d__4&)
-		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<System.ValueTuple<byte,LoadHandle>>,AudioMgr.<Play>d__21>(Cysharp.Threading.Tasks.UniTask.Awaiter<System.ValueTuple<byte,LoadHandle>>&,AudioMgr.<Play>d__21&)
+		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<System.ValueTuple<byte,LoadHandle>>,AudioMgr.<Play>d__22>(Cysharp.Threading.Tasks.UniTask.Awaiter<System.ValueTuple<byte,LoadHandle>>&,AudioMgr.<Play>d__22&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<object>,GameSchedule.<AwakeAsync>d__4>(Cysharp.Threading.Tasks.UniTask.Awaiter<object>&,GameSchedule.<AwakeAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,UnityTcpClient2.<ConnectAsync>d__11>(System.Runtime.CompilerServices.TaskAwaiter&,UnityTcpClient2.<ConnectAsync>d__11&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter,UnityWebClient.<ConnectAsync>d__13>(System.Runtime.CompilerServices.TaskAwaiter&,UnityWebClient.<ConnectAsync>d__13&)
@@ -1471,17 +1471,17 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<ABBLoadMgr.<OnEnableAsync>d__4>(ABBLoadMgr.<OnEnableAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<AbbAssetbundleLoader.<Initialization>d__9>(AbbAssetbundleLoader.<Initialization>d__9&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<AudioMgr.<AwakeAsync>d__12>(AudioMgr.<AwakeAsync>d__12&)
-		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<AudioMgr.<Play>d__21>(AudioMgr.<Play>d__21&)
+		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<AudioMgr.<Play>d__22>(AudioMgr.<Play>d__22&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<CfgMgr.<AwakeAsync>d__0>(CfgMgr.<AwakeAsync>d__0&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<CmdMgr.<AwakeAsync>d__1>(CmdMgr.<AwakeAsync>d__1&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleBallMgr.<AwakeAsync>d__6>(GameBattleBallMgr.<AwakeAsync>d__6&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleBallMgr.<OnEnableAsync>d__8>(GameBattleBallMgr.<OnEnableAsync>d__8&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleBallPartsMgr.<OnEnableAsync>d__4>(GameBattleBallPartsMgr.<OnEnableAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleGridMgr.<AwakeAsync>d__2>(GameBattleGridMgr.<AwakeAsync>d__2&)
-		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleMgr.<OnEnableAsync>d__5>(GameBattleMgr.<OnEnableAsync>d__5&)
+		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleMgr.<OnEnableAsync>d__6>(GameBattleMgr.<OnEnableAsync>d__6&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameBattleWindowMgr.<OnEnableAsync>d__9>(GameBattleWindowMgr.<OnEnableAsync>d__9&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameCfgMgr.<AwakeAsync>d__3>(GameCfgMgr.<AwakeAsync>d__3&)
-		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameMonsterMgr.<AwakeAsync>d__3>(GameMonsterMgr.<AwakeAsync>d__3&)
+		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameMonsterMgr.<AwakeAsync>d__5>(GameMonsterMgr.<AwakeAsync>d__5&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GamePlayerMgr.<AwakeAsync>d__4>(GamePlayerMgr.<AwakeAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameSchedule.<AwakeAsync>d__4>(GameSchedule.<AwakeAsync>d__4&)
 		// System.Void Cysharp.Threading.Tasks.CompilerServices.AsyncUniTaskMethodBuilder.Start<GameSkillPassivityMgr.<OnEnableAsync>d__5>(GameSkillPassivityMgr.<OnEnableAsync>d__5&)
@@ -1557,7 +1557,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<byte>,GameBattleSkillBallPart1008EntityData.<PlayAnim>d__7>(Cysharp.Threading.Tasks.UniTask.Awaiter<byte>&,GameBattleSkillBallPart1008EntityData.<PlayAnim>d__7&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<byte>,GameBattleSkillBallPart1012EntityData.<PlayRestoreAnim>d__11>(Cysharp.Threading.Tasks.UniTask.Awaiter<byte>&,GameBattleSkillBallPart1012EntityData.<PlayRestoreAnim>d__11&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<byte>,GameBattleWindowMgr.<PlayEnergyAnimAsync>d__22>(Cysharp.Threading.Tasks.UniTask.Awaiter<byte>&,GameBattleWindowMgr.<PlayEnergyAnimAsync>d__22&)
-		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<byte>,GameMapMgr.<DelayMonsterZeroCreateBoss>d__21>(Cysharp.Threading.Tasks.UniTask.Awaiter<byte>&,GameMapMgr.<DelayMonsterZeroCreateBoss>d__21&)
+		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<byte>,GameMapMgr.<DelayMonsterZeroCreateBoss>d__22>(Cysharp.Threading.Tasks.UniTask.Awaiter<byte>&,GameMapMgr.<DelayMonsterZeroCreateBoss>d__22&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<byte>,UIBattleSkillBallFussionWindow.<Setting>d__6>(Cysharp.Threading.Tasks.UniTask.Awaiter<byte>&,UIBattleSkillBallFussionWindow.<Setting>d__6&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<Cysharp.Threading.Tasks.UniTask.Awaiter<int>,GameManager.<Start>d__6>(Cysharp.Threading.Tasks.UniTask.Awaiter<int>&,GameManager.<Start>d__6&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.AwaitUnsafeOnCompleted<System.Runtime.CompilerServices.TaskAwaiter<int>,UnityUdpClient.<SendMessage2>d__10>(System.Runtime.CompilerServices.TaskAwaiter<int>&,UnityUdpClient.<SendMessage2>d__10&)
@@ -1572,7 +1572,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<GameBattleSkillBallPart1012EntityData.<PlayRestoreAnim>d__11>(GameBattleSkillBallPart1012EntityData.<PlayRestoreAnim>d__11&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<GameBattleWindowMgr.<PlayEnergyAnimAsync>d__22>(GameBattleWindowMgr.<PlayEnergyAnimAsync>d__22&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<GameManager.<Start>d__6>(GameManager.<Start>d__6&)
-		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<GameMapMgr.<DelayMonsterZeroCreateBoss>d__21>(GameMapMgr.<DelayMonsterZeroCreateBoss>d__21&)
+		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<GameMapMgr.<DelayMonsterZeroCreateBoss>d__22>(GameMapMgr.<DelayMonsterZeroCreateBoss>d__22&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<PlayableClipAdapter.<LoadClipAsync>d__9>(PlayableClipAdapter.<LoadClipAsync>d__9&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<SkillFlyItemScheduleAction.<ScheduleInvoke>d__15>(SkillFlyItemScheduleAction.<ScheduleInvoke>d__15&)
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<UIBattleEntityAttributeWindow.<Setting>d__6>(UIBattleEntityAttributeWindow.<Setting>d__6&)
@@ -1585,6 +1585,7 @@ public class AOTGenericReferences : UnityEngine.MonoBehaviour
 		// System.Void System.Runtime.CompilerServices.AsyncVoidMethodBuilder.Start<UnityUdpClient.<SendMessage2>d__10>(UnityUdpClient.<SendMessage2>d__10&)
 		// UnityEngine.AssetBundleRequest UnityEngine.AssetBundle.LoadAssetAsync<object>(string)
 		// object UnityEngine.Component.GetComponent<object>()
+		// object UnityEngine.Component.GetComponentInChildren<object>()
 		// object[] UnityEngine.Component.GetComponentsInChildren<object>(bool)
 		// bool UnityEngine.Component.TryGetComponent<object>(object&)
 		// object UnityEngine.GameObject.AddComponent<object>()

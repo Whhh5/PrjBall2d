@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: MiniGameConfig
   m_EditorClassIdentifier: 
   ProjectConf:
-    projectName: "\u7403\u4E86\u4E2A\u7403"
-    Appid: wxca1bf37b10fc5d0f
-    CDN: http://172.20.10.10:8000/RunGame/webgl
+    projectName: quilegequi
+    Appid: wx46b4c0f32d3f32f8
+    CDN: https://cloud1-d5gy0bngg418fba77-1304051594.tcloudbaseapp.com/RunGame/webgl
     assetLoadType: 0
-    compressDataPackage: 1
+    compressDataPackage: 0
     VideoUrl: 
     relativeDST: /Users/qiuxiaohui/Desktop/MyServer/Remote/RunGame
     DST: /Users/qiuxiaohui/Desktop/MyServer/Remote/RunGame
@@ -52,20 +52,20 @@ MonoBehaviour:
     AutoProfile: 0
     ScriptOnly: 0
     Il2CppOptimizeSize: 1
-    profilingFuncs: 1
-    Webgl2: 0
+    profilingFuncs: 0
+    Webgl2: 1
     fbslim: 0
     DeleteStreamingAssets: 1
     ProfilingMemory: 0
     CleanBuild: 0
     CustomNodePath: 
     autoAdaptScreen: 0
-    showMonitorSuggestModal: 1
+    showMonitorSuggestModal: 0
     enableProfileStats: 0
     enableRenderAnalysis: 0
     enablePerfAnalysis: 0
     iOSAutoGCInterval: 10000
-    enableIOSPerformancePlus: 0
+    enableIOSPerformancePlus: 1
     enableiOSMetal: 0
     enableEmscriptenGLX: 0
     brotliMT: 1

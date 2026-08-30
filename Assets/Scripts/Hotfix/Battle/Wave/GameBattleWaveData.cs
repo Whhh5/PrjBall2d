@@ -8,6 +8,7 @@ public class GameBattleWaveData : IClassPoolDestroy
     private readonly List<int> delayCreateList = new();
     private readonly List<GameMonsterCreateInfo> monsters = new();
     public int MaxMonsterCount => monsters.Count;
+    private List<GameBattleGridIndex> _GridIndexs = new(10);
     public void OnPoolDestroy()
     {
         foreach (var info in monsters)
@@ -42,8 +43,9 @@ public class GameBattleWaveData : IClassPoolDestroy
     {
         foreach (var createInfo in monsters)
         {
-            var posList = GameEntityUtility.GetEntityGridPosList(createInfo.monsterId, createInfo.row, createInfo.col);
-            if (!GameMapUtility.GridsIsIdle(posList))
+            _GridIndexs.Clear();
+            GameEntityUtility.GetEntityGridPosList(createInfo.monsterId, createInfo.row, createInfo.col, ref _GridIndexs);
+            if (!GameMapUtility.GridsIsIdle(_GridIndexs))
                 return false;
         }
         return true;

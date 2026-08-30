@@ -15,11 +15,14 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
         }
     }
 
+    public EnGameMapLifecycleOrder GetMapLifecycleOrder() => EnGameMapLifecycleOrder.GameSkillPassivityMgr;
+
     private readonly Dictionary<int, GameBattleSkillPassivityData> _SkillId2Datas = new();
     private readonly Dictionary<int, SkillPassivityRuntimeData> _SkillRuntimeData = new();
 
     public override void Destroy()
     {
+        GameMapMgr.Instance.UnregisterLifecycle(this);
         foreach (var (_, rtData) in _SkillRuntimeData)
         {
             ClassPoolMgr.Instance.Push(rtData);
@@ -31,30 +34,25 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
         base.Destroy();
         _SkillRuntimeData.Clear();
     }
-
-    public EnGameMapLifecycleOrder GetMapLifecycleOrder() => EnGameMapLifecycleOrder.GameSkillPassivityMgr;
-    public override async UniTask OnEnableAsync()
+    public override async UniTask AwakeAsync()
     {
-        await base.OnEnableAsync();
+        await base.AwakeAsync();
+
         GameMapMgr.Instance.RegisterLifecycle(this);
     }
-    public override void OnDisable()
-    {
-        GameMapMgr.Instance.UnregisterLifecycle(this);
-        base.OnDisable();
-    }
 
-    public void EnterMap(int mapId)
+
+    public void EnterMap(int mapId, int chapterId)
     {
         
     }
 
-    public void ExitMap(int mapId)
+    public void ExitMap()
     {
         ClearSkillPassivityData();
     }
 
-    public void ReenterMap(int mapId)
+    public void ReenterMap()
     {
         ClearSkillPassivityData();
     }

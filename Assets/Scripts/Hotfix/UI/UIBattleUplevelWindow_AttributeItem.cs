@@ -80,10 +80,10 @@ public class UIBattleUplevelWindow_AttributeItem : UIWindowItem, IUIBattleUpleve
         _AttId = EnEntityAttributeId.None;
         _AddValueType = EnValueType.None;
     }
-    public override void LoadCompeletion()
+    public override void LoadCompletion()
     {
         _Rect = GetComponent<RectTransform>();
-        base.LoadCompeletion();
+        base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
         _StarGo.SetActive(false);
 

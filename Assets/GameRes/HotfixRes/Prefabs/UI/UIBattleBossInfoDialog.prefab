@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2715293434929434430}
   - component: {fileID: 8062459584948849121}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _HpValueSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 6272117787729631329}
   - component: {fileID: 2601598038062554656}
   - component: {fileID: 3808123917843919340}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _NameTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -232,7 +232,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 653048393665547806}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: rect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -268,7 +268,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6107105226541552749}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: 5092530549478046951}
   - component: {fileID: 2314215726664016533}
   - component: {fileID: 1516166132590413522}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -384,7 +384,7 @@ GameObject:
   - component: {fileID: 5576292016438626755}
   - component: {fileID: 9134541384659472447}
   - component: {fileID: 5207164763336584665}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: hp_bg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -459,7 +459,7 @@ GameObject:
   - component: {fileID: 6483718467311077608}
   - component: {fileID: 8352303663038017184}
   - component: {fileID: 7942253952836426914}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UIBattleBossInfoDialog
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -519,7 +519,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7661920507488589911}
   - component: {fileID: 2446231083136383370}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: hpmask
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -571,7 +571,7 @@ GameObject:
   - component: {fileID: 7994948552362122381}
   - component: {fileID: 8931393443947729187}
   - component: {fileID: 3988002933127707867}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _HpValueTxt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -705,7 +705,7 @@ GameObject:
   - component: {fileID: 6768828454117795758}
   - component: {fileID: 6973019858906930487}
   - component: {fileID: 6126968396631196242}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}

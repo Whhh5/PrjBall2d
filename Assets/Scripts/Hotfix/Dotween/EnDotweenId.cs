@@ -8,4 +8,6 @@ public enum EnDotweenId
     GameMapMgr,
     UIBattleUplevelWindow,
     UIBattleBossInfoDialog,
+    UIHallMainBattleWindow,
+    UIHallGoodsBarWindow,
 }

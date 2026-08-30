@@ -63,7 +63,8 @@ public class GameBattleSkillBallPart10031004EntityData : GameBattleSkillBallPart
         {
             if (_LastAtkTime + starData.interval < curTime)
             {
-                var damageValue = Mathf.CeilToInt(starData.atkDamage + GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+                var ownerDamage = Mathf.CeilToInt(GetOwnerEntityAttributeDamage(starData.attId) * starData.atkPercentage01);
+                var damageValue = starData.atkDamage + ownerDamage;
                 _LastAtkTime = curTime;
                 foreach (var index in _Keys)
                 {
@@ -106,26 +107,25 @@ public class GameBattleSkillBallPart10031004EntityData : GameBattleSkillBallPart
     {
         var sys = GameBattleMgr.Instance.GetSystem<GameBattleFireSpinSystem>();
         var entityIds = sys.GetEntityKeys();
-        var mapId = GameMapMgr.Instance.GetCurMapId();
         var curTime = GameUtility.GetGameTime();
         foreach (var fireSpinEntityId in entityIds)
         {
             var worldPos = EntityMgr.Instance.GetEntityWorldPos2D(fireSpinEntityId);
-            if (!GameMapUtility.WorldPosToGridRowCol(mapId, in worldPos, out var fireSpinRow, out var fireSpinCol))
+            if (!GameMapUtility.WorldPosToGridRowCol(in worldPos, out var fireSpinRow, out var fireSpinCol))
                 continue;
             var radius = sys.GetEntityRadius(fireSpinEntityId);
             var offset = Mathf.FloorToInt(radius);
             for (int i = -offset; i < offset; i++)
             {
                 var row = fireSpinRow + i;
-                if (!GameMapUtility.RowIsValid(mapId, row))
+                if (!GameMapUtility.RowIsValid(row))
                     continue;
                 for (int j = -offset; j < offset; j++)
                 {
                     var col = fireSpinCol + j;
-                    if (!GameMapUtility.ColIsValid(mapId, col))
+                    if (!GameMapUtility.ColIsValid(col))
                         continue;
-                    var index = GameMapUtility.RowColToIndex(mapId, row, col);
+                    var index = GameMapUtility.RowColToIndex(row, col);
                     var indexPos = GameBattleGridMgr.Instance.GetGridWorldPos(index);
                     if (Vector2.SqrMagnitude(indexPos - worldPos) > radius * radius)
                         continue;

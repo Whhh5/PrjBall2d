@@ -18,11 +18,10 @@ public class GameBattleInputSystem : IBattleSystem
 
     public void OnEnable()
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridLbPos = GameMapUtility.GetGridLbPosition(mapId);
-        var gridRuPos = GameMapUtility.GetGridRuPosition(mapId);
+        ref readonly var gridLbPos = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var gridRuPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
-        var playerStart = GameMapUtility.GetMapPlayerStartPosition(mapId);
+        ref readonly var playerStart = ref GameMapMgr.Instance.GetMapPlayerStartPosition();
         _LeftDirection = (gridLbPos - playerStart).normalized;
         _RightDirection = (new Vector2(gridRuPos.x, gridLbPos.y) - playerStart).normalized;
         _LeftAngle = Vector2.Angle(Vector3.up, _LeftDirection);
@@ -85,8 +84,7 @@ public class GameBattleInputSystem : IBattleSystem
     }
     public Vector2 GetFireCenter()
     {
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var playerStart = GameMapUtility.GetMapPlayerStartPosition(mapId);
+        ref readonly var playerStart = ref GameMapMgr.Instance.GetMapPlayerStartPosition();
         return playerStart;
     }
     public Vector2 GetFireDirection()

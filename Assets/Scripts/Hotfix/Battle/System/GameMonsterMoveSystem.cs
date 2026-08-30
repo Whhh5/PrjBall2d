@@ -35,8 +35,7 @@ public class GameMonsterMoveSystem : IBattleSystem
         if (!GameMonsterUtility.EntityIsValid(entityId))
             return;
         // 判断是否有碰撞, 以限制移动位置
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         var pointInfo = EntityMgr.Instance.GetEntityData<IEntityGridPointInfo>(entityId);
         var mainIndex = pointInfo.GetMainGridIndex();
         var mainPos = pointInfo.GetMainGridPos();
@@ -55,9 +54,9 @@ public class GameMonsterMoveSystem : IBattleSystem
             maxLocalCol = Mathf.Max(maxLocalCol, Mathf.Abs(localCol));
 
             var curIndexBtmY = mainPos.y + (localRow - 0.5f) * gridSize.y;
-            var testRow = GameMapUtility.WorldPosY2Row(in mapId, in curIndexBtmY);
+            var testRow = GameMapUtility.WorldPosY2Row(in curIndexBtmY);
             var testCol = mainIndex.col + localCol;
-            var index = GameMapUtility.RowColToIndex(in mapId, in testRow, in testCol);
+            var index = GameMapUtility.RowColToIndex(in testRow, in testCol);
             _EntityIds.Clear();
             GameBattleGridMgr.Instance.GetGridEntityIds(index, ref _EntityIds);
 
@@ -113,9 +112,8 @@ public class GameMonsterMoveSystem : IBattleSystem
     public void CheckAttack(int entityId)
     {
         var monsterEntityData = EntityMgr.Instance.GetEntityData<GameBattleMonsterEntityData>(entityId);
-        var mapId = GameMapMgr.Instance.GetCurMapId();
-        var battleAreaLb = GameMapUtility.GetGridLbPosition(mapId);
-        var gridSize = GameMapUtility.GetMapGridSize(mapId);
+        ref readonly var battleAreaLb = ref GameMapMgr.Instance.GetGridLbPosition();
+        ref readonly var gridSize = ref GameMapMgr.Instance.GetMapGridSize();
         ref readonly var gridPosArr = ref monsterEntityData.GetGridIndexs();
         var minRowOffset = gridPosArr[^2];
         var entityWorldPos = EntityMgr.Instance.GetEntityWorldPos2D(entityId);
