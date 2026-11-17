@@ -56,6 +56,8 @@ public class GameBattleSkillBallPart10071011EntityData : GameBattleSkillBallPart
                 AudioMgr.Instance.Play(EnAudioId.Lightning);
             }
         }
+
+        GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_1011_1, WorldPos, 2);
     }
 }
 public class GameBattleSkillBallPart10071011Entity : GameBattleSkillBallPartEntity

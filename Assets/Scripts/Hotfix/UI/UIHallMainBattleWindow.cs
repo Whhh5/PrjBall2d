@@ -24,7 +24,7 @@ public class UIHallMainBattleWindow : UIWindow
     [SerializeField, AutoReference]
     private RectTransform _EnterGoodsInfoRootRect = null;
 
-    private UIGoodsItemCountRightTip _GoodsCountTips = null;
+    private UIGoodsItemCountBottomTip _GoodsCountTips = null;
     private int _CurSelectChapterId = 0;
     private readonly List<UIHallMainBattleWindow_ChapterItem> _ChapterItems = new();
 
@@ -57,21 +57,24 @@ public class UIHallMainBattleWindow : UIWindow
         _EnterBattleBtn.AddListener(OnClick_EnterBattleBtn);
         _ChangeLeftChapterBtn.AddListener(OnClick_ChangeLeftChapterBtn);
         _ChangeRightChapterBtn.AddListener(OnClick_ChangeRightChapterBtn);
+        EventMgr.Instance.Register<GameGoodsChangeEventData>(EnABBEvent.EVENT_GOODS_CHANGE, 0, 0, OnEvent_GoodsChange);
 
+
+        CreateEnergyIconItem();
         var isCancel = await InitChapterItems().SuppressCancellationThrow();
         if (!isCancel)
         {
-            SetChapterId(1);
+            var curSelectChapterId = GameChapterMgr.Instance.GetCurSelectChapterId();
+            SetChapterId(curSelectChapterId);
             UpdateChapterItemRect(true);
         }
-
-        CreateEnergyIconItem();
-
-        EventMgr.Instance.Register<GameGoodsChangeEventData>(EnABBEvent.EVENT_GOODS_CHANGE, 0, 0, OnEvent_GoodsChange);
     }
 
     private void OnClick_EnterBattleBtn()
     {
+        var energyCount = GlobalCfgUtility.Get10011_Int32();
+        UIGoodsMgr.Instance.RemoveGoods((int)EnGoodsId.Energy, energyCount);
+
         var chapterId = _CurSelectChapterId;
         UIMgr.Instance.HideLobby();
         GameMapMgr.Instance.EnterMap(chapterId);
@@ -94,12 +97,13 @@ public class UIHallMainBattleWindow : UIWindow
 
     private async void CreateEnergyIconItem()
     {
-        var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemCountRightTip>(EnLoadTarget.Pre_UIGoodsItemCountRightTip, _EnterGoodsInfoRootRect, GetWindowToken())
+        var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemCountBottomTip>(EnLoadTarget.Pre_UIGoodsItemCountBottomTip, _EnterGoodsInfoRootRect, GetWindowToken())
             .SuppressCancellationThrow();
         if (isCancel)
             return;
         var enterEnergyCount = GlobalCfgUtility.Get10011_Int32();
         item.Setting(new((int)EnGoodsId.Energy, enterEnergyCount), EnSourceId.UIHallMainBattleWindow);
+        item.SetAutoSize();
         _GoodsCountTips = item;
         UpdateEnterButtonStatus();
     }
@@ -124,6 +128,12 @@ public class UIHallMainBattleWindow : UIWindow
         var curItem = _ChapterItems[chapterId - 1];
         curItem.SetSelectStatus(true);
         UpdateEnterButtonStatus();
+
+        var isLock = GameChapterMgr.Instance.IsLock(chapterId);
+        if (!isLock)
+        {
+            GameChapterMgr.Instance.SetCurSelectChapterId(chapterId);
+        }
     }
     protected override void Update()
     {
@@ -175,8 +185,9 @@ public class UIHallMainBattleWindow : UIWindow
         var isLock = GameChapterMgr.Instance.IsLock(_CurSelectChapterId);
         var energyCount = UIGoodsMgr.Instance.GetGoodsCount((int)EnGoodsId.Energy);
         var isEnergy = energyCount >= GlobalCfgUtility.Get10011_Int32();
-        _EnterBattleBtn.interactable = !isLock & isEnergy;
+        _EnterBattleBtn.gameObject.SetActive(!isLock);
+        _EnterBattleBtn.interactable = isEnergy;
         if (_GoodsCountTips != null)
-            _GoodsCountTips.SetValid(isEnergy);
+            _GoodsCountTips.SetComValid(isEnergy);
     }
 }

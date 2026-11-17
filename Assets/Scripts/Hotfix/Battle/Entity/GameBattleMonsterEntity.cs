@@ -26,7 +26,7 @@ public abstract class GameBattleMonsterEntityData<T> : GameBattleMonsterEntityDa
     protected T GameBattleMonsterEntity => _Entity as T;
 
 }
-public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameBattleMonsterEntity, GameBattleMonsterEntityUserData>, IGameEntityHpChange, IEntityGridPointInfo
+public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameBattleMonsterEntity, GameBattleMonsterEntityUserData>, IGameEntityHpChange, IEntityGridPointInfo, IGameEntityInfo
 {
     public GameBattleGridIndex _MainGridIndex;
     private float _HpSliderValue;
@@ -130,6 +130,12 @@ public abstract class GameBattleMonsterEntityData : SceneMonsterEntityData<GameB
     public virtual void ApplyData()
     {
 
+    }
+
+    public int GetIconAssetId()
+    {
+        var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(_MonsterCfgId);
+        return monsterCfg.nIconAssetID;
     }
 }
 

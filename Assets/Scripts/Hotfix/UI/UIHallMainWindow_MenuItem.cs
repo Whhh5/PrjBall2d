@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class UIHallMainWindow_MenuItem : UIWindowItem
 {
-    [SerializeField, AutoReference(SearchScope.Self)]
-    private RectTransform _Rect;
+    [SerializeField, AutoReference(nameof(_IconImg))]
+    private RectTransform _IconRect;
     [SerializeField, AutoReference]
     private Image _IconImg;
     [SerializeField, AutoReference]
@@ -14,14 +14,17 @@ public class UIHallMainWindow_MenuItem : UIWindowItem
 
     private float _MenuItemSize;
     private EnUIHallMainMenuItemId _ItemId;
+    private Vector2 _IconSize;
     public override void Unload()
     {
+        _IconRect.sizeDelta = _IconSize;
         _IconImg.UnloadSprite();
         base.Unload();
     }
     public override void LoadCompletion()
     {
         base.LoadCompletion();
+        _IconSize = _IconRect.sizeDelta;
 
         _MenuItemSize = _Rect.rect.width;
     }
@@ -29,6 +32,7 @@ public class UIHallMainWindow_MenuItem : UIWindowItem
     {
         _ItemId = itemId;
         _Rect.localEulerAngles = Vector3.forward * angle;
+        _IconRect.localEulerAngles = -Vector3.forward * angle;
 
         var icon = UIHallMainUtility.GetIconId(itemId);
         _IconImg.LoadSprirte(icon);
@@ -39,12 +43,13 @@ public class UIHallMainWindow_MenuItem : UIWindowItem
     {
         return _MenuItemSize;
     }
-    public void SetScale(float size)
+    public override void SetLocalScale(float scale)
     {
-        _Rect.localScale = Vector3.one * size;
-    }
-    public float GetScale()
-    {
-        return _Rect.localScale.x;
+        base.SetLocalScale(scale);
+
+        _IconRect.sizeDelta = (0.1f + (0.9f * scale)) * _IconSize;
+
+        //var iconPos = _IconRect.anchoredPosition;
+        //iconPos.y = (scale - 0.3f)
     }
 }

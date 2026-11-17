@@ -7,9 +7,11 @@ using UnityEngine.U2D;
 public enum EnGameMonsterType
 {
     None,
-    Normal,
-    Elite,
-    Boss,
+    Character = 11,
+    Normal = 21,
+    Elite = 22,
+    Boss = 23,
+    MapBoss = 51,
 }
 public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
 {
@@ -35,14 +37,14 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
     }
     public void EnterMap(int mapId, int chapterId)
     {
-        EventMgr.Instance.Register<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
+        //EventMgr.Instance.Register<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
         EventMgr.Instance.Register<GameSkillMonsterDieEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Die, OnEvent_SkillMonsterDie);
         EventMgr.Instance.Register<GameSkillMonsterAttack1EventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Attack, OnEvent_SkillMonsterAttack);
     }
 
     public void ExitMap()
     {
-        EventMgr.Instance.Unregister<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
+        //EventMgr.Instance.Unregister<GameBattleMouseClickEventData>(EnABBEvent.EVENT_BATTLE_MOUSE_CLICK, 0, 0, OnEvent_MouseClick);
         EventMgr.Instance.Unregister<GameSkillMonsterDieEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Die, OnEvent_SkillMonsterDie);
         EventMgr.Instance.Unregister<GameSkillMonsterAttack1EventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Attack, OnEvent_SkillMonsterAttack);
 
@@ -132,14 +134,14 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         SceneEntityMgr.Instance.RemoveCom(entityId, EnSceneEntityComType.Attribute);
         SceneEntityMgr.Instance.DestroyEntityData(entityId);
     }
-    public int CreateMonsterEntity(in int monsterId, in int row, in int col, in int attValueCfgId, in int energyCount)
+    public int CreateMonsterEntity(in int monsterId, in int row, in int col, in int attValueCfgId, float attCofficient = 1)
     {
+        var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(monsterId);
         var gridIndex = GameMapUtility.CreateGridIndex(row, col);
         var userData = ClassPoolMgr.Instance.Pull<GameBattleMonsterEntityUserData>();
         userData.monsterId = monsterId;
         userData.gridPos = gridIndex;
-        userData.energyCount = energyCount;
-        var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(monsterId);
+        userData.energyCount = monsterCfg.nEnergyCount;
         var entityId = SceneEntityMgr.Instance.CreateEntityData(monsterCfg.nEntityTypeId, userData);
         ClassPoolMgr.Instance.Push(userData);
         _MonsterEntityIds.Add(entityId);
@@ -154,7 +156,7 @@ public class GameMonsterMgr : Singleton<GameMonsterMgr>, IGameMapLifecycle
         SceneEntityMgr.Instance.AddCom(entityId, EnSceneEntityComType.Attribute);
         SceneEntityMgr.Instance.AddCom(entityId, EnSceneEntityComType.Buff);
 
-        GameAttributeUtility.SetEntityAttributes(in entityId, in attValueCfgId);
+        GameAttributeUtility.SetEntityAttributes(in entityId, in attValueCfgId, attCofficient);
 
         var gridData = ClassPoolMgr.Instance.Pull<GameMonsterGridIndexData>();
         GameMonsterUtility.GetGridDataByWorldPos(ref gridData, pos);

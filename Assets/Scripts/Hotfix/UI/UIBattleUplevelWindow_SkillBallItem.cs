@@ -27,15 +27,17 @@ public class UIBattleUplevelWindow_SkillBallItemUserData : IUIBattleUplevelWindo
 
 public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUplevelWindowItem
 {
-    [SerializeField]
+    [SerializeField, AutoReference(SearchScope.Self)]
     private Button _Btn;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private Image _IconImg;
-    [SerializeField]
+    [SerializeField, AutoReference(nameof(_IconImg))]
+    private Button _IconBtn;
+    [SerializeField, AutoReference]
     private TextMeshProUGUI _NameTxt;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private TextMeshProUGUI _DescriptionTxt;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private GameObject _StarGo;
     [SerializeField, AutoReference]
     private Image _FussionImg;
@@ -47,7 +49,6 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
     private Action _Callback;
 
     private List<DescriptionInfo> _DescInfos = new();
-    private RectTransform _Rect;
     private int _BallId;
     private int _Star;
     public override void Unload()
@@ -58,6 +59,7 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
         }
         _IconImg.UnloadSprite();
         _Btn.RemoveListener(OnClick_Btn);
+        _IconBtn.RemoveListener(OnClick_IconBtn);
         for (int i = 0; i < _StarList.Count; i++)
         {
             GameObject.Destroy(_StarList[i]);
@@ -72,16 +74,15 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
         _StarList.Clear();
         _DescInfos.Clear();
         _FussionImgList.Clear();
-        _Rect = null;
         _BallId
             = _Star
             = -1;
     }
     public override void LoadCompletion()
     {
-        _Rect = GetComponent<RectTransform>();
         base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
+        _IconBtn.AddListener(OnClick_IconBtn);
         _StarGo.SetActive(false);
         _FussionImg.gameObject.SetActive(false);
 
@@ -108,7 +109,7 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
             var info = level1DescInfoList[i];
             var content = string.IsNullOrWhiteSpace(info.title)
                 ? $"{info.content}"
-                : $"{info.title}:{info.content}";
+                : $"{info.content}"; // $"{info.title}:{info.content}";
             if (i < level1DescInfoList.Count - 1)
                 strBuilder.AppendLine(content);
             else
@@ -146,6 +147,14 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
     {
         _Callback?.Invoke();
     }
+    private void OnClick_IconBtn()
+    {
+        var ud = ClassPoolMgr.Instance.Pull<UIBattleSkillBallInfoTipsUserData>();
+        ud.ballId = _BallId;
+        ud.star = _Star;
+        UIMgr.Instance.ShowWindow<UIBattleSkillBallInfoTipsData>(ud);
+        ClassPoolMgr.Instance.Push(ud);
+    }
 
     public List<DescriptionInfo> GetDescriptionList(EnDescriptionLevel startLevel, EnDescriptionLevel endLevel)
     {
@@ -158,10 +167,6 @@ public class UIBattleUplevelWindow_SkillBallItem : UIWindowItem, IUIBattleUpleve
         var curStar = GameBattleBallMgr.Instance.GetBallStar(_BallId);
         var addStar = _Star - curStar;
         GameBattleBallMgr.Instance.AddBall(_BallId, addStar);
-    }
-    public Vector3 GetWorldPos()
-    {
-        return _Rect.position;
     }
 
     public float GetSizeDeltaY()

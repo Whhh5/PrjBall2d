@@ -32,6 +32,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     private readonly List<GameBallFireData> _DelayFireBalls = new();
 
     private readonly Dictionary<int, HashSet<int>> _BallId2FussionId = new();
+    private readonly Dictionary<int, List<int>> _FussionIdBallId2SourceBallIds = new();
 
     public override void Destroy()
     {
@@ -49,6 +50,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     {
         base.OnDisable();
         _BallId2FussionId.Clear();
+        _FussionIdBallId2SourceBallIds.Clear();
     }
     public override async UniTask OnEnableAsync()
     {
@@ -58,7 +60,7 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
         for (int i = 0; i < fussionCfgCount; i++)
         {
             var cfg = GameSchedule.Instance.GetSkillBallFussionCfg(i);
-
+            _FussionIdBallId2SourceBallIds.Add(cfg.nFinalBallId, new(cfg.arrSourceBallIds));
             for (int j = 0; j < cfg.arrSourceBallIds.Length; j++)
             {
                 var ballId = cfg.arrSourceBallIds[j];
@@ -447,6 +449,12 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
 
 
     #region 融合相关
+    public List<int> GetSourceIds(int ballId)
+    {
+        if (!_FussionIdBallId2SourceBallIds.TryGetValue(ballId, out var sourceIds))
+            return new() { ballId };
+        return sourceIds;
+    }
     public void Fussion(int fussionCfgId)
     {
         var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(fussionCfgId);
@@ -460,20 +468,23 @@ public class GameBattleBallMgr : Singleton<GameBattleBallMgr>, IGameMapLifecycle
     }
     public bool IsFussion(params int[] ballIds)
     {
-        var ballId = ballIds[0];
-        if (!_BallId2FussionId.TryGetValue(ballId, out var fussionIds))
+        var ballId = ballIds[0]; // 1007
+        if (!_BallId2FussionId.TryGetValue(ballId, out var fussionIds)) // 4, 5
             return false;
         foreach (var fussionId in fussionIds)
         {
             var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(fussionId);
+            var index = -1;
             for (int k = 1; k < ballIds.Length; k++)
             {
-                var index = Array.FindIndex(fussionCfg.arrSourceBallIds, id => id == ballIds[k]);
+                index = Array.FindIndex(fussionCfg.arrSourceBallIds, id => id == ballIds[k]);
                 if (index < 0)
-                    return false;
+                    break;
             }
+            if (index >= 0)
+                return true;
         }
-        return true;
+        return false;
     }
     public bool TryFussion(EnGameBallFussionCondition condition, ref List<int> fussionInfos, params int[] ballIds)
     {

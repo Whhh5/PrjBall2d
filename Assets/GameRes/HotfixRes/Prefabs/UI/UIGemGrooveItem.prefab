@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7166b0a2578704f75a30d869dcb38f0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _Rect: {fileID: 360188594686833025}
   _Btn: {fileID: 5485195474179459192}
   _IconImg: {fileID: 86972821082886646}
   _GemIconRootRect: {fileID: 216897821562820442}

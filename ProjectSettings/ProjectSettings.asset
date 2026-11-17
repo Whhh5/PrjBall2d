@@ -780,8 +780,8 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: 
-    WebGL: UNItY_MINIGAME_WX
+    Standalone: UNItY_MINIGAME_WX
+    WebGL: UNITY_MINIGAME_WX
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

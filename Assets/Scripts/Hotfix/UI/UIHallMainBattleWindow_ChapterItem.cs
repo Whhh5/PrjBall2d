@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class UIHallMainBattleWindow_ChapterItem : UIWindowItem
 {
-    [SerializeField, AutoReference(SearchScope.Self)]
-    private RectTransform _Rect;
     [SerializeField, AutoReference]
     private Image _IconImg;
     [SerializeField, AutoReference]
@@ -20,6 +18,7 @@ public class UIHallMainBattleWindow_ChapterItem : UIWindowItem
     private CanvasGroup _TextGroup;
     [SerializeField, AutoReference]
     private GameObject _LockGo;
+
 
     public override void Unload()
     {
@@ -40,35 +39,18 @@ public class UIHallMainBattleWindow_ChapterItem : UIWindowItem
 
         _IconImg.LoadSprirte((EnLoadTarget)mapCfg.nIconAssetId);
         SetIsLock(isLock);
+        SetSelectStatus(false);
     }
     public void SetSelectStatus(bool isSelect)
     {
         _TextGroup.alpha = isSelect ? 1 : 0;
     }
-    public Vector2 GetSize()
-    {
-        return _Rect.sizeDelta;
-    }
-    public float GetLocalPosX()
-    {
-        return _Rect.anchoredPosition.x;
-    }
-    public void SetLocalPos(float posX)
-    {
-        var pos = _Rect.anchoredPosition;
-        pos.x = posX;
-        _Rect.anchoredPosition = pos;
-    }
-    public float GetLocalScale()
-    {
-        return _Rect.localScale.x;
-    }
-    public void SetLocalScale(float sclae)
-    {
-        _Rect.localScale = Vector2.one * sclae;
-    }
+
     public void SetIsLock(bool isLock)
     {
         _LockGo.SetActive(isLock);
+
+        _IconImg.color = isLock ? Color.black : Color.white;
+        _TextGroup.gameObject.SetActive(!isLock);
     }
 }

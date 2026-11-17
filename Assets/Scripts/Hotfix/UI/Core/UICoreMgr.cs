@@ -10,6 +10,7 @@ public class UICoreMgr : Singleton<UICoreMgr>
 
     public override void Destroy()
     {
+        EventMgr.Instance.Unregister(EnABBEvent.EVENT_ACCOUNT_LOGIN, OnEvent_AccountLogin);
         EventMgr.Instance.Unregister<GameBattlePlayerCreateEventData>(EnABBEvent.EVENT_BATTLE_PLAYER_CREATE, 0, 0, OnEvent_PlayerCreate);
         base.Destroy();
         _WearCoreIds.Clear();
@@ -19,6 +20,13 @@ public class UICoreMgr : Singleton<UICoreMgr>
     {
         await base.AwakeAsync();
 
+
+        EventMgr.Instance.Register<GameBattlePlayerCreateEventData>(EnABBEvent.EVENT_BATTLE_PLAYER_CREATE, 0, 0, OnEvent_PlayerCreate);
+        EventMgr.Instance.Register(EnABBEvent.EVENT_ACCOUNT_LOGIN, OnEvent_AccountLogin);
+    }
+
+    private void OnEvent_AccountLogin(in int _, in int __)
+    {
         var perData = PersistentMgr.Instance.GetData<PersistentCoreData>(EnPersistentId.Core);
         _TempIntList.Clear();
         GetAlreadyCoreIds(ref _TempIntList);
@@ -31,8 +39,6 @@ public class UICoreMgr : Singleton<UICoreMgr>
             else
                 _BagCoreIds.Add(coreId);
         }
-
-        EventMgr.Instance.Register<GameBattlePlayerCreateEventData>(EnABBEvent.EVENT_BATTLE_PLAYER_CREATE, 0, 0, OnEvent_PlayerCreate);
     }
 
     private void OnEvent_PlayerCreate(in int entityId, in int _, in GameBattlePlayerCreateEventData data)
@@ -42,7 +48,18 @@ public class UICoreMgr : Singleton<UICoreMgr>
         for (int i = 0; i < _TempIntList.Count; i++)
         {
             var coreId = _TempIntList[i];
+            if (!IsWear(coreId))
+                continue;
             UICoreUtility.ApplyEntity(data.entityId, coreId);
+
+            var grooveCount = UICoreUtility.GetCoreGemGrooveCount(coreId);
+            for (int j = 0; j < grooveCount; j++)
+            {
+                if (!UICoreUtility.ContainsGem(coreId, j))
+                    continue;
+                var gemId = UICoreUtility.GetCoreGrooveGemId(coreId, j);
+                UIGemMgr.Instance.ApplyEntityGem(entityId, gemId);
+            }
         }
     }
 
@@ -55,7 +72,7 @@ public class UICoreMgr : Singleton<UICoreMgr>
         var coreId = AddCore(coreGoodsCfgId, effectValue, quality);
         return coreId;
     }
-    public int AddCore(int coreGoodsCfgId, int effectValue, EnCoreQuality quality)
+    public int AddCore(int coreGoodsCfgId, float effectValue, EnCoreQuality quality)
     {
         var perData = PersistentMgr.Instance.GetData<PersistentCoreData>(EnPersistentId.Core);
         var coreId = perData.AddCoreData(coreGoodsCfgId, effectValue, quality);

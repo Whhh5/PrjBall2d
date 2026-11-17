@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 
@@ -22,15 +22,44 @@ public class GameDamageMgr : Singleton<GameDamageMgr>
     private readonly List<GameDamageItemInfo> _DamageItemInfos = new(200);
 
 
+    private bool _IsShow = true;
+
+
+    public override async UniTask AwakeAsync()
+    {
+        await base.AwakeAsync();
+
+        var pd = PersistentMgr.Instance.GetData<PersistentSettingData>(EnPersistentId.Setting);
+        _IsShow = pd.GetIsShowDamageTxt();
+    }
+
+    public void SetIsShowDamageTxt(bool isShow)
+    {
+        _IsShow = isShow;
+        var pd = PersistentMgr.Instance.GetData<PersistentSettingData>(EnPersistentId.Setting);
+        pd.SetIsShowDamageTxt(isShow);
+        if (!isShow)
+        {
+            foreach (var itemInfo in _DamageItemInfos)
+            {
+                EntityMgr.Instance.RecycleEntityData(itemInfo.entityId);
+                ClassPoolMgr.Instance.Push(itemInfo);
+            }
+            _DamageItemInfos.Clear();
+        }
+    }
+
     public void EntityReduceHealth(
         in int value,
         in Vector2 worldPos,
         in EnDamageType damageType,
         in EnDamageValueType valueType)
     {
+        if (!_IsShow)
+            return;
         // 表现
         var item = ClassPoolMgr.Instance.Pull<GameDamageItemInfo>();
-        item.desTime = GameUtility.GetGameTime() + 0.5f;
+        item.desTime = GameUtility.GetGameTime() + 0.2f;
         var userData = ClassPoolMgr.Instance.Pull<GameBattleDamageValueUserData>();
         userData.Init(damageType, valueType, value);
         item.entityId = EntityMgr.Instance.CreateEntityData<GameBattleDamageValueData>(userData);

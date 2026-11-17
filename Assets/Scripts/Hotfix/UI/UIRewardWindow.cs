@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -46,6 +47,8 @@ public class UIRewardWindow : UIWindow
     private Button _CloseBtn;
     [SerializeField, AutoReference]
     private RectTransform _GoodsItemRootRect;
+    [SerializeField, AutoReference]
+    private TextMeshProUGUI _CountTxt;
 
 
     private readonly List<UIGoodsItemBase> _GoodsItems = new();
@@ -67,6 +70,7 @@ public class UIRewardWindow : UIWindow
     }
     public async void Setting(List<GoodsInfo> goodsInfos)
     {
+        _CountTxt.SetText($"{goodsInfos.Count}");
         for (int i = 0; i < goodsInfos.Count; i++)
         {
             var cancel = await UniTask.WaitForSeconds(0.05f, cancelImmediately: true, cancellationToken: GetWindowToken())
@@ -74,11 +78,14 @@ public class UIRewardWindow : UIWindow
             if (cancel)
                 break;
             var goodsInfo = goodsInfos[i];
-            var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsCommonItem>(EnLoadTarget.Pre_UIGoodsCommonItem, _GoodsItemRootRect, GetWindowToken())
+            var (isCancel, item) = await UIGoodsUtility.CreateGoodsItem(
+                goodsInfo,
+                _GoodsItemRootRect,
+                GetWindowToken(),
+                EnSourceId.UIRewardWindow)
                 .SuppressCancellationThrow();
             if (isCancel)
                 break;
-            item.Setting(goodsInfo, EnSourceId.UIRewardWindow);
             _GoodsItems.Add(item);
         }
     }

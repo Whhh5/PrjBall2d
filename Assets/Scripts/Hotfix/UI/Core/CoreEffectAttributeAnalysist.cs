@@ -7,7 +7,7 @@ public class CoreEffectAttributeAnalysist : ICoreEffectAnalysist
     {
         var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
         var coreEffectCfg = GameSchedule.Instance.GetCoreEffectCfg0(coreCfg.nEffectId);
-        var attId = coreCfg.arrEffectParams[0];
+        var attId = UICoreUtility.GetCoreQualityParam(coreCfgId, EnCoreQuality.Quality1, 0);
         var attName = LanguageUtility.GetLanguage_AttiributeName((EnEntityAttributeId)attId);
         var nameStr = LanguageUtility.GetLanguage(coreEffectCfg.nNameLangId, attName);
         return nameStr;
@@ -16,7 +16,7 @@ public class CoreEffectAttributeAnalysist : ICoreEffectAnalysist
     {
         var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
         var coreEffectCfg = GameSchedule.Instance.GetCoreEffectCfg0(coreCfg.nEffectId);
-        var attId = coreCfg.arrEffectParams[0];
+        var attId = UICoreUtility.GetCoreQualityParam(coreCfgId, EnCoreQuality.Quality1, 0);
         var attName = LanguageUtility.GetLanguage_AttiributeName((EnEntityAttributeId)attId);
         if (quality > EnCoreQuality.None && quality < EnCoreQuality.EnumCount)
         {
@@ -37,45 +37,41 @@ public class CoreEffectAttributeAnalysist : ICoreEffectAnalysist
         var coreCfg = UICoreUtility.GetCoreCfg(coreId);
         var coreEffectCfg = GameSchedule.Instance.GetCoreEffectCfg0(coreCfg.nEffectId);
         var effectValue = UICoreMgr.Instance.GetCoreEffectValue(coreId);
-        var attId = coreCfg.arrEffectParams[0];
+        var attId = UICoreUtility.GetCoreQualityParam(coreId, 0);
         var attName = LanguageUtility.GetLanguage_AttiributeName((EnEntityAttributeId)attId);
         var (minValue, maxValue) = GetEffectValueRandom(coreCfg.nCoreId, quality);
         var desc = LanguageUtility.GetLanguage(coreEffectCfg.nEffectDescLangId, attName, effectValue, minValue, maxValue);
         return desc;
     }
 
-    public int CalculateRandomEffectValue(int coreCfgId, EnCoreQuality quality)
+    public virtual float CalculateRandomEffectValue(int coreCfgId, EnCoreQuality quality)
     {
         var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
         var (minValue, maxValue) = GetEffectValueRandom(coreCfg.nCoreId, quality);
-        var value = Random.Range(minValue, maxValue + 1);
+        var value = Mathf.RoundToInt(Random.Range(minValue, maxValue));
         return value;
     }
 
     public int GetIconAssetId(int coreCfgId)
     {
-        var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
-        var attId = (int)coreCfg.arrEffectParams[0];
+        var attId = (int)UICoreUtility.GetCoreQualityParam(coreCfgId, EnCoreQuality.Quality1, 0);
         var attCfg = GameSchedule.Instance.GetAttributeCfg0(attId);
         return attCfg.nIconAssetId;
     }
     public virtual void ApplyEntity(int entityId, int coreId)
     {
-        var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(entityId, EnSceneEntityComType.Attribute);
         var value = UICoreMgr.Instance.GetCoreEffectValue(coreId);
-        var coreCfg = UICoreUtility.GetCoreCfg(coreId);
-        var attId = (EnEntityAttributeId)coreCfg.arrEffectParams[0];
-        attCom.AddAddtionalValue(attId, value);
-        if (attId == EnEntityAttributeId.LimitHp)
+        var attId = UICoreUtility.GetCoreQualityParam(coreId, 0);
+        GameAttributeUtility.AddAddtionalValue(entityId, (EnEntityAttributeId)attId, value);
+        if (attId == (int)EnEntityAttributeId.LimitHp)
         {
-            attCom.AddAddtionalValue(EnEntityAttributeId.Hp, value);
+            GameAttributeUtility.AddAddtionalValue(entityId, EnEntityAttributeId.Hp, value);
         }
     }
-    private (int minValue, int maxValue) GetEffectValueRandom(int coreCfgId, EnCoreQuality quality)
+    protected (float minValue, float maxValue) GetEffectValueRandom(int coreCfgId, EnCoreQuality quality)
     {
-        var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
-        var testValue = coreCfg.arrEffectParams[1];
-        var result = UICoreUtility.GetEffectValueRange(coreCfgId, quality, testValue);
-        return result;
+        var minValue = UICoreUtility.GetCoreQualityParam(coreCfgId, quality, 1);
+        var maxValue = UICoreUtility.GetCoreQualityParam(coreCfgId, quality, 2);
+        return (minValue, maxValue);
     }
 }

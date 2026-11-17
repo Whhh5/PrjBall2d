@@ -19,9 +19,13 @@ public class GameBallFireSystem : IBattleSystem
 
     public void OnUpdate()
     {
+        var settingPd = PersistentMgr.Instance.GetData<PersistentSettingData>(EnPersistentId.Setting);
         var inputSystem = GameBattleMgr.Instance.GetSystem<GameBattleInputSystem>();
-        if (!inputSystem.MouseIsValid())
-            return;
+        if (!settingPd.GetAutoFireBall())
+        {
+            if (!inputSystem.MouseIsValid())
+                return;
+        }
         var playerEntityId = GamePlayerMgr.Instance.GetPlayerEntityId();
         var curTime = GameUtility.GetGameTime();
         var interval = GamePlayerMgr.Instance.GetBallFireInterval(playerEntityId);
@@ -39,5 +43,7 @@ public class GameBallFireSystem : IBattleSystem
 
         var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
         AudioMgr.Instance.Play(ballCfg.nFireAudioId);
+
+        GamePlayerMgr.Instance.AddAttackCmd();
     }
 }

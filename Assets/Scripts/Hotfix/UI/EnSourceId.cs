@@ -16,4 +16,8 @@ public enum EnSourceId
     UIHallInlayWindow,
     UIHallMainShopWindow,
     UIHallMainBattleWindow,
+    UIBattleDieWindow,
+    UIBattleFinishWindow,
+    UIBattleMainWindow,
+    UIStartGameWindow,
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 public class GameBattleWaveSystem : IBattleSystem
 {
@@ -8,10 +9,20 @@ public class GameBattleWaveSystem : IBattleSystem
     private int _CurWaveId;
     private int _MaxWaveId;
     private bool _IsPlaying = false;
+    private readonly Dictionary<int, int> _MonsterId2AttributeGroupIds = new();
 
     public void OnEnable()
     {
         var mapId = GameMapMgr.Instance.GetCurMapId();
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
+        for (int i = 0; i < chapterCfg.arrMonsterIds.Length; i += 2)
+        {
+            var monsterId = chapterCfg.arrMonsterIds[i];
+            var attGroupId = chapterCfg.arrMonsterIds[i + 1];
+            _MonsterId2AttributeGroupIds.Add(monsterId, attGroupId);
+        }
+
         InitMonsterGrid(mapId);
         StartCreateMonster();
     }
@@ -19,6 +30,7 @@ public class GameBattleWaveSystem : IBattleSystem
     public void OnDisable()
     {
         ClearWaveData();
+        _MonsterId2AttributeGroupIds.Clear();
     }
 
     public void OnReset()
@@ -47,6 +59,8 @@ public class GameBattleWaveSystem : IBattleSystem
     {
         ref readonly var mapRowCol = ref GameMapMgr.Instance.GetMapGridRowCol();
         var waveCfg = GameSchedule.Instance.GetBattleWaveCfg0(waveId);
+        var chapterId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
         var index = 0;
         var userData = ClassPoolMgr.Instance.Pull<CommonSerializeToIntArrayUserData>();
         userData.arrParams = waveCfg.arrMonsterInfos;
@@ -55,12 +69,18 @@ public class GameBattleWaveSystem : IBattleSystem
         ISerializeToIntArray.ParseToValue(userData.arrParams, userData.startIndex, userData.count, ref index, out List<GameBattleWaveMonsterInfo> waveMonsterInfos, userData);
         ClassPoolMgr.Instance.Push(userData);
 
-        var waveInfo = ClassPoolMgr.Instance.Pull<GameBattleWaveData>();
+        var waveInfo = ClassPoolMgr.Instance.Pull<GameBattleWaveData>();;
         for (int j = 0; j < waveMonsterInfos.Count; j++)
         {
             var waveMonsterInfo = waveMonsterInfos[j];
             var createInfo = ClassPoolMgr.Instance.Pull<GameMonsterCreateInfo>();
-            createInfo.Init(j + 1, waveMonsterInfo.monsterId, mapRowCol.x - waveMonsterInfo.backRow, waveMonsterInfo.col, waveMonsterInfo.attValuesId, waveMonsterInfo.energyCount);
+            createInfo.Init(
+                j + 1,
+                waveMonsterInfo.monsterId,
+                mapRowCol.x - waveMonsterInfo.backRow,
+                waveMonsterInfo.col,
+                waveMonsterInfo.attributeCofficient * chapterCfg.fCofficient
+                );
             waveInfo.AddMonsterCreateInfo(createInfo);
         }
         _WaveId2Data.Add(waveId, waveInfo);
@@ -85,6 +105,10 @@ public class GameBattleWaveSystem : IBattleSystem
         _CurWaveId = -1;
         _IsPlaying = false;
         _WaveId2Data.Clear();
+    }
+    public int GetWaveCount()
+    {
+        return _WaveId2Data.Count;
     }
     public int GetCurWaveId()
     {
@@ -115,10 +139,9 @@ public class GameBattleWaveSystem : IBattleSystem
         for (int i = 0; i < infos.Count; i++)
         {
             var createInfo = infos[i];
-
-            // 创建怪物
-            GameMonsterMgr.Instance.CreateMonsterEntity(createInfo.monsterId, createInfo.row, createInfo.col, createInfo.attValueCfgId, createInfo.energyCount);
             waveInfo.CreateFinish(createInfo.index);
+            var waveCofficient = Mathf.Floor(_CurWaveId / 10);
+            CreateMonster(createInfo.monsterId, createInfo.row, createInfo.col, createInfo.attCofficient + waveCofficient);
         }
         var lastWave = _CurWaveId++;
         // 下一波
@@ -138,6 +161,20 @@ public class GameBattleWaveSystem : IBattleSystem
     public void CreateWaveMonsterEntitys(in int waveId)
     {
         _WaveInfo.Enqueue(waveId);
+    }
+    public int CreateMonster(int monsterCfgId, int row, int col, float attCofficient)
+    {
+        if (_MonsterId2AttributeGroupIds.TryGetValue(monsterCfgId, out var attGroupId))
+        {
+            // 创建怪物
+            var monsterId = GameMonsterMgr.Instance.CreateMonsterEntity(monsterCfgId, row, col, attGroupId, attCofficient);
+            return monsterId;
+        }
+        else
+        {
+            AotDebug.LogError($"意外的怪物id，请在 {nameof(ChapterCfg)}.{nameof(ChapterCfg.arrMonsterIds)} 中配置");
+            return -1;
+        }
     }
 }
 

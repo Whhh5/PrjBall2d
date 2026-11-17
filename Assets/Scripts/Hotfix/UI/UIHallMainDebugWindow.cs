@@ -123,8 +123,8 @@ public class UIHallMainDebugWindow : UIWindow
     {
         if (!int.TryParse(_ExpCountInput.text, out var count))
             return;
-        var curExp = AccountMgr.Instance.GetExp();
+        var curExp = UIGoodsMgr.Instance.GetGoodsCount((int)EnGoodsId.Exp);
         var changeExp = count - curExp;
-        AccountMgr.Instance.ChangeExp(changeExp);
+        UIGoodsMgr.Instance.AddGoods((int)EnGoodsId.Exp, changeExp);
     }
 }

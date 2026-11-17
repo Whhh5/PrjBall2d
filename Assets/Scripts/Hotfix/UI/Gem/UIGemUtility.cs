@@ -9,7 +9,7 @@ public interface IGemEffectTypeAnalysist
     public string GetName(int goodsCfgId);
     public string GetDescriptByGemId(int gemId, EnGemQuality quality);
     public string GetDescriptByGoodsCfgId(int goodsCfgId, EnGemQuality quality);
-    public int CalculateEffectValue(int goodsCfgId, EnGemQuality quality);
+    public float CalculateEffectValue(int goodsCfgId, EnGemQuality quality);
     public void ApplyEntity(int entityId, int gemId);
 }
 public static class UIGemUtility
@@ -44,7 +44,7 @@ public static class UIGemUtility
         var desc = analysist.GetDescriptByGoodsCfgId(goodsCfgId, quality);
         return desc;
     }
-    public static int CalculateEffectValue(int goodsCfgId, EnGemQuality quality)
+    public static float CalculateEffectValue(int goodsCfgId, EnGemQuality quality)
     {
         var cfg = GameSchedule.Instance.GetGemCfg0(goodsCfgId);
         var analysist = GetAnalysist((EnGemEffectTypeId)cfg.nEffectTypeId);
@@ -54,10 +54,10 @@ public static class UIGemUtility
 
     public static void ApplyEntity(int entityId, int gemId)
     {
-        foreach (var item in _EffectAnalysists)
-        {
-            item.Value.ApplyEntity(entityId, gemId);
-        }
+        var goodsCfgId = GetGemGoodsCfgId(gemId);
+        var cfg = GameSchedule.Instance.GetGemCfg0(goodsCfgId);
+        var analysist = GetAnalysist((EnGemEffectTypeId)cfg.nEffectTypeId);
+        analysist.ApplyEntity(entityId, gemId);
     }
     public static int GetIconAssetId(int gemId)
     {
@@ -95,19 +95,32 @@ public static class UIGemUtility
     }
     public static EnGemTypeId GetGemType(int gemId)
     {
-        var gemCfgId = GetGemGoodsCfgId(gemId);
-        var gemCfg = GameSchedule.Instance.GetGemCfg0(gemCfgId);
-        return (EnGemTypeId)gemCfg.nTypeId;
+        var perData = PersistentMgr.Instance.GetData<PersistentGemData>(EnPersistentId.Gem);
+        var value = perData.GetGemType(gemId);
+        return value;
     }
-    public static (int minValue, int maxValue) GetEffectValueRange(int gemCfgId, EnGemQuality quality, float testValue)
+    public static float GetGemQualityParam(int gemId, int index)
     {
-        var coreCfg = GameSchedule.Instance.GetGemCfg0(gemCfgId);
-        var testCoefficient = coreCfg.fQualityCoefficient;
-
-        var minValue = Mathf.CeilToInt(testValue * (int)quality * (1 + testCoefficient));
-        var maxValue = Mathf.CeilToInt(minValue * (1 + (int)quality * testCoefficient));
-
-        return (minValue, maxValue);
+        var quality = GetGemQuality(gemId);
+        var cfgId = GetGemGoodsCfgId(gemId);
+        var value = GetGemQualityParam(cfgId, quality, index);
+        return value;
+    }
+    public static float GetGemQualityParam(int gemCfgId, EnGemQuality quality, int index)
+    {
+        var cgemCfg = GameSchedule.Instance.GetGemCfg0(gemCfgId);
+        var param = quality switch
+        {
+            EnGemQuality.Quality1 => cgemCfg.arrEffectParams1,
+            EnGemQuality.Quality2 => cgemCfg.arrEffectParams2,
+            EnGemQuality.Quality3 => cgemCfg.arrEffectParams3,
+            EnGemQuality.Quality4 => cgemCfg.arrEffectParams4,
+            EnGemQuality.Quality5 => cgemCfg.arrEffectParams5,
+            EnGemQuality.Quality6 => cgemCfg.arrEffectParams6,
+            _ => null
+        };
+        var value = param[index];
+        return value;
     }
     public static void SortList(ref List<int> coreIds)
     {
@@ -128,12 +141,9 @@ public static class UIGemUtility
             return 0;
         });
     }
-    public static List<GoodsInfo> ClearGemNeedGoodsInfos()
+    public static GoodsInfo ClearGemNeedGoodsInfo()
     {
-        return new List<GoodsInfo>()
-        {
-            new((int)EnGoodsId.Diamond, 10),
-        };
+        return new((int)EnGoodsId.Diamond, 10);
     }
     public static List<GoodsInfo> RangeGetGemGoodsCfgId(int count)
     {

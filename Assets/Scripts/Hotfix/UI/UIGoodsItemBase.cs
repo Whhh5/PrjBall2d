@@ -11,6 +11,7 @@ public struct GoodsKey
 {
     public int goodsCfgId;
     public int goodsId;
+
     public GoodsKey(int goodsCfgId)
     {
         this.goodsCfgId
@@ -25,9 +26,6 @@ public struct GoodsKey
 }
 public abstract class UIGoodsItemBase : UIWindowItem
 {
-    [SerializeField, AutoReference(SearchScope.Self)]
-    private RectTransform _Rect;
-
     [SerializeField, AutoReference]
     private Image _IconFrameImg;
     [SerializeField, AutoReference]
@@ -82,13 +80,5 @@ public abstract class UIGoodsItemBase : UIWindowItem
     public void Setting(GoodsInfo goodsInfo, EnSourceId sourceId)
     {
         Setting(goodsInfo, () => UIGoodsUtility.DefaultOnClick(goodsInfo, sourceId), sourceId);
-    }
-    public void SetWorldPos(in Vector3 worldPos)
-    {
-        _Rect.position = worldPos;
-    }
-    public void SetSiblingIndex(in int index)
-    {
-        _Rect.SetSiblingIndex(index);
     }
 }

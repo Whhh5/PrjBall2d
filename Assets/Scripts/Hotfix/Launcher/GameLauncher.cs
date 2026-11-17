@@ -6,6 +6,6 @@ public class GameLauncher : IStartLaunch
 {
     public void StartLaunch()
     {
-        UIMgr.Instance.ShowWindow<UIStartGameWindowData>();
+        PlatformUtility.PlatformAnalysis.Init();
     }
 }

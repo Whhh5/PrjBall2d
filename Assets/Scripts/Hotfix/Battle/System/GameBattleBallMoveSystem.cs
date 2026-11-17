@@ -93,6 +93,11 @@ public class GameBattleBallMoveSystem : IBattleSystem
                     ballData.moveDir = dir;
 
                     AudioMgr.Instance.Play(EnAudioId.Ball_Hit_Eage);
+
+                    var evUd = ClassPoolMgr.Instance.Pull<GameSkillBallReflectEventData>();
+                    evUd.ballEntityId = entityId;
+                    EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_BALL_REFLECT, entityId, 0, evUd);
+                    ClassPoolMgr.Instance.Push(evUd);
                 }
                 EntityMgr.Instance.SetEntityWorldPos(entityId, nextPos);
             }

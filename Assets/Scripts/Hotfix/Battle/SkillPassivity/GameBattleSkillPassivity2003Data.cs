@@ -76,10 +76,11 @@ public class GameBattleSkillPassivity2003Data : GameBattleSkillPassivityData<Gam
         var damage = Mathf.CeilToInt(attValue * starData.attPercentage01);
         var worldPos = monsterEntityData.GetCenterPointWorldPos();
         var count = GamePhysicsUtility.SphereCastAll(in worldPos, in radius, ref _Hits);
+        var ownerEntityId = GameSkillPassivityMgr.Instance.GetOwnerEntityId(_SkillPassivityId);
         for (int i = 0; i < count; i++)
         {
             ref readonly var hit = ref _Hits[i];
-            var damageResult = GameAttackMgr.Instance.AttackMonster(in _OwnerEntityId, in hit.entityId, in damage, in starData.damageType);
+            var damageResult = GameAttackMgr.Instance.AttackMonster(in ownerEntityId, in hit.entityId, in damage, in starData.damageType);
             _DamageValue += damageResult.value;
         }
         AudioMgr.Instance.Play(EnAudioId.BallPart1002_Effect2);

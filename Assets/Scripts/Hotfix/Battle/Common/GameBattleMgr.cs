@@ -1,7 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Cysharp.Threading.Tasks;
 
+public enum EnBattleSystemStage
+{
+    None,
+    OnEnable = 1 << 0,
+}
 public interface IBattleSystem
 {
     public void OnEnable();
@@ -19,6 +26,11 @@ public enum EnGameBattleStatus
     Success,
     Resurrection,
 }
+[AttributeUsage(AttributeTargets.Class)]
+public class BattleSystemIgnoreAttribute : Attribute
+{
+
+}
 public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
 {
     public override EnManagerFuncType FuncType => base.FuncType | EnManagerFuncType.Update;
@@ -27,17 +39,23 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
 
     private int _BossEntityId;
     private EnGameBattleStatus _BattleStatus = EnGameBattleStatus.None;
+    private EnBattleSystemStage _SystemStage = EnBattleSystemStage.None;
 
     public override void Destroy()
     {
         GameMapMgr.Instance.UnregisterLifecycle(this);
         base.Destroy();
+        _SystemStage = EnBattleSystemStage.None;
+        _BattleStatus = EnGameBattleStatus.None;
+        _DisableSystem.Clear();
     }
     public override async UniTask AwakeAsync()
     {
         await base.AwakeAsync();
         GameMapMgr.Instance.RegisterLifecycle(this);
-
+    }
+    private void InitSystem()
+    {
         var types = typeof(GameBattleMgr).Assembly.GetTypes();
         foreach (var type in types)
         {
@@ -45,11 +63,43 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
                 continue;
             if (!typeof(IBattleSystem).IsAssignableFrom(type))
                 continue;
+            var attribute = type.GetCustomAttribute<BattleSystemIgnoreAttribute>(true);
+            if (attribute != null)
+                continue;
             var ins = (IBattleSystem)System.Activator.CreateInstance(type);
             _BattleSystems.Add(type.FullName, ins);
         }
     }
-
+    private void ClearSystem()
+    {
+        _BattleSystems.Clear();
+        _DisableSystem.Clear();
+    }
+    public void AddSystem<T>()
+        where T: IBattleSystem, new()
+    {
+        var key = typeof(T).FullName;
+        if (_BattleSystems.ContainsKey(key))
+            return;
+        var ins = new T();
+        if ((_SystemStage & EnBattleSystemStage.OnEnable) == 0)
+        {
+            ins.OnEnable();
+        }
+        _BattleSystems.Add(key, ins);
+    }
+    public void RemoveSystem<T>()
+        where T: IBattleSystem
+    {
+        var key = typeof(T).FullName;
+        if (!_BattleSystems.TryGetValue(key, out var ins))
+            return;
+        if ((_SystemStage & EnBattleSystemStage.OnEnable) != 0)
+        {
+            ins.OnDisable();
+        }
+        _BattleSystems.Remove(key);
+    }
     public IBattleSystem GetSystem(string key)
     {
         if (!_BattleSystems.TryGetValue(key, out var system))
@@ -69,6 +119,8 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
 
     public void EnterMap(int mapId, int chapterId)
     {
+        InitSystem();
+        _SystemStage |= EnBattleSystemStage.OnEnable;
         EventMgr.Instance.Register(EnABBEvent.EVENT_BATTLE_PLAYER_DIE, 0, 0, OnEvent_PlayerDie);
         EventMgr.Instance.Register<GameSkillBossDebutEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Debut, OnEvent_BossDebut);
         foreach (var item in _BattleSystems)
@@ -76,21 +128,29 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
             item.Value.OnEnable();
         }
         SetBattleStatus(EnGameBattleStatus.Battle);
+
+        EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_START);
     }
 
     public void ExitMap()
     {
         EventMgr.Instance.Unregister(EnABBEvent.EVENT_BATTLE_PLAYER_DIE, 0, 0, OnEvent_PlayerDie);
         EventMgr.Instance.Unregister<GameSkillBossDebutEventData>(EnABBEvent.EVENT_SKILL_EVENT_SCHEDULE, 0, (int)EnSkillEventScheduleId.Debut, OnEvent_BossDebut);
-        foreach (var item in _BattleSystems)
+
+
+        foreach (var (_, system) in _BattleSystems)
         {
-            item.Value.OnDisable();
+            system.OnDisable();
         }
+
+        ClearSystem();
+
         if (_BossEntityId > 0)
         {
             EventMgr.Instance.Register<GameBattleMonsterDieEventData>(EnABBEvent.EVENT_BATTLE_MONSTER_DIE, _BossEntityId, 0, OnEvent_BossDie);
         }
         _BossEntityId = -1;
+        _SystemStage &= ~EnBattleSystemStage.OnEnable;
         SetBattleStatus(EnGameBattleStatus.Finish);
     }
 
@@ -106,6 +166,8 @@ public class GameBattleMgr : Singleton<GameBattleMgr>, IGameMapLifecycle
         }
         _BossEntityId = -1;
         SetBattleStatus(EnGameBattleStatus.Battle);
+
+        EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_START);
     }
     public override bool IsUpdate()
     {

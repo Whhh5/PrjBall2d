@@ -7,8 +7,7 @@ public class GameBattleWaveMonsterInfo : ISerializeToIntArray<ISerializeToIntArr
     public int monsterId;
     public int backRow;
     public int col;
-    public int attValuesId;
-    public int energyCount;
+    public float attributeCofficient = 1;
 
     public void DeserializeFromIntArray(int[] datas, int start, int count, ISerializeToIntArrayUserData userData)
     {
@@ -16,8 +15,7 @@ public class GameBattleWaveMonsterInfo : ISerializeToIntArray<ISerializeToIntArr
         ISerializeToIntArray.ParseToValue(in datas, in start, in count, ref index, out monsterId);
         ISerializeToIntArray.ParseToValue(in datas, in start, in count, ref index, out backRow);
         ISerializeToIntArray.ParseToValue(in datas, in start, in count, ref index, out col);
-        ISerializeToIntArray.ParseToValue(in datas, in start, in count, ref index, out attValuesId);
-        ISerializeToIntArray.ParseToValue(in datas, in start, in count, ref index, out energyCount);
+        ISerializeToIntArray.ParseToValue(in datas, in start, in count, ref index, out attributeCofficient);
     }
 
     public List<int> SerializeToIntArray()
@@ -26,8 +24,7 @@ public class GameBattleWaveMonsterInfo : ISerializeToIntArray<ISerializeToIntArr
         ISerializeToIntArray.SerializeToInt(ref list, in monsterId);
         ISerializeToIntArray.SerializeToInt(ref list, in backRow);
         ISerializeToIntArray.SerializeToInt(ref list, in col);
-        ISerializeToIntArray.SerializeToInt(ref list, in attValuesId);
-        ISerializeToIntArray.SerializeToInt(ref list, in energyCount);
+        ISerializeToIntArray.SerializeToInt(ref list, in attributeCofficient);
 
         return list;
     }

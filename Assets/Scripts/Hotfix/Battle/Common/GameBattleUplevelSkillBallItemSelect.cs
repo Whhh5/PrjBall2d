@@ -23,11 +23,13 @@ public class GameBattleUplevelSkillBallItemSelect : IBattleEnergyUplevelItemSele
     {
         var curBallIds = GameBattleBallMgr.Instance.GetBallIdsByType(EnBallType.Skill);
         var newBallPool = _SkillBallPool.FindAll(testBallId => !_IgnoreHistory.Contains(testBallId));
-        if (curBallIds.Count >= GameGlobal.SkillBallCount)
+
+        var maxBallCount = GlobalCfgUtility.Get40001_Int32();
+        if (curBallIds.Count >= maxBallCount)
         {
             newBallPool = newBallPool.FindAll(testBallId => curBallIds.Contains(testBallId));
         }
-        return Mathf.Min(newBallPool.Count, GameGlobal.SkillBallCount);
+        return Mathf.Min(newBallPool.Count, maxBallCount) * 3;
     }
 
     public void Reset()
@@ -50,11 +52,24 @@ public class GameBattleUplevelSkillBallItemSelect : IBattleEnergyUplevelItemSele
                 _SkillBallPool.Add(ballId);
             }
         }
+        // 移除融合技能球
+        var curBallIds = GameBattleBallMgr.Instance.GetBallIdsByType(EnBallType.Skill);
+        for (int i = 0; i < curBallIds.Count; i++)
+        {
+            var ballId = curBallIds[i];
+            var ballCfg = GameSchedule.Instance.GetSkillBallCfg0(ballId);
+            if (ballCfg.nBallUseType != (int)EnBallUseType.Fussion)
+                continue;
+            var sourceBallIds = GameBattleBallMgr.Instance.GetSourceIds(ballId);
+            _SkillBallPool.RemoveAll(id => sourceBallIds.Contains(id));
+        }
+
         _MaxCount = _IgnoreHistory.Count;
     }
     public bool IsValid()
     {
-        return _MaxCount < GameGlobal.SkillBallCount && _IgnoreHistory.Count < _SkillBallPool.Count;
+        var maxBallCount = GlobalCfgUtility.Get40001_Int32();
+        return _MaxCount < maxBallCount && _IgnoreHistory.Count < _SkillBallPool.Count;
     }
 
     public bool TrySelect(out IUIBattleUplevelWindow_ItemUserData userData, bool isIgnoreHistory, HashSet<int> extraIgnoree)
@@ -67,7 +82,8 @@ public class GameBattleUplevelSkillBallItemSelect : IBattleEnergyUplevelItemSele
             ? newBallPool.FindAll(ballId => !_IgnoreHistory.Contains(ballId))
             : newBallPool;
         var curBallIds = GameBattleBallMgr.Instance.GetBallIdsByType(EnBallType.Skill);
-        if (curBallIds.Count >= GameGlobal.SkillBallCount)
+        var maxBallCount = GlobalCfgUtility.Get40001_Int32();
+        if (curBallIds.Count >= maxBallCount)
         {
             newBallPool = newBallPool.FindAll(testBallId => curBallIds.Contains(testBallId));
         }

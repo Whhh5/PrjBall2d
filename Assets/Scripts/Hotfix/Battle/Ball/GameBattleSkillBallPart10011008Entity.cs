@@ -22,6 +22,7 @@ public class GameBattleSkillBallPart10011008EntityData : GameBattleSkillBallPart
 
     private void OnEvent_Attack(in int _, in int __, in GameBattleBall10011008AttackEventData data)
     {
+
         ref readonly var lbPos = ref GameMapMgr.Instance.GetGridLbPosition();
         ref readonly var ruPos = ref GameMapMgr.Instance.GetGridRuPosition();
 
@@ -50,6 +51,7 @@ public class GameBattleSkillBallPart10011008EntityData : GameBattleSkillBallPart
             AudioMgr.Instance.Play(EnAudioId.BallPart1011_Effect1);
         }
 
+        GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_1001_2, WorldPos, 2);
     }
 }
 public class GameBattleSkillBallPart10011008Entity : GameBattleSkillBallPartEntity

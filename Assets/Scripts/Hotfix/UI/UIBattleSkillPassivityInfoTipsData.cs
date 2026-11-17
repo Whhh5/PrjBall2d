@@ -23,6 +23,7 @@ public class UIBattleSkillPassivityInfoTipsData : UITipsData<UIBattleSkillBallIn
     private int _Star;
     public override void OnPoolDestroy()
     {
+        TimeMgr.Instance.SetPause(false, false);
         base.OnPoolDestroy();
         _SkillPassivityId
             = _Star
@@ -33,6 +34,7 @@ public class UIBattleSkillPassivityInfoTipsData : UITipsData<UIBattleSkillBallIn
     {
         _SkillPassivityId = userData.skillPassivityId;
         _Star = userData.star;
+        TimeMgr.Instance.SetPause(true, true);
     }
 
     public override void OnGOCreate(GameEntity entity)
@@ -48,7 +50,7 @@ public class UIBattleSkillPassivityInfoTipsData : UITipsData<UIBattleSkillBallIn
         data.GetDescriptionList(ref list, EnDescriptionLevel.Level2);
 
         var nameStr = LanguageUtility.GetLanguage(partCfg.nNameLangId);
-        _UITips.SettingBallInfo(nameStr, list, _Star);
+        _UITips.SettingBallInfo(nameStr,(EnLoadTarget)partCfg.nIconAssetId, list, _Star);
 
         for (int i = 0; i < list.Count; i++)
         {

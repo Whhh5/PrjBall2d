@@ -20,7 +20,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "352684073f964c965824ba55f84dcff0578ea77e"
+      "hash": "d288776c50578926c732496882bd6ab6684c778c"
     },
     "com.unity.2d.animation": {
       "version": "9.2.0",
@@ -340,14 +340,13 @@
       }
     },
     "com.unity.visualscripting": {
-      "version": "1.9.4",
+      "version": "file:com.unity.visualscripting@1.9.4",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0"
-      },
-      "url": "https://packages.unity.cn"
+      }
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

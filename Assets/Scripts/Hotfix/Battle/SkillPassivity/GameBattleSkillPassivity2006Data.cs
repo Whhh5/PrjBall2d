@@ -67,7 +67,9 @@ public class GameBattleSkillPassivity2006Data : GameBattleSkillPassivityData<Gam
 
         var finalChangeAttValue = changeRound * starData.addAttValue + changeAttValue * _RoundCount;
 
-        GameAttributeUtility.AddAddtionalValue(_OwnerEntityId, starData.addAttId, finalChangeAttValue);
+
+        var ownerEntityId = GameSkillPassivityMgr.Instance.GetOwnerEntityId(_SkillPassivityId);
+        GameAttributeUtility.AddAddtionalValue(ownerEntityId, starData.addAttId, finalChangeAttValue);
         _RoundCount = curRound;
     }
 
@@ -81,7 +83,8 @@ public class GameBattleSkillPassivity2006Data : GameBattleSkillPassivityData<Gam
             var addRound = round - _RoundCount;
             var finalChangeAttValue = addRound * starData.addAttValue;
 
-            GameAttributeUtility.AddAddtionalValue(in _OwnerEntityId, in starData.addAttId, in finalChangeAttValue);
+            var ownerEntityId = GameSkillPassivityMgr.Instance.GetOwnerEntityId(_SkillPassivityId);
+            GameAttributeUtility.AddAddtionalValue(in ownerEntityId, in starData.addAttId, in finalChangeAttValue);
             _RoundCount = round;
         }
     }

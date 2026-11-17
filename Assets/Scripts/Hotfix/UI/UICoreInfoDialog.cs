@@ -88,6 +88,8 @@ public class UICoreInfoDialog : UIWindow
     private TextMeshProUGUI _QualityTxt = null;
     [SerializeField, AutoReference]
     private RectTransform _CoreItemRootRect = null;
+    [SerializeField, AutoReference]
+    private Image _QualityImg = null;
 
     [SerializeField, AutoReference]
     private RectTransform _GemArrtibuteRootRect = null;
@@ -103,6 +105,7 @@ public class UICoreInfoDialog : UIWindow
     private bool _IsHideButton = false;
     public override void OnUnload()
     {
+        _QualityImg.UnloadSprite();
         _CreateToken?.Cancel();
         foreach (var item in _GemAttributeItems)
             UIMgr.Instance.UnloadWindowItem(item.Value);
@@ -238,6 +241,10 @@ public class UICoreInfoDialog : UIWindow
 
         var qualityName = LanguageUtility.GetLanguage_CoreQualityName(quality);
         _QualityTxt.SetText(qualityName);
+
+
+        var qualityCfg = GameSchedule.Instance.GetCoreQualityCfg0((int)quality);
+        _QualityImg.LoadSprirte(qualityCfg.nIconAssetId);
     }
     private void UpdateButtonStatus()
     {
@@ -274,12 +281,13 @@ public class UICoreInfoDialog : UIWindow
             var goodsCount = goodsInfo.goodsCount;
             if (!_NeedGoodsItems.TryGetValue(goodsInfo.goodsCfgId, out var tipsItem))
             {
-                var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemCountLeftTip>(EnLoadTarget.Pre_UIGoodsItemCountLeftTip, _RefreshNeedGoodsIteRootRect, _CreateToken.Token)
+                var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemCountBottomTip>(EnLoadTarget.Pre_UIGoodsItemCountBottomTip, _RefreshNeedGoodsIteRootRect, _CreateToken.Token)
                     .SuppressCancellationThrow();
                 if (isCancel)
                     return;
                 item.Setting(new(goodsInfo.goodsCfgId, goodsCount, _CoreId), EnSourceId.UICoreInfoDialog);
                 tipsItem = item;
+                item.SetAutoSize();
                 _NeedGoodsItems.Add(goodsInfo.goodsCfgId, tipsItem);
             }
             else
@@ -288,7 +296,7 @@ public class UICoreInfoDialog : UIWindow
             }
             var count = UIGoodsMgr.Instance.GetGoodsCount(goodsInfo.goodsCfgId);
             var isValid = count >= goodsCount;
-            tipsItem.SetValid(isValid);
+            tipsItem.SetComValid(isValid);
         }
         _CreateToken = null;
     }

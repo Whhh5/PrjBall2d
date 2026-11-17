@@ -61,7 +61,7 @@ public class UIHallMainShopWindow : UIWindow
                 return;
             var title = LanguageUtility.GetLanguage(22011);
             var desc = LanguageUtility.GetLanguage(22012);
-            item.Setting(title, desc, EnLoadTarget.Sp_ShangCheng_baoxiang1,
+            item.Setting(title, desc, EnLoadTarget.Sp_img_uihallmainshopwindow_box1,
                 new(CoreLotteryNeedGoodsCfgId, CoreLottery1NeedGoodsCount), OnClick_CoreLottery1,
                 new(CoreLotteryNeedGoodsCfgId, CoreLottery10NeedGoodsCount), OnClick_CoreLottery10);
             _BoxItems.Add(item);
@@ -73,7 +73,7 @@ public class UIHallMainShopWindow : UIWindow
                 return;
             var title = LanguageUtility.GetLanguage(22021);
             var desc = LanguageUtility.GetLanguage(22022);
-            item2.Setting(title, desc, EnLoadTarget.Sp_ShangCheng_baoxiang1,
+            item2.Setting(title, desc, EnLoadTarget.Sp_img_uihallmainshopwindow_box2,
                 new(GemLotteryNeedGoodsCfgId, GemLottery1NeedGoodsCount), OnClick_GemLottery1,
                 new(GemLotteryNeedGoodsCfgId, GemLottery10NeedGoodsCount), OnClick_GemLottery10);
             _BoxItems.Add(item2);
@@ -85,7 +85,7 @@ public class UIHallMainShopWindow : UIWindow
                 return;
             var title = LanguageUtility.GetLanguage(22031);
             var desc = string.Format(LanguageUtility.GetLanguage(22032), LotteryCoinMinCount, LotteryCoinMaxCount);
-            item3.Setting(title, desc, EnLoadTarget.Sp_ShangCheng_baoxiang1,
+            item3.Setting(title, desc, EnLoadTarget.Sp_img_uihallmainshopwindow_box3,
                 new(CoinLotteryNeedGoodsCfgId, CoinLottery1NeedGoodsCount), OnClick_CoinLottery1,
                 new(CoinLotteryNeedGoodsCfgId, CoinLottery10NeedGoodsCount), OnClick_CoinLottery10);
             _BoxItems.Add(item3);
@@ -97,7 +97,7 @@ public class UIHallMainShopWindow : UIWindow
                 return;
             var title = LanguageUtility.GetLanguage(22041);
             var desc = string.Format(LanguageUtility.GetLanguage(22042), LotteryEnergyMinCount, LotteryEnergyMaxCount);
-            item4.Setting(title, desc, EnLoadTarget.Sp_ShangCheng_baoxiang1,
+            item4.Setting(title, desc, EnLoadTarget.Sp_img_uihallmainshopwindow_box4,
                 new(EnergyLotteryNeedGoodsCfgId, EnergyLottery1NeedGoodsCount), OnClick_EnergyLottery1,
                 new(EnergyLotteryNeedGoodsCfgId, EnergyLottery10NeedGoodsCount), OnClick_EnergyLottery10);
             _BoxItems.Add(item4);

@@ -82,6 +82,18 @@ public class GameBattleEnergySystem : IBattleSystem
             _EnergyDelayMoveIds.Enqueue(energyEntityId);
         }
     }
+    public int GetCurrentEnergyValue()
+    {
+        return _EnergyValue;
+    }
+    public int GetMaxEnergyValue()
+    {
+        return _MaxEnergyValue;
+    }
+    public int GetEnergyLevel()
+    {
+        return _EnergyLevel;
+    }
 
     public void OnUpdate()
     {

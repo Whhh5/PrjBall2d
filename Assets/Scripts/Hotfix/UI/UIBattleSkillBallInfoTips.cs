@@ -25,6 +25,7 @@ public class UIBattleSkillBallInfoTipsData : UITipsData<UIBattleSkillBallInfoTip
     private int _Star;
     public override void OnPoolDestroy()
     {
+        TimeMgr.Instance.SetPause(false, false);
         base.OnPoolDestroy();
         _BallId
             = _Star
@@ -34,6 +35,8 @@ public class UIBattleSkillBallInfoTipsData : UITipsData<UIBattleSkillBallInfoTip
     {
         _BallId = userData.ballId;
         _Star = userData.star;
+
+        TimeMgr.Instance.SetPause(true, true);
     }
 
     public override void OnGOCreate(GameEntity entity)
@@ -46,7 +49,7 @@ public class UIBattleSkillBallInfoTipsData : UITipsData<UIBattleSkillBallInfoTip
         starData.GetDescriptionList(ref list, EnDescriptionLevel.Level1);
 
         var nameStr = LanguageUtility.GetLanguage(ballCfg.nNameLangId);
-        _UITips.SettingBallInfo(nameStr, list, _Star);
+        _UITips.SettingBallInfo(nameStr, (EnLoadTarget)ballCfg.nIconAssetId, list, _Star);
 
         for (int i = 0; i < list.Count; i++)
         {
@@ -67,12 +70,15 @@ public class UIBattleSkillBallInfoTips : UITips
     private TextMeshProUGUI _DescLevel2Txt;
     [SerializeField]
     private RectTransform _DescRootRect;
+    [SerializeField, AutoReference]
+    private Image _IconImg;
 
 
     private readonly List<UIDescriptionLevel3WindowItem> _DescLevelTxts = new();
     private readonly List<GameObject> _StarGods = new();
     public override void OnUnload()
     {
+        _IconImg.UnloadSprite();
         for (int i = 0; i < _DescLevelTxts.Count; i++)
         {
             var item = _DescLevelTxts[i];
@@ -90,8 +96,9 @@ public class UIBattleSkillBallInfoTips : UITips
         base.LoadCompletion();
         _StarGo.SetActive(false);
     }
-    public async void SettingBallInfo(string title, List<DescriptionInfo> descInfos, int star)
+    public async void SettingBallInfo(string title, EnLoadTarget iconAssetId, List<DescriptionInfo> descInfos, int star)
     {
+        _IconImg.LoadSprirte(iconAssetId);
         _NameTxt.SetText(title);
         var level2Description = new Dictionary<EnDescriptionLevel, List<DescriptionInfo>>(descInfos.Count);
         foreach (var item in descInfos)

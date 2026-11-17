@@ -151,7 +151,7 @@ public class UIHallMainWindow : UIWindow
         var intervalRad = _MenuItemAngleUnit / 360 * Mathf.PI * 2;
         var curDir = (mouseWorldPos - centerWorldPos).normalized;
         var rad = Mathf.Atan2(curDir.y, curDir.x);
-        rad = rad + Mathf.PI / 2 + _MenuItemAngleUnit / 2 / 180 * Mathf.PI;
+        rad = rad - Mathf.PI / 2 + _MenuItemAngleUnit / 2 / 180 * Mathf.PI;
         if (rad < 0)
             rad = Mathf.PI * 2 + rad;
 
@@ -176,9 +176,9 @@ public class UIHallMainWindow : UIWindow
             var scale = _IsWheelUpdate
                 ? _CurSelectItemId == itemId ? 1 : 0.8f
                 : 0.3f;
-            var curSize = item.GetScale();
+            var curSize = item.GetLocalScale();
             curSize = Mathf.Lerp(curSize, scale, GetAnimationSpeed());
-            item.SetScale(curSize);
+            item.SetLocalScale(curSize);
         }
     }
     private void WheelUpdate(bool isMouseInWheel)

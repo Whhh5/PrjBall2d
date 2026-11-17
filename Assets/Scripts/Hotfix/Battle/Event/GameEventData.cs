@@ -424,22 +424,6 @@ public class GameGoodsChangeEventData : IClassPoolDestroy
         this.curValue = curValue;
     }
 }
-public class GameAccountExpChangeEventData : IClassPoolDestroy
-{
-    public int lastValue;
-    public int curValue;
-    public void OnPoolDestroy()
-    {
-        lastValue
-            = curValue
-            = -1;
-    }
-    public void Setting(in int lastValue, in int curValue)
-    {
-        this.lastValue = lastValue;
-        this.curValue = curValue;
-    }
-}
 public class GameAccountLevelChangeEventData : IClassPoolDestroy
 {
     public int lastValue;

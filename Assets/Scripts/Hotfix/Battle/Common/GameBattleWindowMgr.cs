@@ -178,8 +178,9 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
         if (UIMgr.Instance.IsValid(_UplevelWindowId))
             return;
         _DelayUplevelCount--;
-        _UplevelWindowId = ShowUplevelWindow();
-
+        if (!TryShowUplevelWindow(out var windowId))
+            return;
+        _UplevelWindowId = windowId;
         TimeMgr.Instance.SetPause(true, false);
         EventMgr.Instance.Register(EnABBEvent.EVENT_WINDOW_HIDE, _UplevelWindowId, 0, OnEvent_WindowHide);
     }
@@ -197,8 +198,11 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
             if (_DelayUplevelCount > 0)
             {
                 _DelayUplevelCount--;
-                _UplevelWindowId = ShowUplevelWindow();
-                EventMgr.Instance.Register(EnABBEvent.EVENT_WINDOW_HIDE, _UplevelWindowId, 0, OnEvent_WindowHide);
+                if (TryShowUplevelWindow(out var uplevelWindowId))
+                {
+                    _UplevelWindowId = uplevelWindowId;
+                    EventMgr.Instance.Register(EnABBEvent.EVENT_WINDOW_HIDE, _UplevelWindowId, 0, OnEvent_WindowHide);
+                }
             }
             else
             {
@@ -243,7 +247,8 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
             return 0;
         });
 
-        while (result.Count < GameGlobal.UpLevelItemCount)
+        var maxCount = GlobalCfgUtility.Get40003_Int32();
+        while (result.Count < maxCount)
         {
             var testIndex = Random.Range(0, maxTestValue);
             var index = -1;
@@ -279,7 +284,7 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
         }
         return result;
     }
-    private int ShowUplevelWindow()
+    private bool TryShowUplevelWindow(out int windowId)
     {
         var windowUserData = ClassPoolMgr.Instance.Pull<UIBattleUplevelWindowUserData>();
         if (_LastUplevelWindowDataList != null)
@@ -292,10 +297,15 @@ public class GameBattleWindowMgr : Singleton<GameBattleWindowMgr>, IGameMapLifec
             var itemDatas = GetUplevelWindowItemData();
             windowUserData.itemDataList = itemDatas;
         }
-
-        var windowId = UIMgr.Instance.ShowWindow<UIBattleUplevelWindowData>(windowUserData);
+        if (windowUserData.itemDataList.Count == 0)
+        {
+            windowId = -1;
+            ClassPoolMgr.Instance.Push(windowUserData);
+            return false;
+        }
+        windowId = UIMgr.Instance.ShowWindow<UIBattleUplevelWindowData>(windowUserData);
         ClassPoolMgr.Instance.Push(windowUserData);
-        return windowId;
+        return true;
     }
 
     private async void PlayEnergyAnimAsync()

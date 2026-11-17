@@ -78,7 +78,17 @@ public class GameBattleMonster1000301EntityData : GameBattleMonsterBossEntityDat
 
         var createCount = 5;
         var validCount = Mathf.Min(createCount, validGridIndexs.Count);
-        var summonEntityIds = new List<int> { 1000101, 1000102, 1000103, 1000104, 1000201 };
+        var chapterCfgId = GameMapMgr.Instance.GetCurChapterId();
+        var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterCfgId);
+        var summonEntityIds = new List<int>(chapterCfg.arrMonsterIds.Length / 2);
+        for (int i = 0; i < chapterCfg.arrMonsterIds.Length; i += 2)
+        {
+            var monsterId = chapterCfg.arrMonsterIds[i];
+            var monsterCfg = GameSchedule.Instance.GetMonsterCfg0(monsterId);
+            if (monsterCfg.nMonsterType != (int)EnGameMonsterType.Normal)
+                continue;
+            summonEntityIds.Add(monsterId);
+        }
         summonEntityIds.Sort((item1, item2) =>
         {
             var itemCfg1 = GameSchedule.Instance.GetMonsterCfg0(item1);
@@ -114,7 +124,10 @@ public class GameBattleMonster1000301EntityData : GameBattleMonsterBossEntityDat
                         throw new System.Exception($"{monsterIndex}");
                     }
                 }
-                GameMonsterMgr.Instance.CreateMonsterEntity(monsterId, row, col, 2010101, 1);
+                var waveSys = GameBattleMgr.Instance.GetSystem<GameBattleWaveSystem>();
+                var waveCount = waveSys.GetWaveCount();
+                var cofficient = Mathf.CeilToInt(waveCount / 10f);
+                waveSys.CreateMonster(monsterId, row, col, cofficient);
                 break;
             }
         }

@@ -86,7 +86,11 @@ public class UIGemInfoDialog : UIWindow
     [SerializeField, AutoReference]
     private TextMeshProUGUI _QualityTxt = null;
     [SerializeField, AutoReference]
+    private Image _QualityImg = null;
+    [SerializeField, AutoReference]
     private RectTransform _GemItemRootRect = null;
+    [SerializeField, AutoReference(nameof(_InlayBtn))]
+    private RectTransform _InlayBtnRootRect = null;
 
     private Func<bool> _InlayCallback;
     private readonly Dictionary<int, UIGoodsItemCountLeftTip> _NeedGoodsItems = new();
@@ -94,6 +98,7 @@ public class UIGemInfoDialog : UIWindow
     private UIGoodsGemItemIcon _GemItem = null;
     public override void OnUnload()
     {
+        _QualityImg.UnloadSprite();
         foreach (var item in _NeedGoodsItems)
         {
             UIMgr.Instance.UnloadWindowItem(item.Value);
@@ -169,9 +174,12 @@ public class UIGemInfoDialog : UIWindow
 
         var qualityName = LanguageUtility.GetLanguage_GemQualityName(quality);
         _QualityTxt.SetText(qualityName);
+
+        var qualityCfg = GameSchedule.Instance.GetGemQualityCfg0((int)quality);
+        _QualityImg.LoadSprirte(qualityCfg.nIconAssetId);
     }
     private void UpdateButtonStatus()
     {
-        _InlayBtn.gameObject.SetActive(_InlayCallback != null);
+        _InlayBtnRootRect.gameObject.SetActive(_InlayCallback != null);
     }
 }

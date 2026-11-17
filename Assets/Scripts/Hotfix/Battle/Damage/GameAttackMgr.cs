@@ -202,8 +202,11 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
         {
             //SceneEntityMgr.Instance.AddCmd(sourceEntityId, EnEntityCmd.PlayerDie);
             GamePlayerMgr.Instance.SetValid(false);
-
             EventMgr.Instance.FireExecute(EnABBEvent.EVENT_BATTLE_PLAYER_DIE, targetEntityId, 0);
+        }
+        else
+        {
+            GamePlayerMgr.Instance.AddHitCmd();
         }
         return damageResult;
     }
@@ -232,8 +235,9 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
                         valueType = EnDamageValueType.Critical;
                     }
                     var armorValue = targetProCom.GetValue(EnEntityAttributeId.PhysicsArmor);
-                    var reduceValue = Mathf.Clamp01(armorValue / 100f);
-                    finalDamage = Mathf.CeilToInt(finalDamage * (1 - reduceValue));
+                    //var reduceValue = Mathf.Clamp01(armorValue / 100f);
+                    //finalDamage = Mathf.Max(1, Mathf.CeilToInt(finalDamage * (1 - reduceValue)));
+                    finalDamage = Mathf.Max(1, Mathf.CeilToInt(finalDamage - armorValue));
                 }
                 break;
             case EnDamageType.Magic:
@@ -251,8 +255,9 @@ public class GameAttackMgr : Singleton<GameAttackMgr>
                         }
                     }
                     var armorValue = targetProCom.GetValue(EnEntityAttributeId.MagicArmor);
-                    var reduceValue = Mathf.Clamp01(armorValue / 100f);
-                    finalDamage = Mathf.CeilToInt(finalDamage * (1 - reduceValue));
+                    //var reduceValue = Mathf.Clamp01(armorValue / 100f);
+                    //finalDamage = Mathf.Max(1, Mathf.CeilToInt(finalDamage * (1 - reduceValue)));
+                    finalDamage = Mathf.Max(1, Mathf.CeilToInt(finalDamage - armorValue));
                 }
                 break;
             case EnDamageType.True:

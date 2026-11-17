@@ -51,9 +51,12 @@ public static class UICharacterUtility
             if (attCfg.bAptitude > 0)
             {
                 var aptitudeValue = GetAptitudeValue(charaId, value.attId);
-                var add = Mathf.CeilToInt(value.value * level * characterCfg.fLevelCoefficient * aptitudeValue / 100f);
-                value.value += add;
-                attValueList[i] = value;
+                if (attCfg.bCofficient > 0)
+                {
+                    var add = Mathf.CeilToInt(value.value * level * characterCfg.fLevelCoefficient * aptitudeValue / 100f);
+                    value.value += add;
+                    attValueList[i] = value;
+                }
             }
         }
         return attValueList;

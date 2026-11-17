@@ -6,13 +6,16 @@ public class CoreEffectReboundSpeedAnalysist : ICoreEffectAnalysist
 {
     public void ApplyEntity(int entityId, int coreId)
     {
+        var effectValue = UICoreMgr.Instance.GetCoreEffectValue(coreId);
 
+        var curBallSpeed = GameAttributeUtility.GetMiscValue(entityId, EnMiscId.BallSpeedPercentage);
+        GameAttributeUtility.SetMiscValue(entityId, EnMiscId.BallSpeedPercentage, curBallSpeed + effectValue);
     }
 
-    public int CalculateRandomEffectValue(int coreCfgId, EnCoreQuality quality)
+    public float CalculateRandomEffectValue(int coreCfgId, EnCoreQuality quality)
     {
         var (minValue, maxValue) = GetEffectValueRandom(coreCfgId, quality);
-        var value = Random.Range(minValue, maxValue + 1);
+        var value = Mathf.Round(Random.Range(minValue, maxValue) * 100) / 100;
         return value;
     }
 
@@ -46,13 +49,12 @@ public class CoreEffectReboundSpeedAnalysist : ICoreEffectAnalysist
 
     public int GetIconAssetId(int coreCfgId)
     {
-        return (int)EnLoadTarget.Sp_icon_attribute_1001;
+        return (int)EnLoadTarget.Sp_img_icon_attribute_extend1;
     }
-    private (int minValue, int maxValue) GetEffectValueRandom(int coreCfgId, EnCoreQuality quality)
+    private (float minValue, float maxValue) GetEffectValueRandom(int coreCfgId, EnCoreQuality quality)
     {
-        var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
-        var testValue = coreCfg.arrEffectParams[0];
-        var retult = UICoreUtility.GetEffectValueRange(coreCfgId, quality, testValue);
-        return retult;
+        var minValue = UICoreUtility.GetCoreQualityParam(coreCfgId, quality, 0);
+        var maxValue = UICoreUtility.GetCoreQualityParam(coreCfgId, quality, 1);
+        return (minValue, maxValue);
     }
 }

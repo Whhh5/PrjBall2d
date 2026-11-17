@@ -34,6 +34,8 @@ public class UIHallMainInlayWindow : UIWindow
     private TextMeshProUGUI _SelCoreAttTxt;
     [SerializeField, AutoReference]
     private RectTransform _SelCoreGemInfoRootRect;
+    [SerializeField, AutoReference]
+    private GameObject _ApplyHitGo;
 
     private int _SelectCoreId;
     private UIGoodsCoreItemIcon _SelectCoreItemIcon;
@@ -41,7 +43,7 @@ public class UIHallMainInlayWindow : UIWindow
     private readonly Dictionary<int, UIGoodsCoreItemIcon> _CoreIconItems = new();
     private readonly Dictionary<int, UIGoodsGemItemIcon> _GemIconItems = new();
     private readonly Dictionary<int, int> _InlayGrooveIndex2GemIds = new();
-    private readonly Dictionary<int, UICoreInfoDialog_GemAttributeItem> _InlayGrooveIndex2GemInfoItem = new();
+    private readonly Dictionary<int, UIHallMainInlayWindow_GemAttributeItem> _InlayGrooveIndex2GemInfoItem = new();
     private readonly Dictionary<int, UIGoodsItemCountLeftTip> _ClearNeedGoodsInfoItems = new();
     private List<int> _TempIntList = new();
     private readonly HashSet<int> _TempIntHashSet = new();
@@ -133,12 +135,18 @@ public class UIHallMainInlayWindow : UIWindow
 
     private void OnClick_ClearGemBtn()
     {
-        var needGoodsList = UIGemUtility.ClearGemNeedGoodsInfos();
-        for (int i = 0; i < needGoodsList.Count; i++)
-        {
-            var goodsInfo = needGoodsList[i];
-            UIGoodsMgr.Instance.RemoveGoods(goodsInfo.goodsCfgId, goodsInfo.goodsCount);
-        }
+        if (UIMgr.Instance.ContainsWindow<UIControllerDialogData>())
+            return;
+        var needGoods = UIGemUtility.ClearGemNeedGoodsInfo();
+        var goodsName = UIGoodsMgr.Instance.GetGoodsName(needGoods.goodsCfgId);
+        var content = string.Format( LanguageUtility.GetLanguage(30102), needGoods.goodsCount, goodsName);
+        UIUtil.ShowControllerDialog(content, EnSourceId.UIHallMainInlayWindow, ClearCoreGem, null, needGoods);
+    }
+    private void ClearCoreGem()
+    {
+        var needGood = UIGemUtility.ClearGemNeedGoodsInfo();
+        UIGoodsMgr.Instance.RemoveGoods(needGood.goodsCfgId, needGood.goodsCount);
+
         var grooveCount = UICoreUtility.GetCoreGemGrooveCount(_SelectCoreId);
         for (int i = 0; i < grooveCount; i++)
         {
@@ -149,6 +157,7 @@ public class UIHallMainInlayWindow : UIWindow
             CreateBagGemIconItem(gemId).Forget();
         }
         UpdateButtonStatus();
+        UpdateCoreInfos();
     }
     private void OnClick_BagGemIconItem(int gemId)
     {
@@ -181,24 +190,22 @@ public class UIHallMainInlayWindow : UIWindow
     {
         _CreateNeedGoodsInfoToken?.Cancel();
         _CreateNeedGoodsInfoToken = new();
-        foreach (var item in _ClearNeedGoodsInfoItems)
-            UIMgr.Instance.UnloadWindowItem(item.Value);
+        foreach (var (_, goodsItem) in _ClearNeedGoodsInfoItems)
+            UIMgr.Instance.UnloadWindowItem(goodsItem);
         _ClearNeedGoodsInfoItems.Clear();
 
-        var needGoodsList = UIGemUtility.ClearGemNeedGoodsInfos();
-        for (int i = 0; i < needGoodsList.Count; i++)
-        {
-            var goodsInfo = needGoodsList[i];
-            var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemCountLeftTip>(EnLoadTarget.Pre_UIGoodsItemCountLeftTip, _ClearNeedGoodsRootRect, _CreateNeedGoodsInfoToken.Token)
-                .SuppressCancellationThrow();
-            if (isCancel)
-                return;
-            item.Setting(goodsInfo, EnSourceId.UIHallMainInlayWindow);
-            _ClearNeedGoodsInfoItems.Add(goodsInfo.goodsCfgId, item);
+        var goodsInfo = UIGemUtility.ClearGemNeedGoodsInfo();
+        var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemCountBottomTip>(EnLoadTarget.Pre_UIGoodsItemCountBottomTip, _ClearNeedGoodsRootRect, _CreateNeedGoodsInfoToken.Token)
+            .SuppressCancellationThrow();
+        if (isCancel)
+            return;
+        item.Setting(goodsInfo, EnSourceId.UIHallMainInlayWindow);
+        item.SetAutoSize();
+        _ClearNeedGoodsInfoItems.Add(goodsInfo.goodsCfgId, item);
 
-            var goodsCount = UIGoodsMgr.Instance.GetGoodsCount(goodsInfo.goodsCfgId);
-            item.SetValid(goodsCount >= goodsInfo.goodsCount);
-        }
+        var goodsCount = UIGoodsMgr.Instance.GetGoodsCount(goodsInfo.goodsCfgId);
+        item.SetComValid(goodsCount >= goodsInfo.goodsCount);
+
         _CreateNeedGoodsInfoToken = null;
     }
     private async void CreateCoreIconItems()
@@ -255,7 +262,7 @@ public class UIHallMainInlayWindow : UIWindow
                         continue;
                     gemId = UICoreUtility.GetCoreGrooveGemId(_SelectCoreId, i);
                 }
-                var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UICoreInfoDialog_GemAttributeItem>(EnLoadTarget.Pre_UICoreInfoDialog_GemAttributeItem, _SelCoreGemInfoRootRect, _CreateGemAttributeInfoToken.Token)
+                var (isCancel, item) = await UIMgr.Instance.LoadWindowItemAsync<UIHallMainInlayWindow_GemAttributeItem>(EnLoadTarget.Pre_UIHallMainInlayWindow_GemAttributeItem, _SelCoreGemInfoRootRect, _CreateGemAttributeInfoToken.Token)
                     .SuppressCancellationThrow();
                 if (isCancel)
                     return;
@@ -269,6 +276,8 @@ public class UIHallMainInlayWindow : UIWindow
     {
         var isApplyBtn = _SelectCoreId > 0 && _InlayGrooveIndex2GemIds.Count > 0;
         _ApplyBtn.interactable = isApplyBtn;
+        _ApplyBtn.SetComValid(isApplyBtn);
+        _ApplyHitGo.SetActive(isApplyBtn);
 
         var isClearGemBtn = _SelectCoreId > 0;
         if (isClearGemBtn)
@@ -277,16 +286,13 @@ public class UIHallMainInlayWindow : UIWindow
             isClearGemBtn &= gemCount > 0;
             if (isClearGemBtn)
             {
-                var needGoodsList = UIGemUtility.ClearGemNeedGoodsInfos();
-                for (int i = 0; i < needGoodsList.Count; i++)
-                {
-                    var goodsInfo = needGoodsList[i];
-                    var goodsCount = UIGoodsMgr.Instance.GetGoodsCount(goodsInfo.goodsCfgId);
-                    isClearGemBtn &= goodsCount >= goodsInfo.goodsCount;
-                }
+                var goodsInfo = UIGemUtility.ClearGemNeedGoodsInfo();
+                var goodsCount = UIGoodsMgr.Instance.GetGoodsCount(goodsInfo.goodsCfgId);
+                isClearGemBtn &= goodsCount >= goodsInfo.goodsCount;
             }
         }
         _ClearGemBtn.interactable = isClearGemBtn;
+        _ClearGemBtn.SetComValid(isClearGemBtn);
     }
     private async void LoadSelectCoreItem(int coreId)
     {
@@ -354,7 +360,7 @@ public class UIHallMainInlayWindow : UIWindow
         }
         if (grooveIndex < 0)
         {
-            AotDebug.LogError($"类型不匹配 / 没有空位");
+            UIUtil.ShowHitTips(30101);
             return false;
         }
 

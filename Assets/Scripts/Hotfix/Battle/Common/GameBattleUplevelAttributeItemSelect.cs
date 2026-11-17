@@ -17,7 +17,10 @@ public class GameBattleUplevelAttributeItemSelect : IBattleEnergyUplevelItemSele
     public void Init(int chapterId)
     {
         var chapterCfg = GameSchedule.Instance.GetChapterCfg0(chapterId);
-        _AttributePool.AddRange(chapterCfg.arrAttributeIds);
+        if (chapterCfg.arrAttributeIds != null)
+        {
+            _AttributePool.AddRange(chapterCfg.arrAttributeIds);
+        }
     }
     public int GetTestValue()
     {
@@ -31,7 +34,8 @@ public class GameBattleUplevelAttributeItemSelect : IBattleEnergyUplevelItemSele
     public bool IsValid()
     {
         var curBallCount = GameBattleBallMgr.Instance.GetBallCountByType(EnBallType.Skill);
-        return curBallCount >= GameGlobal.SkillBallCount && _IgnoreHistory.Count < _AttributePool.Count;
+        var maxBallCount = GlobalCfgUtility.Get40001_Int32();
+        return curBallCount >= maxBallCount && _IgnoreHistory.Count < _AttributePool.Count;
     }
 
     public bool TrySelect(out IUIBattleUplevelWindow_ItemUserData userData, bool isIgnoreHistory, HashSet<int> extraIgnoree)
@@ -62,8 +66,8 @@ public class GameBattleUplevelAttributeItemSelect : IBattleEnergyUplevelItemSele
         };
         data.addValue = data.valueType switch
         {
-            EnValueType.Percentage => Random.Range(10 * data.star, 10 * (data.star + 1)) / 100f,
-            _ => Random.Range(10 * data.star, 10 * (data.star + 1)),
+            EnValueType.Percentage => Mathf.RoundToInt(Random.Range(10 * data.star, 10 * (data.star + 1)) / 3f)  / 100f,
+            _ => Mathf.RoundToInt(Random.Range(10 * data.star, 10 * (data.star + 1)) / 3f),
         };
 
         userData = data;

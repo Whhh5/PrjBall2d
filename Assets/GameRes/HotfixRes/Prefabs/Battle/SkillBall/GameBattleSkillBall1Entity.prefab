@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7945307115986367409, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
       propertyPath: m_Name
-      value: BattleSkillBall_1
+      value: GameBattleSkillBall1Entity
       objectReference: {fileID: 0}
     - target: {fileID: 8690534774187835321, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -59,6 +59,18 @@ PrefabInstance:
     - target: {fileID: 8690534774187835321, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].inSlope
+      value: -0.13462678
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outSlope
+      value: -0.13462678
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

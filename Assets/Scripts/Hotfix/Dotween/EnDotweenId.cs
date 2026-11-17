@@ -10,4 +10,5 @@ public enum EnDotweenId
     UIBattleBossInfoDialog,
     UIHallMainBattleWindow,
     UIHallGoodsBarWindow,
+    UIBattleSkillBallFussionWindow,
 }

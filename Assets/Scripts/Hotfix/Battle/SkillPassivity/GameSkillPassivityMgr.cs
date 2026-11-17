@@ -8,10 +8,13 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
 {
     private class SkillPassivityRuntimeData : IClassPoolDestroy
     {
+        public int ownerEntityId;
         public int star;
         public void OnPoolDestroy()
         {
-            star = -1;
+            star
+                = ownerEntityId
+                = -1;
         }
     }
 
@@ -33,6 +36,7 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
         }
         base.Destroy();
         _SkillRuntimeData.Clear();
+        _SkillId2Datas.Clear();
     }
     public override async UniTask AwakeAsync()
     {
@@ -74,12 +78,11 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
         var cfg = GameSchedule.Instance.GetSkillPassivityCfg0(id);
         if (!_SkillId2Datas.TryGetValue(id, out var data))
         {
-            var playerEntityId = GamePlayerMgr.Instance.GetPlayerEntityId();
             var userData = ClassPoolMgr.Instance.Pull<GameBattleSkillPassivityUserData>();
             userData.skillPassivityId = id;
-            userData.ownerEntityId = playerEntityId;
             data = TypeDefine.CreateInstance<GameBattleSkillPassivityData>(cfg.nClassTypeId, userData);
             _SkillId2Datas.Add(id, data);
+            ClassPoolMgr.Instance.Push(userData);
         }
         return data;
     }
@@ -93,6 +96,12 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
         var curStar = GetStar(id);
         SetSkillPassivityStar(id, curStar + 1);
     }
+    public int GetOwnerEntityId(int id)
+    {
+        if (!_SkillRuntimeData.TryGetValue(id, out var rtData))
+            return -1;
+        return rtData.ownerEntityId;
+    }
     private void SetSkillPassivityStar(int id, int star)
     {
         var cfg = GameSchedule.Instance.GetSkillPassivityCfg0(id);
@@ -103,6 +112,7 @@ public class GameSkillPassivityMgr : Singleton<GameSkillPassivityMgr>, IGameMapL
             rtData = ClassPoolMgr.Instance.Pull<SkillPassivityRuntimeData>();
             _SkillRuntimeData.Add(id, rtData);
             rtData.star = star;
+            rtData.ownerEntityId = GamePlayerMgr.Instance.GetPlayerEntityId();
 
             var data = GetData(id);
             data.OnEnable(star);

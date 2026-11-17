@@ -5,25 +5,22 @@ public class GameMonsterCreateInfo : IClassPoolDestroy
     public int monsterId;
     public int row;
     public int col;
-    public int attValueCfgId;
-    public int energyCount;
+    public float attCofficient;
     public void OnPoolDestroy()
     {
-        monsterId
+        attCofficient
+            = monsterId
             = row
             = col
-            = attValueCfgId
             = index
-            = energyCount
             = -1;
     }
-    public void Init(in int index, int monsterId, int row, int col, in int attValueCfgId, in int energyCount)
+    public void Init(in int index, int monsterId, int row, int col, in float attCofficient)
     {
-        this.energyCount = energyCount;
+        this.attCofficient = attCofficient;
         this.index = index;
         this.monsterId = monsterId;
         this.row = row;
         this.col = col;
-        this.attValueCfgId = attValueCfgId;
     }
 }

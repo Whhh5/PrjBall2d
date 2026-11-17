@@ -3,12 +3,15 @@ using UnityEngine;
 
 public class GemEffectAttributeAnalysist : IGemEffectTypeAnalysist
 {
-
+    protected (float min, float max) GetEffectValueRange(int gemCfgId, EnGemQuality quality)
+    {
+        var min = UIGemUtility.GetGemQualityParam(gemCfgId, quality, 1);
+        var max = UIGemUtility.GetGemQualityParam(gemCfgId, quality, 2);
+        return (min, max);
+    }
     public int GetIconAssetId(int goodsCfgId)
     {
-        var goodsCfg = GameSchedule.Instance.GetGoodsCfg0(goodsCfgId);
-        var gemCfg = GameSchedule.Instance.GetGemCfg0(goodsCfg.nLinkCfgId);
-        var attId = (int)gemCfg.arrEffectParams[0];
+        var attId = (int)UIGemUtility.GetGemQualityParam(goodsCfgId, EnGemQuality.Quality1, 0);
         var attCfg = GameSchedule.Instance.GetAttributeCfg0(attId);
         return attCfg.nIconAssetId;
     }
@@ -19,12 +22,10 @@ public class GemEffectAttributeAnalysist : IGemEffectTypeAnalysist
         var effectTypeCfg = GameSchedule.Instance.GetGemEffectTypeCfg0(cfg.nEffectTypeId);
 
         var effectValue = UIGemUtility.GetGemEffectValue(gemId);
-        var attId = (EnEntityAttributeId)cfg.arrEffectParams[0];
-        var testVaue = cfg.arrEffectParams[1];
-        var (min, max) = UIGemUtility.GetEffectValueRange(cfgId, quality, testVaue);
-        var attName = LanguageUtility.GetLanguage_AttiributeName(attId);
+        var attId = (int)UIGemUtility.GetGemQualityParam(gemId, 0);
+        var attName = LanguageUtility.GetLanguage_AttiributeName((EnEntityAttributeId)attId);
 
-        var str = LanguageUtility.GetLanguage(effectTypeCfg.nEffectDescLangId, attName, effectValue, min, max);
+        var str = LanguageUtility.GetLanguage(effectTypeCfg.nEffectDescLangId, attName, effectValue);
         return str;
     }
 
@@ -33,12 +34,10 @@ public class GemEffectAttributeAnalysist : IGemEffectTypeAnalysist
         var cfg = GameSchedule.Instance.GetGemCfg0(goodsCfgId);
         var effectTypeCfg = GameSchedule.Instance.GetGemEffectTypeCfg0(cfg.nEffectTypeId);
 
-        var attId = (EnEntityAttributeId)cfg.arrEffectParams[0];
-        var testVaue = cfg.arrEffectParams[1];
-        var (min, max) = UIGemUtility.GetEffectValueRange(goodsCfgId, quality, testVaue);
+        var attId = (EnEntityAttributeId)UIGemUtility.GetGemQualityParam(goodsCfgId, quality, 0);
         var attName = LanguageUtility.GetLanguage_AttiributeName(attId);
 
-        var str = LanguageUtility.GetLanguage(effectTypeCfg.nEffectDescLangId, attName, min, max);
+        var str = LanguageUtility.GetLanguage(effectTypeCfg.nEffectDescLangId, attName);
         return str;
     }
 
@@ -47,7 +46,7 @@ public class GemEffectAttributeAnalysist : IGemEffectTypeAnalysist
         var cfg = GameSchedule.Instance.GetGemCfg0(goodsCfgId);
         var effectTypeCfg = GameSchedule.Instance.GetGemEffectTypeCfg0(cfg.nEffectTypeId);
 
-        var attId = (EnEntityAttributeId)cfg.arrEffectParams[0];
+        var attId = (EnEntityAttributeId)UIGemUtility.GetGemQualityParam(goodsCfgId, EnGemQuality.Quality1, 0);
         var attName = LanguageUtility.GetLanguage_AttiributeName(attId);
 
         var str = LanguageUtility.GetLanguage(effectTypeCfg.nNameLangId, attName);
@@ -55,28 +54,22 @@ public class GemEffectAttributeAnalysist : IGemEffectTypeAnalysist
     }
     public virtual void ApplyEntity(int entityId, int gemId)
     {
-        var cfgId = UIGemUtility.GetGemGoodsCfgId(gemId);
-        var cfg = GameSchedule.Instance.GetGemCfg0(cfgId);
-
         var effectValue = UIGemUtility.GetGemEffectValue(gemId);
-        var attId = (EnEntityAttributeId)cfg.arrEffectParams[0];
+        var attId = (EnEntityAttributeId)UIGemUtility.GetGemQualityParam(gemId, 0);
 
-        var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(entityId, EnSceneEntityComType.Attribute);
-        attCom.AddAddtionalValue(attId, effectValue);
+        GameAttributeUtility.AddAddtionalValue(entityId, attId, effectValue);
         if (attId == EnEntityAttributeId.LimitHp)
         {
-            attCom.AddAddtionalValue(EnEntityAttributeId.Hp, effectValue);
+            GameAttributeUtility.AddAddtionalValue(entityId, EnEntityAttributeId.Hp, effectValue);
         }
     }
 
-    public int CalculateEffectValue(int goodsCfgId, EnGemQuality quality)
+    public virtual float CalculateEffectValue(int goodsCfgId, EnGemQuality quality)
     {
         var goodsCfg = GameSchedule.Instance.GetGoodsCfg0(goodsCfgId);
         var gemCfgId = goodsCfg.nLinkCfgId;
-        var gemCfg = GameSchedule.Instance.GetGemCfg0(gemCfgId);
-        var testValue = gemCfg.arrEffectParams[1];
-        var (min, max) = UIGemUtility.GetEffectValueRange(gemCfgId, quality, testValue);
-        var value = Random.Range(min, max);
+        var (min, max) = GetEffectValueRange(gemCfgId, quality);
+        var value = Mathf.RoundToInt(Random.Range(min, max));
         return value;
     }
 }

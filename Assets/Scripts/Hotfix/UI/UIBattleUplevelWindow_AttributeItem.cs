@@ -39,24 +39,23 @@ public class UIBattleUplevelWindow_AttributeItemUserData : IUIBattleUplevelWindo
 
 public class UIBattleUplevelWindow_AttributeItem : UIWindowItem, IUIBattleUplevelWindowItem
 {
-    [SerializeField]
+    [SerializeField, AutoReference(SearchScope.Self)]
     private Button _Btn;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private Image _IconImg;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private TextMeshProUGUI _NameTxt;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private TextMeshProUGUI _DescriptionTxt;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private TextMeshProUGUI _CurVlaueTxt;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private GameObject _StarGo;
 
     private readonly List<GameObject> _StarList = new();
     private Action _Callback;
 
     private readonly List<DescriptionInfo> _DescInfos = new();
-    private RectTransform _Rect;
     private EnEntityAttributeId _AttId;
     private float _AddValue;
     private EnValueType _AddValueType;
@@ -75,14 +74,12 @@ public class UIBattleUplevelWindow_AttributeItem : UIWindowItem, IUIBattleUpleve
         base.Unload();
         _StarList.Clear();
         _DescInfos.Clear();
-        _Rect = null;
         _AddValue = -1;
         _AttId = EnEntityAttributeId.None;
         _AddValueType = EnValueType.None;
     }
     public override void LoadCompletion()
     {
-        _Rect = GetComponent<RectTransform>();
         base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
         _StarGo.SetActive(false);
@@ -200,11 +197,6 @@ public class UIBattleUplevelWindow_AttributeItem : UIWindowItem, IUIBattleUpleve
                 break;
         }
     }
-    public Vector3 GetWorldPos()
-    {
-        return _Rect.position;
-    }
-
     public float GetSizeDeltaY()
     {
         return _Rect.rect.height;

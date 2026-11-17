@@ -1,15 +1,22 @@
 ﻿
+using UnityEngine;
+
 public class GemEffectAttributePercentageAnalysist : GemEffectAttributeAnalysist
 {
     public new void ApplyEntity(int entityId, int gemId)
     {
-        var cfgId = UIGemUtility.GetGemGoodsCfgId(gemId);
-        var cfg = GameSchedule.Instance.GetGemCfg0(cfgId);
-
         var effectValue = UIGemUtility.GetGemEffectValue(gemId);
-        var attId = (EnEntityAttributeId)cfg.arrEffectParams[0];
+        var attId = (EnEntityAttributeId)UIGemUtility.GetGemQualityParam(gemId, 0);
 
-        var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(entityId, EnSceneEntityComType.Attribute);
-        attCom.AddAddtionalPercentage(attId, effectValue / 100f);
+        GameAttributeUtility.AddAddtionalPercentage(entityId, attId, effectValue / 100f);
+    }
+
+    public override float CalculateEffectValue(int goodsCfgId, EnGemQuality quality)
+    {
+        var goodsCfg = GameSchedule.Instance.GetGoodsCfg0(goodsCfgId);
+        var gemCfgId = goodsCfg.nLinkCfgId;
+        var (min, max) = GetEffectValueRange(gemCfgId, quality);
+        var value = Mathf.Round(Random.Range(min, max) * 100f) / 100f;
+        return value;
     }
 }

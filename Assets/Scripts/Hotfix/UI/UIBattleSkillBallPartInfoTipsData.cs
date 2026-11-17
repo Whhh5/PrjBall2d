@@ -23,6 +23,7 @@ public class UIBattleSkillBallPartInfoTipsData : UITipsData<UIBattleSkillBallInf
     private int _Star;
     public override void OnPoolDestroy()
     {
+        TimeMgr.Instance.SetPause(false, false);
         base.OnPoolDestroy();
         _PartId
             = _Star
@@ -33,6 +34,7 @@ public class UIBattleSkillBallPartInfoTipsData : UITipsData<UIBattleSkillBallInf
     {
         _PartId = userData.partId;
         _Star = userData.star;
+        TimeMgr.Instance.SetPause(true, true);
     }
 
     public override void OnGOCreate(GameEntity entity)
@@ -45,7 +47,7 @@ public class UIBattleSkillBallPartInfoTipsData : UITipsData<UIBattleSkillBallInf
         starData.GetDescriptionList(ref list, EnDescriptionLevel.Level1);
 
         var nameStr = LanguageUtility.GetLanguage(partCfg.nNameLangId);
-        _UITips.SettingBallInfo(nameStr, list, _Star);
+        _UITips.SettingBallInfo(nameStr, (EnLoadTarget)partCfg.nIconAssetId, list, _Star);
 
         for (int i = 0; i < list.Count; i++)
         {

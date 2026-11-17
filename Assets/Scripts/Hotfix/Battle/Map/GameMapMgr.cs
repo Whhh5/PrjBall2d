@@ -7,6 +7,7 @@ using UnityEngine;
 public enum EnGameMapLifecycleOrder
 {
     None,
+    GameBattleMonitorMgr,
     GameBattleGridMgr,
     GamePlayerMgr,
     GameBattleBallPartsMgr,
@@ -120,6 +121,9 @@ public class GameMapMgr : Singleton<GameMapMgr>
         AudioMgr.Instance.Play(mapCfg.nBgmAudioId);
 
         _BattleMainWindowId = UIMgr.Instance.ShowWindow<UIBattleMainWindowData>();
+
+        _FireHitEntityId = EntityMgr.Instance.CreateEntityData<GameEffectFireLineEntityData>();
+        EntityMgr.Instance.LoadEntity(_FireHitEntityId);
         return true;
     }
 
@@ -182,8 +186,6 @@ public class GameMapMgr : Singleton<GameMapMgr>
     }
     private void CreateMap(int mapId)
     {
-        _FireHitEntityId = EntityMgr.Instance.CreateEntityData<GameEffectFireLineEntityData>();
-        EntityMgr.Instance.LoadEntity(_FireHitEntityId);
 
         // 创建网格
         ref readonly var rowCol = ref GameMapMgr.Instance.GetMapGridRowCol();

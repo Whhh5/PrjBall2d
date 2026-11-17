@@ -23,8 +23,9 @@ public class UIHallMainCoreWindow : UIWindow
     private Button _ResolveBtn;
 
 
-    private readonly Vector2 _CoreItemInterval = new(180, 160);
-    private readonly int _TypeUnitCount = 5;
+    private readonly Vector2 _CoreItemInterval = 250 * Vector2.one + new Vector2(30, 30);
+    private readonly int _TypeUnitCount = 3;
+    private readonly Vector2 _WearItemSize = Vector2.one * 210;
 
     private readonly Dictionary<EnCoreType, List<UIHallMainCoreWindow_CoreFrameItem>> _Type2Frames = new();
     private readonly Dictionary<int, UIGoodsCoreItemIcon> _CoreItems = new();
@@ -65,10 +66,12 @@ public class UIHallMainCoreWindow : UIWindow
         _SortBtn.AddListener(OnClick_SortBtn);
         _ResolveBtn.AddListener(OnClick_ResolveBtn);
 
-        if (!await CreateCoreFrameAsync().SuppressCancellationThrow())
-            if (!await CreateCoreItemAsync().SuppressCancellationThrow())
-                if (!await CreateBagCoreItemAsync().SuppressCancellationThrow())
-                    return;
+        if (await CreateCoreFrameAsync().SuppressCancellationThrow())
+            return;
+        if (await CreateCoreItemAsync().SuppressCancellationThrow())
+            return;
+        if (await CreateBagCoreItemAsync().SuppressCancellationThrow())
+            return;
     }
     private void OnClick_SortBtn()
     {
@@ -100,12 +103,16 @@ public class UIHallMainCoreWindow : UIWindow
     {
         var item = _CoreItems[data.coreId];
         item.SetParent(_CoreItemRootRect);
+        item.SetSizeDelta(_WearItemSize);
         SetWearItemPos(data.coreId);
+        SetCoreGrooveStatus(data.coreId, true);
     }
     private void OnEvent_CoreUnwear(in int _, in int __, in GameCoreUnwearEventData data)
     {
         var item = _CoreItems[data.coreId];
         item.SetParent(_BagCoreItemRootRect);
+
+        SetCoreGrooveStatus(data.coreId, false);
     }
 
     private async UniTask CreateCoreFrameAsync()
@@ -123,7 +130,7 @@ public class UIHallMainCoreWindow : UIWindow
                     .SuppressCancellationThrow();
                 if (isCancel)
                     throw new System.OperationCanceledException();
-                item.Init(i);
+                item.Setting(i);
                 item.SetLocalPos(new(posX, posY));
                 list.Add(item);
             }
@@ -141,8 +148,10 @@ public class UIHallMainCoreWindow : UIWindow
             if (isCancel)
                 throw new System.OperationCanceledException();
             item.SettingCoreId(coreId, EnSourceId.UIHallMainCoreWindow);
+            item.SetSizeDelta(_WearItemSize);
             _CoreItems.Add(coreId, item);
             SetWearItemPos(coreId);
+            SetCoreGrooveStatus(coreId, true);
         }
     }
     private void SetWearItemPos(int coreId)
@@ -231,5 +240,13 @@ public class UIHallMainCoreWindow : UIWindow
                 continue;
             UICoreMgr.Instance.RemoveCore(coreId);
         }
+    }
+
+    private void SetCoreGrooveStatus(int coreId, bool status)
+    {
+        var index = UICoreMgr.Instance.GetWearIndex(coreId);
+        var coreType = UICoreUtility.GetCoreType(coreId);
+        var frameItem = _Type2Frames[coreType][index];
+        frameItem.SetStatus(status);
     }
 }

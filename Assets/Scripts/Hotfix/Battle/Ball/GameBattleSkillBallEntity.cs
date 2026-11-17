@@ -43,6 +43,10 @@ public abstract class GameBattleSkillBallEntityData : SceneEntityData<GameBattle
         var cfg = GameSchedule.Instance.GetSkillBallCfg0(userData.skillBallId);
         _BallRadius = cfg.fRadius;
     }
+    public int GetOwnerEntityId()
+    {
+        return _OwnerEntityId;
+    }
     public override void SetPosition(in Vector3 worldPos)
     {
         var posZ = GameMapMgr.Instance.GetLayerDepth(EnGameEntityOrderLayer.Ball);

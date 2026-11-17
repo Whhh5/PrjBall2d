@@ -24,7 +24,7 @@ public static class UICoreUtility
         var iconId = analysis.GetIconAssetId(coreCfgId);
         return iconId;
     }
-    public static int GetRandomCoreEffectValue(int coreCfgId, EnCoreQuality quality)
+    public static float GetRandomCoreEffectValue(int coreCfgId, EnCoreQuality quality)
     {
         var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
         var effectType = (EnCoreEffectType)coreCfg.nEffectId;
@@ -142,15 +142,28 @@ public static class UICoreUtility
         var goodsInfos = new List<GoodsInfo>() { new((int)EnGoodsId.Diamond, diamandCount) };
         return goodsInfos;
     }
-    public static (int minValue, int maxValue) GetEffectValueRange(int coreCfgId, EnCoreQuality quality, float testValue)
+    public static float GetCoreQualityParam(int coreId, int index)
+    {
+        var quality = GetCoreQuality(coreId);
+        var cfgId = GetCoreCfgId(coreId);
+        var value = GetCoreQualityParam(cfgId, quality, index);
+        return value;
+    }
+    public static float GetCoreQualityParam(int coreCfgId, EnCoreQuality quality, int index)
     {
         var coreCfg = GameSchedule.Instance.GetCoreCfg0(coreCfgId);
-        var testCoefficient = coreCfg.fQualityCoefficient;
-
-        var minValue = Mathf.CeilToInt(testValue * (int)quality * (1 + testCoefficient));
-        var maxValue = Mathf.CeilToInt(minValue * (1 + (int)quality * testCoefficient));
-
-        return (minValue, maxValue);
+        var param = quality switch
+        {
+            EnCoreQuality.Quality1 => coreCfg.arrEffectParams1,
+            EnCoreQuality.Quality2 => coreCfg.arrEffectParams2,
+            EnCoreQuality.Quality3 => coreCfg.arrEffectParams3,
+            EnCoreQuality.Quality4 => coreCfg.arrEffectParams4,
+            EnCoreQuality.Quality5 => coreCfg.arrEffectParams5,
+            EnCoreQuality.Quality6 => coreCfg.arrEffectParams6,
+            _ => null
+        };
+        var value = param[index];
+        return value;
     }
     public static void SortList(ref List<int> coreIds)
     {
@@ -162,11 +175,11 @@ public static class UICoreUtility
                 return -1;
             if (quality1 < quality2)
                 return 1;
-            var cfgId1 = UICoreUtility.GetCoreCfgId(item1);
-            var cfgId2 = UICoreUtility.GetCoreCfgId(item2);
-            if (cfgId1 < cfgId2)
+            //var cfgId1 = UICoreUtility.GetCoreCfgId(item1);
+            //var cfgId2 = UICoreUtility.GetCoreCfgId(item2);
+            if (item1 < item2)
                 return -1;
-            if (cfgId1 < cfgId2)
+            if (item1 > item2)
                 return 1;
             return 0;
         });

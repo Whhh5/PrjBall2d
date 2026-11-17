@@ -28,14 +28,15 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
     [SerializeField, AutoReference]
     private TextMeshProUGUI _NameTxt;
     [SerializeField, AutoReference]
-    private Image _FinalBallImg;
+    private Image _IconImg;
+    [SerializeField, AutoReference(nameof(_IconImg))]
+    private Button _IconBtn;
     [SerializeField, AutoReference]
     private Image _SourceImg;
     [SerializeField, AutoReference]
     private TextMeshProUGUI _DescriptionTxt;
 
     private Action _Callback;
-    private RectTransform _Rect;
     private int _FussionCfgId;
     private readonly List<Image> _SourceImgs = new();
     private List<DescriptionInfo> _DescInfos = new();
@@ -51,19 +52,19 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
             ClassPoolMgr.Instance.Push(_DescInfos[i]);
         }
         _Btn.RemoveListener(OnClick_Btn);
+        _IconBtn.RemoveListener(OnClick_IconBtn);
 
         base.Unload();
 
-        _Rect = null;
         _FussionCfgId = -1;
         _SourceImgs.Clear();
         _DescInfos.Clear();
     }
     public override void LoadCompletion()
     {
-        _Rect = GetComponent<RectTransform>();
         base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
+        _IconBtn.AddListener(OnClick_IconBtn);
         _SourceImg.gameObject.SetActive(false);
     }
 
@@ -75,7 +76,7 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
 
         var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(fussionId);
         var finalBallCfg = GameSchedule.Instance.GetSkillBallCfg0(fussionCfg.nFinalBallId);
-        _FinalBallImg.LoadSprirte((EnLoadTarget)finalBallCfg.nIconAssetId);
+        _IconImg.LoadSprirte((EnLoadTarget)finalBallCfg.nIconAssetId);
         var name = LanguageUtility.GetLanguage(finalBallCfg.nNameLangId);
         var title = LanguageUtility.GetLanguage_1011(name);
         _NameTxt.SetText(title);
@@ -97,7 +98,7 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
         for (int i = 0; i < level1DescInfoList.Count; i++)
         {
             var info = level1DescInfoList[i];
-            var content = $"{info.title}:{info.content}";
+            var content = $"{info.content}";
             if (i < level1DescInfoList.Count - 1)
                 strBuilder.AppendLine(content);
             else
@@ -109,6 +110,15 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
     private void OnClick_Btn()
     {
         _Callback?.Invoke();
+    }
+    private void OnClick_IconBtn()
+    {
+        var fussionCfg = GameSchedule.Instance.GetSkillBallFussionCfg0(_FussionCfgId);
+        var ud = ClassPoolMgr.Instance.Pull<UIBattleSkillBallInfoTipsUserData>();
+        ud.ballId = fussionCfg.nFinalBallId;
+        ud.star = 1;
+        UIMgr.Instance.ShowWindow<UIBattleSkillBallInfoTipsData>(ud);
+        ClassPoolMgr.Instance.Push(ud);
     }
 
     public List<DescriptionInfo> GetDescriptionList(EnDescriptionLevel startLevel, EnDescriptionLevel endLevel)
@@ -125,10 +135,6 @@ public class UIBattleUplevelWindow_SkillBallFussionItem : UIWindowItem, IUIBattl
         data.fussionCfgId = _FussionCfgId;
         UIMgr.Instance.ShowWindow<UIBattleSkillBallFussionWindowData>(data);
         ClassPoolMgr.Instance.Push(data);
-    }
-    public Vector3 GetWorldPos()
-    {
-        return _Rect.position;
     }
 
     public float GetSizeDeltaY()

@@ -37,7 +37,7 @@ public class UIHallGoodsBarWindow : UIWindow
             UIMgr.Instance.UnloadWindowItem(item.Value);
         }
         EventMgr.Instance.Unregister<GameGoodsChangeEventData>(EnABBEvent.EVENT_GOODS_CHANGE, 0, 0, OnEvent_GoodsChange);
-        EventMgr.Instance.Unregister<GameAccountExpChangeEventData>(EnABBEvent.EVENT_ACCOUNT_EXP_CHANGE, 0, 0, OnEvent_AccountExpChange);
+        EventMgr.Instance.Unregister<GameGoodsChangeEventData>(EnABBEvent.EVENT_GOODS_CHANGE, (int)EnGoodsId.Exp, 0, OnEvent_AccountExpChange);
         EventMgr.Instance.Unregister<GameAccountLevelChangeEventData>(EnABBEvent.EVENT_ACCOUNT_LEVEL_CHANGE, 0, 0, OnEvent_AccountLevelChange);
         base.OnUnload();
         _GoodsCfgId2GoodsItem.Clear();
@@ -47,7 +47,7 @@ public class UIHallGoodsBarWindow : UIWindow
     {
         base.LoadCompletion();
         EventMgr.Instance.Register<GameGoodsChangeEventData>(EnABBEvent.EVENT_GOODS_CHANGE, 0, 0, OnEvent_GoodsChange);
-        EventMgr.Instance.Register<GameAccountExpChangeEventData>(EnABBEvent.EVENT_ACCOUNT_EXP_CHANGE, 0, 0, OnEvent_AccountExpChange);
+        EventMgr.Instance.Register<GameGoodsChangeEventData>(EnABBEvent.EVENT_GOODS_CHANGE, (int)EnGoodsId.Exp, 0, OnEvent_AccountExpChange);
         EventMgr.Instance.Register<GameAccountLevelChangeEventData>(EnABBEvent.EVENT_ACCOUNT_LEVEL_CHANGE, 0, 0, OnEvent_AccountLevelChange);
 
         UpdateLevel();
@@ -61,7 +61,7 @@ public class UIHallGoodsBarWindow : UIWindow
             return;
         item.SetCount(data.curValue);
     }
-    private void OnEvent_AccountExpChange(in int _, in int __, in GameAccountExpChangeEventData data)
+    private void OnEvent_AccountExpChange(in int _, in int __, in GameGoodsChangeEventData data)
     {
         UpdateExp();
     }

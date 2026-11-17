@@ -45,6 +45,8 @@ public class GameBattleSkillBallPart10071012EntityData : GameBattleSkillBallPart
 
         AudioMgr.Instance.Play(EnAudioId.Blood);
         GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_10071012_1, atkPoint, radius * 2);
+
+        GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_1012_1, WorldPos, 2);
     }
 }
 

@@ -30,7 +30,7 @@ public class GameBattleUplevelSkillBallFussionItemSelect : IBattleEnergyUplevelI
     }
     public int GetTestValue()
     {
-        return _FussionInfos.FindAll(id => !_IgnoreHistory.Contains(id)).Count;
+        return _FussionInfos.FindAll(id => !_IgnoreHistory.Contains(id)).Count * 10;
     }
     public bool IsValid()
     {

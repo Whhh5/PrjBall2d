@@ -47,6 +47,8 @@ public class UIBattleBossInfoDialog : UIWindow
     private TextMeshProUGUI _HpValueTxt;
     [SerializeField, AutoReference]
     private TextMeshProUGUI _NameTxt;
+    [SerializeField, AutoReference]
+    private Image _BossIconImg;
 
 
     private int _BossEntityId;
@@ -54,6 +56,7 @@ public class UIBattleBossInfoDialog : UIWindow
 
     public override void OnUnload()
     {
+        _BossIconImg.UnloadSprite();
         if (_BossEntityId > 0)
             EventMgr.Instance.Unregister<GameBattleEntityAttributeChangeEventData>(EnABBEvent.EVENT_BATTLE_ENTITY_ATTRIBUTE_CHANGE, _BossEntityId, (int)EnEntityAttributeId.Hp, OnEvent_BossHpChange);
         DOTween.Kill(_DotweenId);
@@ -80,9 +83,12 @@ public class UIBattleBossInfoDialog : UIWindow
             var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(_BossEntityId, EnSceneEntityComType.Attribute);
             var curHp = attCom.GetValue(EnEntityAttributeId.Hp);
             var maxHp = attCom.GetValue(EnEntityAttributeId.LimitHp);
-            _HpValueTxt.SetText(LanguageUtility.GetLanguage_1009(Mathf.CeilToInt(curHp), Mathf.CeilToInt(maxHp)));
+            //_HpValueTxt.SetText(LanguageUtility.GetLanguage_1009(Mathf.CeilToInt(curHp), Mathf.CeilToInt(maxHp)));
+            _HpValueTxt.SetText($"{Mathf.CeilToInt(curHp)}");
 
             _HpValueSlider.value = Mathf.Clamp01(curHp / maxHp);
+
+            _BossIconImg.LoadSprirte(monsterCfg.nIconAssetID);
         }
     }
 
@@ -92,7 +98,8 @@ public class UIBattleBossInfoDialog : UIWindow
         var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(_BossEntityId, EnSceneEntityComType.Attribute);
         var curHp = attCom.GetValue(EnEntityAttributeId.Hp);
         var maxHp = attCom.GetValue(EnEntityAttributeId.LimitHp);
-        _HpValueTxt.SetText(LanguageUtility.GetLanguage_1009(Mathf.CeilToInt(curHp), Mathf.CeilToInt(maxHp)));
+        //_HpValueTxt.SetText(LanguageUtility.GetLanguage_1009(Mathf.CeilToInt(curHp), Mathf.CeilToInt(maxHp)));
+        _HpValueTxt.SetText($"{Mathf.CeilToInt(curHp)}");
 
         _HpValueSlider.value = Mathf.Clamp01(curHp / maxHp);
     }

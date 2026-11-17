@@ -38,13 +38,16 @@ public class GameBattleSkillPassivity2008Data : GameBattleSkillPassivityData<Gam
     public override void OnDisable()
     {
         var starData = GetStarUserData();
-        GameAttributeUtility.RemoveAddtionalValue(_OwnerEntityId, starData.addAttId, starData.addAttValue);
+
+        var ownerEntityId = GameSkillPassivityMgr.Instance.GetOwnerEntityId(_SkillPassivityId);
+        GameAttributeUtility.RemoveAddtionalValue(ownerEntityId, starData.addAttId, starData.addAttValue);
     }
 
     public override void OnEnable(int star)
     {
         var starData = GetStarUserData();
-        GameAttributeUtility.AddAddtionalValue(_OwnerEntityId, starData.addAttId, starData.addAttValue);
+        var ownerEntityId = GameSkillPassivityMgr.Instance.GetOwnerEntityId(_SkillPassivityId);
+        GameAttributeUtility.AddAddtionalValue(ownerEntityId, starData.addAttId, starData.addAttValue);
     }
 
     public override void OnUpstar(int lastStar, int curStar)

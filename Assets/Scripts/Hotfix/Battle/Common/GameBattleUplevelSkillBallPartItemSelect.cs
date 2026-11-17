@@ -30,7 +30,7 @@ public class GameBattleUplevelSkillBallPartItemSelect : IBattleEnergyUplevelItem
 
     public int GetTestValue()
     {
-        return _SkillBallPartPool.FindAll(id=>!_IgnoreHistory.Contains(id)).Count;
+        return _SkillBallPartPool.FindAll(id=>!_IgnoreHistory.Contains(id)).Count * 2;
     }
 
     public bool IsValid()

@@ -23,12 +23,12 @@ public static class UIHallMainUtility
     }
     private static readonly Dictionary<EnUIHallMainMenuItemId, ItemData> _ItemDatas = new()
     {
-        {EnUIHallMainMenuItemId.Battle, new(true, false, EnLoadTarget.Sp_zhujiemian_zhsndou1, 20011, EnLoadTarget.Pre_UIHallMainBattleWindow) },
-        {EnUIHallMainMenuItemId.Shop, new(true, false, EnLoadTarget.Sp_zhujiemian_shangdian1, 20021, EnLoadTarget.Pre_UIHallMainShopWindow) },
-        {EnUIHallMainMenuItemId.Inlay, new(true, false, EnLoadTarget.Sp_zhujiemian_tianfu1, 20071, EnLoadTarget.Pre_UIHallMainInlayWindow) },
-        {EnUIHallMainMenuItemId.Core, new(true, false, EnLoadTarget.Sp_zhujiemian_zhuangbei1, 20041, EnLoadTarget.Pre_UIHallMainCoreWindow) },
-        {EnUIHallMainMenuItemId.Character, new(true, false, EnLoadTarget.Sp_zhujiemian_kuaijiefangshi, 20051, EnLoadTarget.Pre_UIHallMainCharacterWindow) },
-        {EnUIHallMainMenuItemId.Item2, new(true, false, EnLoadTarget.Sp_zhujiemian_kuaijiefangshi, 20061, EnLoadTarget.Pre_UIHallMainDebugWindow) },
+        {EnUIHallMainMenuItemId.Battle, new(true, false, EnLoadTarget.Sp_img_uihallmainwindow_zhandou, 20011, EnLoadTarget.Pre_UIHallMainBattleWindow) },
+        {EnUIHallMainMenuItemId.Shop, new(true, false, EnLoadTarget.Sp_img_uihallmainwindow_shangdian, 20021, EnLoadTarget.Pre_UIHallMainShopWindow) },
+        {EnUIHallMainMenuItemId.Inlay, new(true, false, EnLoadTarget.Sp_img_uihallmainwindow_baoshi, 20071, EnLoadTarget.Pre_UIHallMainInlayWindow) },
+        {EnUIHallMainMenuItemId.Core, new(true, false, EnLoadTarget.Sp_img_uihallmainwindow_xinpian, 20041, EnLoadTarget.Pre_UIHallMainCoreWindow) },
+        {EnUIHallMainMenuItemId.Character, new(true, false, EnLoadTarget.Sp_img_uihallmainwindow_juese, 20051, EnLoadTarget.Pre_UIHallMainCharacterWindow) },
+        {EnUIHallMainMenuItemId.Item2, new(true, true, EnLoadTarget.Sp_img_uihallmainwindow_null, 20061, EnLoadTarget.Pre_UIHallMainDebugWindow) },
     };
 
     public static List<EnUIHallMainMenuItemId> GetMenuItemList()

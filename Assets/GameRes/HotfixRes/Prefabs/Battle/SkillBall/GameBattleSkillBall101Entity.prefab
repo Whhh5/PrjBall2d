@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7945307115986367409, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
       propertyPath: m_Name
-      value: BattleSkillBall_101
+      value: GameBattleSkillBall101Entity
       objectReference: {fileID: 0}
     - target: {fileID: 8690534774187835321, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -67,6 +67,42 @@ PrefabInstance:
     - target: {fileID: 8690534774187835321, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.b
+      value: 0.4528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.g
+      value: 0.4528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.r
+      value: 0.4528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.b
+      value: 0.4528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.g
+      value: 0.4528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.colorGradient.key1.r
+      value: 0.4528302
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[1].inSlope
+      value: -0.08462677
+      objectReference: {fileID: 0}
+    - target: {fileID: 9014379034146245619, guid: f30a471aa16b34c95bce2fcbee040eb4, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].outSlope
+      value: -0.08462677
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

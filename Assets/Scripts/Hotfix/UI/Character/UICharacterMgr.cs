@@ -16,20 +16,6 @@ public class UICharacterMgr : Singleton<UICharacterMgr>
     {
         await base.AwakeAsync();
 
-        var data = PersistentMgr.Instance.GetData<PersistentCharacterData>(EnPersistentId.Character);
-        var activeCharaId = data.GetActiveCharacterId();
-        if (activeCharaId <= 0)
-        {
-            var defCharaId = UICharacterUtility.GetDefaultCharacterId();
-            var isLock = data.IsLock(defCharaId);
-            if (isLock)
-            {
-                data.SetIsLock(defCharaId, false);
-                RefreshAptitude(defCharaId, false);
-            }
-            data.SetActiveCharacterId(defCharaId);
-        }
-
         EventMgr.Instance.Register<GameBattlePlayerCreateEventData>(EnABBEvent.EVENT_BATTLE_PLAYER_CREATE, 0, 0, OnEvent_PlayerCreate);
     }
     private void OnEvent_PlayerCreate(in int entityId, in int _, in GameBattlePlayerCreateEventData data)

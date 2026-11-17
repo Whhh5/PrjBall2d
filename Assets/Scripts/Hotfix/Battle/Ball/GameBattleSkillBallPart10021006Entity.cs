@@ -81,6 +81,8 @@ public class GameBattleSkillBallPart10021006EntityData : GameBattleSkillBallPart
         {
             atkData.atkTime = GameUtility.GetGameTime();
         }
+
+        GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_1006_1, WorldPos, 2);
     }
 }
 

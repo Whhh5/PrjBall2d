@@ -61,6 +61,7 @@ public class GameBattleSkillBallPart10091010EntityData : GameBattleSkillBallPart
             }
         }
 
+        GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_1009_1, WorldPos, 2);
     }
     
     public override void GameBallOnCollision(in int ballEntityId, in GamePhysicsHit hit)

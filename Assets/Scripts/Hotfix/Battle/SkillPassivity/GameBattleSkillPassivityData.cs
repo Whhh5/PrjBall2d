@@ -84,11 +84,9 @@ public abstract class GameBattleSkillPassivityData<T> : GameBattleSkillPassivity
 public class GameBattleSkillPassivityUserData : IClassPoolDestroy
 {
     public int skillPassivityId;
-    public int ownerEntityId;
     public void OnPoolDestroy()
     {
         skillPassivityId
-            = ownerEntityId
             = -1;
     }
 }
@@ -96,18 +94,15 @@ public class GameBattleSkillPassivityUserData : IClassPoolDestroy
 public abstract class GameBattleSkillPassivityData : IClassPoolInit<GameBattleSkillPassivityUserData>
 {
     protected int _SkillPassivityId;
-    protected int _OwnerEntityId;
     public virtual void OnPoolDestroy()
     {
         _SkillPassivityId
-            = _OwnerEntityId
             = -1;
     }
 
     public void OnPoolInit(GameBattleSkillPassivityUserData userData)
     {
         _SkillPassivityId = userData.skillPassivityId;
-        _OwnerEntityId = userData.ownerEntityId;
     }
 
     public abstract GameBattleSkillPassivityStarData GetStarData(int star);

@@ -46,8 +46,4 @@ public class UIGoodsItemCountLeftTip : UIWindowItem
         var str = count < 0 ? LanguageUtility.GetLanguage_10035() : $"{count}";
         _UpLevelNeedGoodsCountTxt.SetText(str);
     }
-    public void SetValid(bool isValid)
-    {
-        _UpLevelNeedGoodsCountTxt.color = isValid ? _DefColor : Color.red;
-    }
 }

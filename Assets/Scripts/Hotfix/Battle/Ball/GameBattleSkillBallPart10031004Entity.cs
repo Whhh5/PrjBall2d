@@ -89,6 +89,7 @@ public class GameBattleSkillBallPart10031004EntityData : GameBattleSkillBallPart
                         AudioMgr.Instance.Play(EnAudioId.Burn);
                     }
                 }
+                GameEffectMgr.Instance.PlayEffectOnce(EnGameEffectId.Eff_ball_part_1003_1, WorldPos, 2);
             }
         }
         foreach (var index in _Keys)

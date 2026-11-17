@@ -23,6 +23,7 @@ public class UIBattleEntityAttributeTipsData : UITipsData<UIBattleEntityAttribut
 
     public override void OnPoolDestroy()
     {
+        TimeMgr.Instance.SetPause(false, false);
         base.OnPoolDestroy();
         _TargetEntityId = -1;
         _Title = null;
@@ -31,6 +32,7 @@ public class UIBattleEntityAttributeTipsData : UITipsData<UIBattleEntityAttribut
     {
         _Title = userData.title;
         _TargetEntityId = userData.targetEntityId;
+        TimeMgr.Instance.SetPause(true, true);
     }
 
     public override void OnGOCreate(GameEntity entity)
@@ -43,17 +45,20 @@ public class UIBattleEntityAttributeTipsData : UITipsData<UIBattleEntityAttribut
 
 public class UIBattleEntityAttributeTips : UITips
 {
-    [SerializeField]
+    [SerializeField, AutoReference]
     private TextMeshProUGUI _NameTxt = null;
-    [SerializeField]
+    [SerializeField, AutoReference]
     private RectTransform _AttributeRootRect = null;
+    [SerializeField, AutoReference]
+    private Image _IconImg = null;
 
     private int _TargetEntityId;
     private readonly Dictionary<EnEntityAttributeId, UIBattleEntityAttributeTips_AttributeItem> _AttributeItems = new();
 
     public override void OnUnload()
     {
-        if(_TargetEntityId > 0)
+        _IconImg.UnloadSprite();
+        if (_TargetEntityId > 0)
             EventMgr.Instance.Unregister<GameBattleEntityAttributeChangeEventData>(EnABBEvent.EVENT_BATTLE_ENTITY_ATTRIBUTE_CHANGE, _TargetEntityId, 0, OnEvent_AttributeChange);
 
         foreach (var (_, attItem) in _AttributeItems)
@@ -74,6 +79,10 @@ public class UIBattleEntityAttributeTips : UITips
     {
         _TargetEntityId = entityId;
         _NameTxt.SetText(title);
+        var infoData = EntityMgr.Instance.GetEntityData<IGameEntityInfo>(entityId);
+        var iconAssetId = infoData.GetIconAssetId();
+        _IconImg.LoadSprirte(iconAssetId);
+
         var attCom = SceneEntityMgr.Instance.GetEntityCom<SceneEntityAttributeComData>(entityId, EnSceneEntityComType.Attribute);
         for (var i = EnEntityAttributeId.None + 1; i < EnEntityAttributeId.EnumCount; i++)
         {

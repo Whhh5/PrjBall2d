@@ -13,6 +13,7 @@ public class UIGoodsMgr : Singleton<UIGoodsMgr>
     {
         { EnGoodsTypeId.Currenty, new GoodsTypeCurrentyAnalysist()},
         { EnGoodsTypeId.Consumables, new GoodsTypeConsumablesAnalysist()},
+        { EnGoodsTypeId.Const, new GoodsTypeCurrentyAnalysist()},
         { EnGoodsTypeId.Core, new GoodsTypeCoreAnalysist()},
         { EnGoodsTypeId.Gem, new GoodsTypeGemAnalysist()},
     };
@@ -20,15 +21,18 @@ public class UIGoodsMgr : Singleton<UIGoodsMgr>
     {
         return _GoodsTypeAnalysists[typeId];
     }
-    public List<int> AddGoods(List<GoodsInfo> goodsInfos)
+    public void AddGoods(ref List<GoodsInfo> goodsInfos)
     {
-        var ids = new List<int>(goodsInfos.Count);
-        foreach (var item in goodsInfos)
+        for (int i = 0; i < goodsInfos.Count; i++)
         {
-            var goodsId = AddGoods(item.goodsCfgId, item.goodsCount);
-            ids.Add(goodsId);
+            var item = goodsInfos[i];
+            item.goodsId = AddGoods(item.goodsCfgId, item.goodsCount);
+            goodsInfos[i] = item;
         }
-        return ids;
+    }
+    public int AddGoods(EnGoodsId goodsCfgId, int count)
+    {
+        return AddGoods((int)goodsCfgId, count);
     }
     public int AddGoods(int goodsCfgId, int count)
     {

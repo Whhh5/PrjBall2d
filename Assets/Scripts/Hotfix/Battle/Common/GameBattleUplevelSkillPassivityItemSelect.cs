@@ -24,11 +24,12 @@ public class GameBattleUplevelSkillPassivityItemSelect : IBattleEnergyUplevelIte
     {
         var curSkillPassivityIds = GameSkillPassivityMgr.Instance.GetSkillPassivityIds();
         var newSkillPassivityPool = _SkillPassivityPool.FindAll(testBallId => !_IgnoreHistory.Contains(testBallId));
-        if (curSkillPassivityIds.Count >= GameGlobal.SkillPassivityCount)
+        var maxBallCount = GlobalCfgUtility.Get40002_Int32();
+        if (curSkillPassivityIds.Count >= maxBallCount)
         {
             newSkillPassivityPool = newSkillPassivityPool.FindAll(testBallId => curSkillPassivityIds.Contains(testBallId));
         }
-        return Mathf.Min(GameGlobal.SkillPassivityCount, newSkillPassivityPool.Count);
+        return Mathf.Min(maxBallCount, newSkillPassivityPool.Count);
     }
 
     public void Reset()
@@ -56,7 +57,8 @@ public class GameBattleUplevelSkillPassivityItemSelect : IBattleEnergyUplevelIte
     }
     public bool IsValid()
     {
-        return _MaxCount < GameGlobal.SkillPassivityCount && _IgnoreHistory.Count < _SkillPassivityPool.Count;
+        var maxBallCount = GlobalCfgUtility.Get40002_Int32();
+        return _MaxCount < maxBallCount && _IgnoreHistory.Count < _SkillPassivityPool.Count;
     }
 
     public bool TrySelect(out IUIBattleUplevelWindow_ItemUserData userData, bool isIgnoreHistory, HashSet<int> extraIgnoree)
@@ -69,7 +71,8 @@ public class GameBattleUplevelSkillPassivityItemSelect : IBattleEnergyUplevelIte
             ? newSkillPassivityPool.FindAll(skillPassivityId => !_IgnoreHistory.Contains(skillPassivityId))
             : newSkillPassivityPool;
         var curSkillPassivityIds = GameSkillPassivityMgr.Instance.GetSkillPassivityIds();
-        if (curSkillPassivityIds.Count >= GameGlobal.SkillPassivityCount)
+        var maxBallCount = GlobalCfgUtility.Get40002_Int32();
+        if (curSkillPassivityIds.Count >= maxBallCount)
         {
             newSkillPassivityPool = newSkillPassivityPool.FindAll(testSkillPassivityId => curSkillPassivityIds.Contains(testSkillPassivityId));
         }

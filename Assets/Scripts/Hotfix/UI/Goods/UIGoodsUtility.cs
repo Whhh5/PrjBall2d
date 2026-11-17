@@ -25,6 +25,10 @@ public static class UIGoodsUtility
         item.SetAutoSize();
         return item as T;
     }
+    public static UniTask<UIGoodsItemIconBase> CreateGoodsItemIcon(EnGoodsId goodsCfgId, RectTransform parent, CancellationToken token)
+    {
+        return CreateGoodsItemIcon((int)goodsCfgId, parent, token);
+    }
     public static async UniTask<UIGoodsItemIconBase> CreateGoodsItemIcon(int goodsCfgId, RectTransform parent, CancellationToken token)
     {
         var goodsCfg = GameSchedule.Instance.GetGoodsCfg0(goodsCfgId);
@@ -34,6 +38,30 @@ public static class UIGoodsUtility
         if (isCancel)
             throw new System.OperationCanceledException();
         item.SetAutoSize();
+        return item;
+    }
+    public static async UniTask<T> CreateGoodsItem<T>(int goodsCfgId, RectTransform parent, CancellationToken token)
+        where T: UIGoodsItemBase
+    {
+        var goodsCfg = GameSchedule.Instance.GetGoodsCfg0(goodsCfgId);
+        var goodsTypeCfg = GameSchedule.Instance.GetGoodsTypeCfg0(goodsCfg.nGoodsTypeId);
+
+        var (isCancel2, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemBase>((EnLoadTarget)goodsTypeCfg.nItemFrameAssetId, parent, token)
+            .SuppressCancellationThrow();
+        if (isCancel2)
+            throw new System.OperationCanceledException();
+        return item as T;
+    }
+    public static async UniTask<UIGoodsItemBase> CreateGoodsItem(GoodsInfo goodsInfo, RectTransform parent, CancellationToken token, EnSourceId sourceId)
+    {
+        var goodsCfg = GameSchedule.Instance.GetGoodsCfg0(goodsInfo.goodsCfgId);
+        var goodsTypeCfg = GameSchedule.Instance.GetGoodsTypeCfg0(goodsCfg.nGoodsTypeId);
+
+        var (isCancel2, item) = await UIMgr.Instance.LoadWindowItemAsync<UIGoodsItemBase>((EnLoadTarget)goodsTypeCfg.nItemFrameAssetId, parent, token)
+            .SuppressCancellationThrow();
+        if (isCancel2)
+            throw new System.OperationCanceledException();
+        item.Setting(goodsInfo, sourceId);
         return item;
     }
     public static async UniTask<T> CreateGoodsItemIcon<T>(int goodsCfgId, RectTransform parent, CancellationToken token)

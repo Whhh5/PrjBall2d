@@ -31,6 +31,8 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
     private Button _Btn;
     [SerializeField, AutoReference]
     private Image _IconImg;
+    [SerializeField, AutoReference(nameof(_IconImg))]
+    private Button _IconBtn;
     [SerializeField, AutoReference]
     private TextMeshProUGUI _NameTxt;
     [SerializeField, AutoReference]
@@ -41,7 +43,6 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
     private Action _Callback;
 
     private List<DescriptionInfo> _DescInfos = new();
-    private RectTransform _Rect;
     private int _SkillPassivityId;
     private int _Star;
     public override void Unload()
@@ -52,6 +53,7 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
         }
         _IconImg.UnloadSprite();
         _Btn.RemoveListener(OnClick_Btn);
+        _IconBtn.RemoveListener(OnClick_IconBtn);
         for (int i = 0; i < _StarList.Count; i++)
         {
             GameObject.Destroy(_StarList[i]);
@@ -59,16 +61,15 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
         base.Unload();
         _StarList.Clear();
         _DescInfos.Clear();
-        _Rect = null;
         _SkillPassivityId
             = _Star
             = -1;
     }
     public override void LoadCompletion()
     {
-        _Rect = GetComponent<RectTransform>();
         base.LoadCompletion();
         _Btn.AddListener(OnClick_Btn);
+        _IconBtn.AddListener(OnClick_IconBtn);
         _StarGo.SetActive(false);
 
     }
@@ -94,7 +95,7 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
             var info = level1DescInfoList[i];
             var content = string.IsNullOrWhiteSpace(info.title)
                 ? $"{info.content}"
-                : $"{info.title}:{info.content}";
+                : $"{info.content}"; // $"{info.title}:{info.content}";
             if (i < level1DescInfoList.Count - 1)
                 strBuilder.AppendLine(content);
             else
@@ -114,6 +115,14 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
     {
         _Callback?.Invoke();
     }
+    private void OnClick_IconBtn()
+    {
+        var ud = ClassPoolMgr.Instance.Pull<UIBattleSkillPassivityInfoTipsUserData>();
+        ud.skillPassivityId = _SkillPassivityId;
+        ud.star = _Star;
+        UIMgr.Instance.ShowWindow<UIBattleSkillPassivityInfoTipsData>(ud);
+        ClassPoolMgr.Instance.Push(ud);
+    }
 
     public List<DescriptionInfo> GetDescriptionList(EnDescriptionLevel startLevel, EnDescriptionLevel endLevel)
     {
@@ -127,11 +136,6 @@ public class UIBattleUplevelWindow_SkillPassivityItem : UIWindowItem, IUIBattleU
         var addStar = _Star - curStar;
         GameSkillPassivityMgr.Instance.AddSkillPassivity(_SkillPassivityId, addStar);
     }
-    public Vector3 GetWorldPos()
-    {
-        return _Rect.position;
-    }
-
     public float GetSizeDeltaY()
     {
         return _Rect.rect.height;

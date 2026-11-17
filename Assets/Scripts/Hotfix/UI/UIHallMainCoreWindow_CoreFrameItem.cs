@@ -5,34 +5,34 @@ using UnityEngine.UI;
 
 public class UIHallMainCoreWindow_CoreFrameItem : UIWindowItem
 {
-    [SerializeField, AutoReference(SearchScope.Self)]
-    private RectTransform _Rect;
     [SerializeField, AutoReference]
     private Image _FrameIconImg;
 
+    private EnCoreType _CoreType;
     public override void Unload()
     {
+        _FrameIconImg.UnloadSprite();
         base.Unload();
+        _CoreType = EnCoreType.None;
     }
     public override void LoadCompletion()
     {
         base.LoadCompletion();
     }
 
-    public void Init(EnCoreType type)
+    public void Setting(EnCoreType type)
     {
-        var cfg = GameSchedule.Instance.GetCoreTypeCfg0((int)type);
-        if (ColorUtility.TryParseHtmlString(cfg.strColor, out var col))
-        {
-            _FrameIconImg.color = col;
-        }
+        _CoreType = type;
+        SetStatus(false);
     }
     public void SetLocalPos(in Vector2 localPos)
     {
         _Rect.anchoredPosition = localPos;
     }
-    public Vector3 GetWorldPos()
+    public void SetStatus(bool status)
     {
-        return _Rect.position;
+        var cfg = GameSchedule.Instance.GetCoreTypeCfg0((int)_CoreType);
+        var assetId = status ? cfg.nActiveGrooveAssetId : cfg.nGrooveAssetId;
+        _FrameIconImg.LoadSprirte(assetId);
     }
 }

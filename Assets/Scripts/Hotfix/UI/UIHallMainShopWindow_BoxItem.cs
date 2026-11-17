@@ -104,10 +104,10 @@ public class UIHallMainShopWindow_BoxItem : UIWindowItem
         var lottery1GoodsCount = UIGoodsMgr.Instance.GetGoodsCount(_Lottery1GoodsInfo.goodsCfgId);
         var isLottery1Btn = lottery1GoodsCount >= _Lottery1GoodsInfo.goodsCount;
         _Lottery1Btn.interactable = isLottery1Btn;
-        _NeedGoodsInfoItems[0].SetValid(isLottery1Btn);
+        _NeedGoodsInfoItems[0].SetComValid(isLottery1Btn);
         var lottery10GoodsCount = UIGoodsMgr.Instance.GetGoodsCount(_Lottery10GoodsInfo.goodsCfgId);
         var isLottery10Btn = lottery10GoodsCount >= _Lottery10GoodsInfo.goodsCount;
         _Lottery10Btn.interactable = isLottery10Btn;
-        _NeedGoodsInfoItems[1].SetValid(isLottery10Btn);
+        _NeedGoodsInfoItems[1].SetComValid(isLottery10Btn);
     }
 }
