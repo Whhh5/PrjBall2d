@@ -16,11 +16,10 @@
       }
     },
     "com.qq.weixin.minigame": {
-      "version": "https://github.com/wechat-miniprogram/minigame-tuanjie-transform-sdk.git",
+      "version": "file:com.qq.weixin.minigame@d288776c50",
       "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "d288776c50578926c732496882bd6ab6684c778c"
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.2d.animation": {
       "version": "9.2.0",
