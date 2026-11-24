@@ -1,1 +1,1 @@
-﻿[{"nCharacterID":1,"nMonsterID":1}]
+﻿[{"nCharacterID":1,"nMonsterId":101,"nUIClassTypeId":5002,"fBallSpeed":10.0,"fBallFireInterval":0.2,"nMaxLevel":60,"nBaseAttributeValueId":1010001,"fLevelCoefficient":0.3,"arrUnlockGoods":null},{"nCharacterID":2,"nMonsterId":102,"nUIClassTypeId":5004,"fBallSpeed":10.0,"fBallFireInterval":0.2,"nMaxLevel":80,"nBaseAttributeValueId":1020001,"fLevelCoefficient":0.5,"arrUnlockGoods":[10000002,100]}]
